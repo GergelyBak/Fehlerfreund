@@ -1,0 +1,38 @@
+# Fehlerfreund
+
+A German conversation partner that teaches from your own mistakes.
+
+Chat in a real-life situation (Bürgeramt, doctor, flat viewing…) at your CEFR level. Claude plays the other side and corrects each message with a structured explanation in your native language. Your mistakes become flashcards, and an SM-2 spaced-repetition scheduler brings them back for review.
+
+> Work in progress. Done so far: auth and project skeleton, Claude client, correction schema.
+
+## Stack
+
+- **Client:** React 19, TypeScript, Tailwind CSS 4, Vite, React Router
+- **Server:** Node.js, Express 5, TypeScript, MongoDB Atlas (Mongoose), Zod
+- **AI:** Claude API: `claude-sonnet-5` for the streamed roleplay, `claude-haiku-4-5` for structured corrections
+- **Tests:** Vitest
+
+## Engineering notes
+
+- **Two calls per message.** The roleplay reply streams as plain text, while the correction is a separate structured-output call validated with Zod. When the output fails validation, the chat keeps going without that correction.
+- **Closed error taxonomy** (`Kasus`, `Artikel`, `Wortstellung`…) so the mistakes can be aggregated into statistics.
+- **Versioned prompts** in `server/prompts/*.vN.md`. The version is stored with each correction.
+- **Production concerns:** the API key stays server-side only. Auth uses a JWT in an httpOnly cookie. There are per-user rate limits and a daily token budget.
+
+## Running locally
+
+```bash
+# server
+cd server
+cp .env.example .env   # fill in MONGODB_URI and ANTHROPIC_API_KEY
+npm install
+npm run dev            # http://localhost:4000
+
+# client
+cd client
+npm install
+npm run dev            # http://localhost:5173 (proxies /api to the server)
+```
+
+Run the tests with `cd server && npm test`.
