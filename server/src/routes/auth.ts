@@ -1,12 +1,15 @@
+import { createHash, randomBytes } from "node:crypto";
 import { Router } from "express";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { env } from "../config/env.js";
 import { User, LEVELS, NATIVE_LANGUAGES, type UserDoc } from "../models/User.js";
 import { validateBody } from "../middleware/validate.js";
 import { requireAuth } from "../middleware/requireAuth.js";
-import { authLimiter } from "../middleware/rateLimit.js";
+import { authLimiter, resetLimiter } from "../middleware/rateLimit.js";
 import { AUTH_COOKIE, authCookieOptions, signToken } from "../lib/jwt.js";
 import { HttpError } from "../lib/HttpError.js";
+import { passwordResetMail, sendMail } from "../lib/mailer.js";
 
 const router = Router();
 
@@ -76,6 +79,53 @@ router.get("/me", requireAuth, async (req, res) => {
 router.patch("/me", requireAuth, validateBody(UpdateMeSchema), async (req, res) => {
   const user = await User.findByIdAndUpdate(req.userId, req.body, { new: true, runValidators: true });
   if (!user) throw new HttpError(401, "User no longer exists");
+  res.json({ user: toPublic(user) });
+});
+
+const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
+const hashToken = (token: string) => createHash("sha256").update(token).digest("hex");
+
+const ForgotSchema = z.object({ email: z.email().toLowerCase() });
+
+router.post("/forgot-password", resetLimiter, validateBody(ForgotSchema), async (req, res) => {
+  const { email } = req.body as z.infer<typeof ForgotSchema>;
+  const user = await User.findOne({ email });
+  if (user) {
+    const token = randomBytes(32).toString("hex");
+    user.passwordResetTokenHash = hashToken(token);
+    user.passwordResetExpires = new Date(Date.now() + RESET_TOKEN_TTL_MS);
+    await user.save();
+    const link = `${env.CLIENT_ORIGIN}/reset-password?token=${token}`;
+    // Not awaited: the response time must not reveal whether the account
+    // exists, and a slow mail server shouldn't hold up the request.
+    sendMail(passwordResetMail(user.email, user.displayName, link)).catch((err) =>
+      console.error("Sending password reset email failed:", err),
+    );
+  }
+  // Same answer either way, so this endpoint can't be used to probe for accounts.
+  res.json({ ok: true });
+});
+
+const ResetSchema = z.object({
+  token: z.string().regex(/^[a-f0-9]{64}$/, "Invalid token"),
+  password: z.string().min(8, "At least 8 characters"),
+});
+
+router.post("/reset-password", authLimiter, validateBody(ResetSchema), async (req, res) => {
+  const { token, password } = req.body as z.infer<typeof ResetSchema>;
+  const user = await User.findOne({
+    passwordResetTokenHash: hashToken(token),
+    passwordResetExpires: { $gt: new Date() },
+  });
+  if (!user) throw new HttpError(400, "Reset link is invalid or has expired");
+
+  user.passwordHash = await bcrypt.hash(password, 12);
+  // Single use: the same link can't reset the password twice.
+  user.passwordResetTokenHash = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+
+  res.cookie(AUTH_COOKIE, signToken(user.id), authCookieOptions);
   res.json({ user: toPublic(user) });
 });
 

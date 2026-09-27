@@ -10,6 +10,10 @@ const userSchema = new Schema(
     displayName: { type: String, required: true, trim: true },
     nativeLanguage: { type: String, enum: NATIVE_LANGUAGES, default: "hu" },
     level: { type: String, enum: LEVELS, default: "A2" },
+    // Only a SHA-256 hash of the reset token is stored, so a leaked database
+    // can't be used to reset passwords.
+    passwordResetTokenHash: { type: String, select: false },
+    passwordResetExpires: { type: Date, select: false },
   },
   { timestamps: true },
 );

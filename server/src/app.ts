@@ -4,6 +4,7 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import { env } from "./config/env.js";
 import authRoutes from "./routes/auth.js";
+import conversationRoutes from "./routes/conversations.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { HttpError } from "./lib/HttpError.js";
 
@@ -20,6 +21,7 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/conversations", conversationRoutes);
 
 app.use(() => {
   throw new HttpError(404, "Not found");

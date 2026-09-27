@@ -4,7 +4,7 @@ A German conversation partner that teaches from your own mistakes.
 
 Chat in a real-life situation (Bürgeramt, doctor, flat viewing…) at your CEFR level. Claude plays the other side and corrects each message with a structured explanation in your native language. Your mistakes become flashcards, and an SM-2 spaced-repetition scheduler brings them back for review.
 
-> Work in progress. Done so far: auth and project skeleton, Claude client, correction schema.
+> Work in progress. Done so far: auth (with password reset), 4 situations, streamed (SSE) roleplay chat with parallel corrections, conversation history. Next: flashcards from mistakes + SM-2.
 
 ## Stack
 

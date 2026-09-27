@@ -9,6 +9,15 @@ export const authLimiter = rateLimit({
   message: { error: "Too many attempts, try again later" },
 });
 
+// Stricter limit for requesting reset emails, so it can't be used to spam someone's inbox.
+export const resetLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { error: "Too many attempts, try again later" },
+});
+
 // Per-user limit for Claude-backed endpoints (mount after requireAuth).
 export const aiLimiter = rateLimit({
   windowMs: 60 * 1000,

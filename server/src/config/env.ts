@@ -1,6 +1,9 @@
 import "dotenv/config";
 import { z } from "zod";
 
+// Treats an empty `KEY=` line in .env as not set.
+const optionalString = z.preprocess((v) => (v === "" ? undefined : v), z.string().optional());
+
 const EnvSchema = z
   .object({
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
@@ -8,15 +11,25 @@ const EnvSchema = z
     MONGODB_URI: z.string().startsWith("mongodb"),
     // mock = free canned responses for development; live = real Claude calls.
     LLM_MODE: z.enum(["mock", "live"]).default("mock"),
-    // An empty `ANTHROPIC_API_KEY=` line counts as not set.
-    ANTHROPIC_API_KEY: z.preprocess((v) => (v === "" ? undefined : v), z.string().optional()),
+    ANTHROPIC_API_KEY: optionalString,
     JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters"),
     CLIENT_ORIGIN: z.url().default("http://localhost:5173"),
     DAILY_TOKEN_BUDGET: z.coerce.number().int().positive().default(200_000),
+    // console = print emails (e.g. password reset links) to the server log; smtp = really send them.
+    EMAIL_MODE: z.enum(["console", "smtp"]).default("console"),
+    SMTP_HOST: optionalString,
+    SMTP_PORT: z.coerce.number().int().positive().default(465),
+    SMTP_USER: optionalString,
+    SMTP_PASS: optionalString,
+    MAIL_FROM: optionalString,
   })
   .refine((e) => e.LLM_MODE === "mock" || e.ANTHROPIC_API_KEY, {
     message: "ANTHROPIC_API_KEY is required when LLM_MODE=live",
     path: ["ANTHROPIC_API_KEY"],
+  })
+  .refine((e) => e.EMAIL_MODE === "console" || (e.SMTP_HOST && e.SMTP_USER && e.SMTP_PASS), {
+    message: "SMTP_HOST, SMTP_USER and SMTP_PASS are required when EMAIL_MODE=smtp",
+    path: ["SMTP_HOST"],
   });
 
 const parsed = EnvSchema.safeParse(process.env);
