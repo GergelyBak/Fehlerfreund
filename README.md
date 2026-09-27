@@ -10,7 +10,7 @@ Chat in a real-life situation (Bürgeramt, doctor, flat viewing…) at your CEFR
 
 - **Client:** React 19, TypeScript, Tailwind CSS 4, Vite, React Router
 - **Server:** Node.js, Express 5, TypeScript, MongoDB Atlas (Mongoose), Zod
-- **AI:** Claude API: `claude-sonnet-5` for the streamed roleplay, `claude-haiku-4-5` for structured corrections
+- **AI:** Claude API, `claude-sonnet-5` for both the streamed roleplay and the structured corrections (Haiku 4.5 was tested for corrections, but it missed errors and gave wrong explanations)
 - **Tests:** Vitest
 
 ## Engineering notes
@@ -18,6 +18,7 @@ Chat in a real-life situation (Bürgeramt, doctor, flat viewing…) at your CEFR
 - **Two calls per message.** The roleplay reply streams as plain text, while the correction is a separate structured-output call validated with Zod. When the output fails validation, the chat keeps going without that correction.
 - **Closed error taxonomy** (`Kasus`, `Artikel`, `Wortstellung`…) so the mistakes can be aggregated into statistics.
 - **Versioned prompts** in `server/prompts/*.vN.md`. The version is stored with each correction.
+- **Mock mode for free development.** With `LLM_MODE=mock` (the default), a provider with the same interface returns canned replies and rule-based corrections, so UI work and tests cost nothing and give the same result on every run. Switch to `LLM_MODE=live` for real Claude calls.
 - **Production concerns:** the API key stays server-side only. Auth uses a JWT in an httpOnly cookie. There are per-user rate limits and a daily token budget.
 
 ## Running locally
@@ -25,7 +26,7 @@ Chat in a real-life situation (Bürgeramt, doctor, flat viewing…) at your CEFR
 ```bash
 # server
 cd server
-cp .env.example .env   # fill in MONGODB_URI and ANTHROPIC_API_KEY
+cp .env.example .env   # fill in MONGODB_URI; ANTHROPIC_API_KEY is only needed for LLM_MODE=live
 npm install
 npm run dev            # http://localhost:4000
 

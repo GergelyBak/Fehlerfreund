@@ -7,6 +7,8 @@ export const anthropic = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
 export const MODELS = {
   // Streams the roleplay partner's replies.
   roleplay: "claude-sonnet-5",
-  // Produces the structured correction JSON; cheaper and fast enough.
-  correction: "claude-haiku-4-5",
+  // Produces the structured correction JSON. Haiku 4.5 was tried first, but it
+  // missed errors (habe/bin + fahren) and gave wrong explanations, and those
+  // would become flashcards.
+  correction: "claude-sonnet-5",
 } as const;

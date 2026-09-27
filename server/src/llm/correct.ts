@@ -1,22 +1,14 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { anthropic, MODELS } from "./client.js";
-import { CorrectionSchema, type Correction } from "./correctionSchema.js";
+import { CorrectionSchema } from "./correctionSchema.js";
 import { loadPrompt } from "./prompts.js";
 import { recordUsage } from "./usage.js";
+import type { CorrectParams, CorrectionResult } from "./types.js";
 
 const LANGUAGE_NAMES: Record<string, string> = { hu: "Hungarian", en: "English", tr: "Turkish" };
 
-export type CorrectionResult =
-  | { ok: true; correction: Correction; promptVersion: string; model: string }
-  | { ok: false; reason: string; promptVersion: string; model: string };
-
-export async function correctMessage(opts: {
-  userId: string;
-  text: string;
-  level: string;
-  nativeLanguage: string;
-}): Promise<CorrectionResult> {
+export async function correctMessage(opts: CorrectParams): Promise<CorrectionResult> {
   const { text: system, version: promptVersion } = await loadPrompt("correction", {
     level: opts.level,
     nativeLanguage: LANGUAGE_NAMES[opts.nativeLanguage] ?? "English",
@@ -27,10 +19,13 @@ export async function correctMessage(opts: {
   try {
     response = await anthropic.messages.parse({
       model,
-      max_tokens: 2048,
+      // Sonnet 5 thinks adaptively by default; thinking counts toward max_tokens.
+      max_tokens: 8000,
       system,
       messages: [{ role: "user", content: opts.text }],
-      output_config: { format: zodOutputFormat(CorrectionSchema) },
+      // Low effort found the same errors as medium in testing, at about half
+      // the tokens and latency.
+      output_config: { effort: "low", format: zodOutputFormat(CorrectionSchema) },
     });
   } catch (err) {
     // The SDK throws a plain AnthropicError when the JSON fails to parse or
