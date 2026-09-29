@@ -3,6 +3,16 @@ import { env } from "./config/env.js";
 import { connectDb } from "./config/db.js";
 import { llm } from "./llm/index.js";
 
+// Make crashes loud: without these, a stray async error can take the server
+// down mid-request and the only visible trace is the client's ECONNRESET.
+process.on("unhandledRejection", (reason) => {
+  console.error("💥 Unhandled promise rejection (server keeps running):", reason);
+});
+process.on("uncaughtException", (err) => {
+  console.error("💥 Uncaught exception, server is stopping:", err);
+  process.exit(1);
+});
+
 await connectDb();
 
 app.listen(env.PORT, () => {
