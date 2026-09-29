@@ -38,6 +38,8 @@ export interface LlmProvider {
   mode: "live" | "ollama" | "mock";
   // Whether correction and reply can run at the same time without slowing each other down.
   concurrent: boolean;
+  // Model that writes the partner's replies, for display (e.g. "gemma3:4b").
+  model: string;
   correct(params: CorrectParams): Promise<CorrectionResult>;
   // Yields text chunks as they arrive.
   streamRoleplay(params: RoleplayParams): AsyncGenerator<string, void>;

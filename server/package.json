@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "test": "vitest run",
-    "dev": "tsx watch src/index.ts",
+    "dev": "node --watch-path=./src --watch-path=./prompts --watch-path=./.env --import tsx src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit"

@@ -184,6 +184,7 @@ export async function checkOllama() {
 export const ollamaProvider: LlmProvider = {
   mode: "ollama",
   concurrent: false,
+  model: env.OLLAMA_MODEL,
   correct,
   streamRoleplay,
   translate,

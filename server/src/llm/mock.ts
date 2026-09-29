@@ -120,6 +120,7 @@ export function mockTranslate(text: string, targetLanguage: string) {
 export const mockProvider: LlmProvider = {
   mode: "mock",
   concurrent: true,
+  model: "mock",
   correct: async (params: CorrectParams) => {
     // Simulate a little latency so loading states are visible.
     await new Promise((r) => setTimeout(r, 300));

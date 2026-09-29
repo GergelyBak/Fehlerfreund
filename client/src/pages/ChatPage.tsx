@@ -5,6 +5,7 @@ import { errorMessage } from '../api/errors'
 import { postSse } from '../api/sse'
 import { AssistantMessage } from '../chat/AssistantMessage'
 import { CorrectionPanel } from '../chat/CorrectionPanel'
+import { ModeBadge } from '../chat/ModeBadge'
 import { SituationPanel } from '../chat/SituationPanel'
 import { useSituations } from '../chat/useSituations'
 import { notifyCardsChanged } from '../review/cardEvents'
@@ -186,7 +187,10 @@ export function ChatPage() {
             </span>
             <div>
               <h1 className="font-semibold">{situation?.title ?? 'Beszélgetés'}</h1>
-              <p className="text-sm text-slate-500">Szint: {conversation.level}</p>
+              <p className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
+                Szint: {conversation.level}
+                <ModeBadge />
+              </p>
             </div>
           </div>
           <Link to="/" className="text-sm text-slate-600 hover:text-slate-900">
