@@ -1,0 +1,118 @@
+import type { GrammarTopic } from "../types.js";
+
+export const praeteritum: GrammarTopic = {
+  id: "praeteritum",
+  level: "A2",
+  order: 2,
+  title: "Präteritum: war, hatte és a módbeli segédigék",
+  summary: "A sein, a haben és a módbeli segédigék múlt idejét beszédben is Präteritumban mondjuk.",
+  errorType: "Tempus",
+  lesson: [
+    {
+      heading: "Mikor használjuk?",
+      text: "Beszédben a legtöbb igét Perfektben használjuk. A sein, a haben és a módbeli segédigék (können, müssen, wollen, dürfen, sollen) múlt idejét viszont szinte mindig Präteritumban mondjuk: az „Ich war müde” sokkal természetesebb, mint az „Ich bin müde gewesen”.",
+      examples: [
+        { de: "Gestern war ich krank.", hu: "Tegnap beteg voltam." },
+        { de: "Wir hatten keine Zeit.", hu: "Nem volt időnk." },
+        { de: "Ich konnte nicht kommen.", hu: "Nem tudtam eljönni." },
+      ],
+    },
+    {
+      heading: "sein és haben",
+      table: {
+        headers: ["", "sein", "haben"],
+        rows: [
+          ["ich", "war", "hatte"],
+          ["du", "warst", "hattest"],
+          ["er / sie / es", "war", "hatte"],
+          ["wir", "waren", "hatten"],
+          ["ihr", "wart", "hattet"],
+          ["sie / Sie", "waren", "hatten"],
+        ],
+      },
+      tip: "Az ich és az er/sie/es alak Präteritumban mindig ugyanaz, nincs végződése.",
+    },
+    {
+      heading: "Módbeli segédigék",
+      text: "Präteritumban a módbeli segédigék elveszítik az umlautot, és a tőhöz -te- kerül: können → konnte, müssen → musste, dürfen → durfte, wollen → wollte, sollen → sollte.",
+      table: {
+        headers: ["", "können", "müssen", "wollen"],
+        rows: [
+          ["ich", "konnte", "musste", "wollte"],
+          ["du", "konntest", "musstest", "wolltest"],
+          ["er / sie / es", "konnte", "musste", "wollte"],
+          ["wir", "konnten", "mussten", "wollten"],
+          ["ihr", "konntet", "musstet", "wolltet"],
+          ["sie / Sie", "konnten", "mussten", "wollten"],
+        ],
+      },
+      tip: "Vigyázz: könnte (umlauttal) már nem múlt idő, hanem feltételes mód, azt jelenti: „tudna”.",
+    },
+  ],
+  exercises: [
+    {
+      id: "pr1",
+      type: "gap",
+      prompt: "Gestern ___ ich sehr müde.",
+      hint: "sein",
+      answers: ["war"],
+      explanation: "A sein Präteritum alakja ich személyben: war.",
+    },
+    {
+      id: "pr2",
+      type: "gap",
+      prompt: "___ du am Wochenende Zeit?",
+      hint: "haben",
+      answers: ["Hattest"],
+      explanation: "A haben Präteritum alakja du személyben: hattest.",
+    },
+    {
+      id: "pr3",
+      type: "gap",
+      prompt: "Wir ___ letzte Woche im Urlaub.",
+      hint: "sein",
+      answers: ["waren"],
+      explanation: "A sein Präteritum alakja wir személyben: waren.",
+    },
+    {
+      id: "pr4",
+      type: "choice",
+      prompt: "Ich ___ gestern nicht kommen, ich war krank.",
+      options: ["kann", "konnte", "könnte"],
+      answer: "konnte",
+      explanation: "Múlt idő, tehát können → konnte. A könnte feltételes mód („tudnék”).",
+    },
+    {
+      id: "pr5",
+      type: "gap",
+      prompt: "Er ___ am Sonntag arbeiten.",
+      hint: "müssen",
+      answers: ["musste"],
+      explanation: "A müssen Präteritumban elveszíti az umlautot: musste. Er alakban nincs végződés.",
+    },
+    {
+      id: "pr6",
+      type: "gap",
+      prompt: "Ihr ___ doch Pizza essen, oder?",
+      hint: "wollen",
+      answers: ["wolltet"],
+      explanation: "A wollen Präteritum alakja ihr személyben: wolltet.",
+    },
+    {
+      id: "pr7",
+      type: "choice",
+      prompt: "Als Kind ___ ich keinen Hund haben.",
+      options: ["durfte", "darf", "dürfte"],
+      answer: "durfte",
+      explanation: "A dürfen Präteritum alakja durfte („szabad volt”). A darf jelen idő, a dürfte feltételes mód.",
+    },
+    {
+      id: "pr8",
+      type: "gap",
+      prompt: "Meine Eltern ___ damals ein kleines Auto.",
+      hint: "haben",
+      answers: ["hatten"],
+      explanation: "A haben Präteritum alakja sie (ők) személyben: hatten.",
+    },
+  ],
+};

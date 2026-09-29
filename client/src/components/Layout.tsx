@@ -46,6 +46,9 @@ export function Layout() {
                   </span>
                 )}
               </NavLink>
+              <NavLink to="/grammar" className={navClass}>
+                Nyelvtan
+              </NavLink>
             </nav>
           </div>
           <div className="flex items-center gap-3 text-sm">

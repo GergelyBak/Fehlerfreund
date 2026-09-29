@@ -4,6 +4,8 @@ import { RequireAuth } from './auth/RequireAuth'
 import { Layout } from './components/Layout'
 import { ChatPage } from './pages/ChatPage'
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
+import { GrammarPage } from './pages/GrammarPage'
+import { GrammarTopicPage } from './pages/GrammarTopicPage'
 import { SituationsPage } from './pages/SituationsPage'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
@@ -24,6 +26,8 @@ export default function App() {
               <Route index element={<SituationsPage />} />
               <Route path="chat/:id" element={<ChatPage />} />
               <Route path="review" element={<ReviewPage />} />
+              <Route path="grammar" element={<GrammarPage />} />
+              <Route path="grammar/:id" element={<GrammarTopicPage />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

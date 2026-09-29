@@ -1,0 +1,115 @@
+import type { GrammarTopic } from "../types.js";
+
+export const komparation: GrammarTopic = {
+  id: "komparation",
+  level: "A2",
+  order: 6,
+  title: "Fokozás: groß – größer – am größten",
+  summary: "Komparativ és Superlativ, rendhagyó alakok, és az als meg a wie.",
+  errorType: "Adjektivdeklination",
+  lesson: [
+    {
+      heading: "Képzés",
+      text: "A Komparativ (középfok) -er végződést kap, a Superlativ (felsőfok) am + -sten alakú. Sok egy szótagú melléknév umlautot is kap (alt → älter, jung → jünger). Ha a melléknév -t, -d, -s, -ß vagy -z végű, a Superlativ -esten: am ältesten, am kürzesten.",
+      table: {
+        headers: ["Alapfok", "Komparativ", "Superlativ"],
+        rows: [
+          ["schnell", "schneller", "am schnellsten"],
+          ["billig", "billiger", "am billigsten"],
+          ["alt", "älter", "am ältesten"],
+          ["groß", "größer", "am größten"],
+          ["kurz", "kürzer", "am kürzesten"],
+        ],
+      },
+    },
+    {
+      heading: "Rendhagyó alakok",
+      table: {
+        headers: ["Alapfok", "Komparativ", "Superlativ"],
+        rows: [
+          ["gut", "besser", "am besten"],
+          ["viel", "mehr", "am meisten"],
+          ["gern", "lieber", "am liebsten"],
+          ["hoch", "höher", "am höchsten"],
+          ["nah", "näher", "am nächsten"],
+        ],
+      },
+    },
+    {
+      heading: "Összehasonlítás: als vagy wie?",
+      text: "Ha két dolog egyforma: so + alapfok + wie. Ha különböző: Komparativ + als.",
+      examples: [
+        { de: "Er ist so groß wie ich.", hu: "Olyan magas, mint én." },
+        { de: "Berlin ist größer als München.", hu: "Berlin nagyobb, mint München." },
+        { de: "Ich trinke lieber Tee als Kaffee.", hu: "Szívesebben iszom teát, mint kávét." },
+      ],
+      tip: "Magyarul mindkettő „mint”, ezért könnyű összekeverni. Középfok után mindig als.",
+    },
+  ],
+  exercises: [
+    {
+      id: "k1",
+      type: "gap",
+      prompt: "Der Zug ist ___ als der Bus.",
+      hint: "schnell",
+      answers: ["schneller"],
+      explanation: "Komparativ: schnell + -er → schneller.",
+    },
+    {
+      id: "k2",
+      type: "gap",
+      prompt: "Mein Bruder ist drei Jahre ___ als ich.",
+      hint: "alt",
+      answers: ["älter"],
+      explanation: "Az alt umlautot kap: älter.",
+    },
+    {
+      id: "k3",
+      type: "gap",
+      prompt: "Ich finde Tee ___ als Kaffee.",
+      hint: "gut",
+      answers: ["besser"],
+      explanation: "A gut rendhagyó: gut → besser → am besten.",
+    },
+    {
+      id: "k4",
+      type: "choice",
+      prompt: "Anna ist so groß ___ ihre Mutter.",
+      options: ["als", "wie", "dann"],
+      answer: "wie",
+      explanation: "Egyenlőség: so … wie.",
+    },
+    {
+      id: "k5",
+      type: "choice",
+      prompt: "Heute ist es kälter ___ gestern.",
+      options: ["wie", "als", "so"],
+      answer: "als",
+      explanation: "Középfok (kälter) után als áll.",
+    },
+    {
+      id: "k6",
+      type: "gap",
+      prompt: "Im Sommer ist es hier am ___.",
+      hint: "schön",
+      answers: ["schönsten"],
+      explanation: "Superlativ: am + schön + -sten → am schönsten.",
+    },
+    {
+      id: "k7",
+      type: "gap",
+      prompt: "Ich trinke am ___ Wasser.",
+      hint: "gern",
+      answers: ["liebsten"],
+      explanation: "A gern rendhagyó: gern → lieber → am liebsten.",
+    },
+    {
+      id: "k8",
+      type: "gap",
+      prompt: "Welcher Berg ist am ___?",
+      hint: "hoch",
+      answers: ["höchsten"],
+      explanation: "A hoch rendhagyó: hoch → höher → am höchsten.",
+    },
+  ],
+};

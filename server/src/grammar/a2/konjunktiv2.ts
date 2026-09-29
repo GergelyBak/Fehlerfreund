@@ -1,0 +1,111 @@
+import type { GrammarTopic } from "../types.js";
+
+export const konjunktiv2: GrammarTopic = {
+  id: "konjunktiv2",
+  level: "A2",
+  order: 8,
+  title: "Udvarias kérés: hätte, wäre, könnte, würde",
+  summary: "Udvarias kérések, kívánságok és tanácsok a Konjunktiv II-vel.",
+  errorType: "Verbkonjugation",
+  lesson: [
+    {
+      heading: "Udvarias kérés és kívánság",
+      text: "A Konjunktiv II-vel udvariasabban kérünk. Az „Ich will einen Kaffee” helyett ezt mondjuk: „Ich hätte gern einen Kaffee” vagy „Ich möchte einen Kaffee”. A könnte és a würde kezdetű kérdéssel udvarias kérést fogalmazunk meg.",
+      table: {
+        headers: ["", "haben", "sein", "können", "werden"],
+        rows: [
+          ["ich", "hätte", "wäre", "könnte", "würde"],
+          ["du", "hättest", "wärst", "könntest", "würdest"],
+          ["er / sie / es", "hätte", "wäre", "könnte", "würde"],
+          ["wir", "hätten", "wären", "könnten", "würden"],
+          ["ihr", "hättet", "wärt", "könntet", "würdet"],
+          ["sie / Sie", "hätten", "wären", "könnten", "würden"],
+        ],
+      },
+    },
+    {
+      heading: "Tipikus mondatok",
+      table: {
+        headers: ["Helyzet", "Mondat", "Jelentés"],
+        rows: [
+          ["Rendelés", "Ich hätte gern ein Wasser.", "Egy vizet kérnék."],
+          ["Kérés", "Könnten Sie mir helfen?", "Tudna segíteni?"],
+          ["Kérés", "Würden Sie das Fenster öffnen?", "Kinyitná az ablakot?"],
+          ["Kívánság", "Ich wäre gern am Meer.", "Szívesen lennék a tengernél."],
+          ["Tanács", "Du solltest mehr schlafen.", "Többet kellene aludnod."],
+        ],
+      },
+      tip: "A legtöbb igénél a würde + főnévi igenév adja a feltételes módot: Ich würde gern reisen. (Szívesen utaznék.)",
+      examples: [
+        { de: "Könnten Sie das bitte wiederholen?", hu: "Megismételné, kérem?" },
+        { de: "Ich würde gern einen Termin machen.", hu: "Szeretnék időpontot kérni." },
+      ],
+    },
+  ],
+  exercises: [
+    {
+      id: "kj1",
+      type: "choice",
+      prompt: "___ Sie mir bitte helfen?",
+      options: ["Können", "Könnten", "Konnten"],
+      answer: "Könnten",
+      explanation: "Udvarias kérés: könnten. A konnten múlt idő („tudtak”).",
+    },
+    {
+      id: "kj2",
+      type: "gap",
+      prompt: "Ich ___ gern einen Tee.",
+      hint: "haben",
+      answers: ["hätte"],
+      explanation: "Udvarias rendelés: ich hätte gern …",
+    },
+    {
+      id: "kj3",
+      type: "gap",
+      prompt: "Das ___ super!",
+      hint: "sein",
+      answers: ["wäre"],
+      explanation: "A sein Konjunktiv II alakja: wäre („jó lenne”).",
+    },
+    {
+      id: "kj4",
+      type: "choice",
+      prompt: "___ du mir bitte das Salz geben?",
+      options: ["Würdest", "Wirst", "Würde"],
+      answer: "Würdest",
+      explanation: "Udvarias kérés du alakban: würdest du …? A wirst jövő idő, a würde pedig ich vagy er alak.",
+    },
+    {
+      id: "kj5",
+      type: "gap",
+      prompt: "Wir ___ gern ans Meer fahren.",
+      hint: "werden",
+      answers: ["würden"],
+      explanation: "Kívánság: würde + főnévi igenév, wir alakban würden.",
+    },
+    {
+      id: "kj6",
+      type: "choice",
+      prompt: "Du ___ mehr Wasser trinken.",
+      options: ["solltest", "sollst", "solltet"],
+      answer: "solltest",
+      explanation: "Tanács: sollte, du alakban solltest („kellene”).",
+    },
+    {
+      id: "kj7",
+      type: "gap",
+      prompt: "___ Sie mir sagen, wo der Bahnhof ist?",
+      hint: "können",
+      answers: ["Könnten"],
+      explanation: "Udvarias kérdés: Könnten Sie …?",
+    },
+    {
+      id: "kj8",
+      type: "choice",
+      prompt: "Wenn ich Zeit ___, würde ich dich besuchen.",
+      options: ["habe", "hätte", "hatte"],
+      answer: "hätte",
+      explanation: "Nem valós feltétel: wenn + Konjunktiv II → hätte („ha lenne időm”).",
+    },
+  ],
+};
