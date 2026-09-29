@@ -1,0 +1,108 @@
+import type { GrammarTopic } from "../types.js";
+
+export const zeitangaben: GrammarTopic = {
+  id: "zeitangaben",
+  level: "A2",
+  order: 12,
+  title: "Időhatározók: am, im, um, seit, vor, für",
+  summary: "Mikor? Mióta? Mennyi időre? A legfontosabb idő-elöljárók.",
+  errorType: "Präposition",
+  lesson: [
+    {
+      heading: "Mikor? – um, am, im",
+      table: {
+        headers: ["Elöljáró", "Mire használjuk", "Példa"],
+        rows: [
+          ["um", "pontos időpont", "um 8 Uhr, um Mitternacht"],
+          ["am", "napok, napszakok, dátum, hétvége", "am Montag, am Abend, am 3. Mai, am Wochenende"],
+          ["im", "hónapok, évszakok", "im Juli, im Winter"],
+          ["in der", "hét, éjszaka", "in der Woche, in der Nacht"],
+        ],
+      },
+      tip: "Évszám előtt nincs elöljáró: Ich bin 2020 nach Deutschland gekommen. (Vagy: im Jahr 2020.) Kivétel a napszakoknál: am Abend (este), de in der Nacht (éjjel).",
+      examples: [{ de: "Wir treffen uns am Freitag um sieben.", hu: "Pénteken hétkor találkozunk." }],
+    },
+    {
+      heading: "Mióta? Mikor? Mennyi időre? Meddig?",
+      table: {
+        headers: ["Elöljáró", "Jelentés", "Példa"],
+        rows: [
+          ["seit + Dativ", "óta (ma is tart)", "Ich wohne seit drei Jahren in Wien."],
+          ["vor + Dativ", "ezelőtt (lezárult)", "Ich bin vor zwei Wochen umgezogen."],
+          ["für + Akkusativ", "valamennyi időre (előre)", "Ich fahre für eine Woche nach Italien."],
+          ["bis", "-ig", "Der Laden ist bis 20 Uhr offen."],
+          ["ab", "-tól kezdve", "Ab Montag arbeite ich wieder."],
+          ["nach + Dativ", "után", "Nach dem Essen trinke ich Kaffee."],
+        ],
+      },
+      tip: "Magyarul mindkettő „három éve”, de: „három éve lakom itt” – még tart, ezért seit. „Három éve költöztem ide” – lezárult, ezért vor. Mindkettő Dativot kér: seit drei Jahren, vor zwei Tagen.",
+      examples: [{ de: "Ich lerne seit einem Jahr Deutsch.", hu: "Egy éve tanulok németül." }],
+    },
+  ],
+  exercises: [
+    {
+      id: "z1",
+      type: "choice",
+      prompt: "Der Film beginnt ___ 20 Uhr.",
+      options: ["am", "um", "im"],
+      answer: "um",
+      explanation: "Pontos időpont előtt um áll.",
+    },
+    {
+      id: "z2",
+      type: "choice",
+      prompt: "Wir fahren ___ Sommer nach Kroatien.",
+      options: ["am", "im", "um"],
+      answer: "im",
+      explanation: "Évszak előtt im áll.",
+    },
+    {
+      id: "z3",
+      type: "choice",
+      prompt: "Ich habe ___ Montag einen Termin beim Arzt.",
+      options: ["am", "im", "um"],
+      answer: "am",
+      explanation: "A hét napjai előtt am áll.",
+    },
+    {
+      id: "z4",
+      type: "choice",
+      prompt: "Ich wohne ___ zwei Jahren in Deutschland.",
+      options: ["vor", "seit", "für"],
+      answer: "seit",
+      explanation: "Két éve kezdődött, és ma is tart, ezért seit.",
+    },
+    {
+      id: "z5",
+      type: "choice",
+      prompt: "Er ist ___ drei Tagen angekommen.",
+      options: ["seit", "vor", "für"],
+      answer: "vor",
+      explanation: "Az érkezés három napja megtörtént és lezárult, ezért vor.",
+    },
+    {
+      id: "z6",
+      type: "gap",
+      prompt: "Ich fahre ___ zwei Wochen in Urlaub.",
+      hint: "két hétre",
+      answers: ["für"],
+      explanation: "Előre megadott időtartam: für + Akkusativ.",
+    },
+    {
+      id: "z7",
+      type: "gap",
+      prompt: "Das Geschäft hat ___ 18 Uhr geöffnet.",
+      hint: "-ig",
+      answers: ["bis"],
+      explanation: "Időpontig: bis.",
+    },
+    {
+      id: "z8",
+      type: "choice",
+      prompt: "___ der Nacht ist es hier sehr ruhig.",
+      options: ["Am", "In", "Um"],
+      answer: "In",
+      explanation: "Kivétel: in der Nacht (éjjel), pedig a többi napszaknál am áll (am Abend).",
+    },
+  ],
+};

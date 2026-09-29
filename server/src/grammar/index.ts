@@ -1,11 +1,16 @@
 import { adjektivdeklination } from "./a2/adjektivdeklination.js";
 import { dativ } from "./a2/dativ.js";
+import { festePraepositionen } from "./a2/festePraepositionen.js";
+import { indirekteFragen } from "./a2/indirekteFragen.js";
 import { komparation } from "./a2/komparation.js";
 import { konjunktiv2 } from "./a2/konjunktiv2.js";
 import { nebensaetze } from "./a2/nebensaetze.js";
 import { perfekt } from "./a2/perfekt.js";
 import { praeteritum } from "./a2/praeteritum.js";
+import { reflexiv } from "./a2/reflexiv.js";
+import { verbenMitPraepositionen } from "./a2/verbenMitPraepositionen.js";
 import { wechselpraepositionen } from "./a2/wechselpraepositionen.js";
+import { zeitangaben } from "./a2/zeitangaben.js";
 import { GAP, type Exercise, type GrammarTopic } from "./types.js";
 
 export const GRAMMAR_TOPICS: GrammarTopic[] = [
@@ -17,6 +22,11 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
   komparation,
   adjektivdeklination,
   konjunktiv2,
+  reflexiv,
+  verbenMitPraepositionen,
+  indirekteFragen,
+  zeitangaben,
+  festePraepositionen,
 ].sort((a, b) => a.order - b.order);
 
 export function getTopic(id: string) {

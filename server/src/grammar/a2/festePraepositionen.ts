@@ -1,0 +1,113 @@
+import type { GrammarTopic } from "../types.js";
+
+export const festePraepositionen: GrammarTopic = {
+  id: "feste-praepositionen",
+  level: "A2",
+  order: 13,
+  title: "Elöljárók fix esettel: mit, zu, für, ohne…",
+  summary: "Mely elöljárók után áll mindig Dativ, és melyek után mindig Akkusativ.",
+  errorType: "Kasus",
+  lesson: [
+    {
+      heading: "Mindig Dativ",
+      text: "Ezek után az elöljárók után mindig Dativ áll: aus (-ból/-ből), bei (-nál/-nél), mit (-val/-vel), nach (után; városnév, országnév előtt: -ba/-be), seit (óta), von (-tól/-től, -ról/-ről), zu (-hoz/-hez/-höz).",
+      examples: [
+        { de: "Ich komme aus der Schweiz.", hu: "Svájcból jövök." },
+        { de: "Ich gehe zum Arzt.", hu: "Orvoshoz megyek." },
+        { de: "Er wohnt bei seinen Eltern.", hu: "A szüleinél lakik." },
+      ],
+      tip: "Összevont alakok: zu dem → zum, zu der → zur, von dem → vom, bei dem → beim.",
+    },
+    {
+      heading: "Mindig Akkusativ",
+      text: "Ezek után az elöljárók után mindig Akkusativ áll: durch (át, keresztül), für (-ért, számára), gegen (ellen), ohne (nélkül), um (körül).",
+      examples: [
+        { de: "Das Geschenk ist für dich.", hu: "Az ajándék neked szól." },
+        { de: "Wir gehen durch den Park.", hu: "Átmegyünk a parkon." },
+        { de: "Ich fahre nie ohne mein Handy weg.", hu: "Soha nem megyek el a telefonom nélkül." },
+      ],
+    },
+    {
+      heading: "Összefoglaló",
+      table: {
+        headers: ["Mindig Dativ", "Mindig Akkusativ", "Wo? Dativ / Wohin? Akkusativ"],
+        rows: [["aus, bei, mit, nach, seit, von, zu", "durch, für, gegen, ohne, um", "in, an, auf, unter, über, vor, hinter, neben, zwischen"]],
+      },
+      tip: "A harmadik csoportot a „Wo oder wohin?” lecke tárgyalja.",
+    },
+  ],
+  exercises: [
+    {
+      id: "f1",
+      type: "choice",
+      prompt: "Ich gehe heute ___ Arzt.",
+      options: ["zum", "zur", "zu den"],
+      answer: "zum",
+      explanation: "A zu Dativot kér. der Arzt → zu dem Arzt → zum Arzt.",
+    },
+    {
+      id: "f2",
+      type: "choice",
+      prompt: "Das Geschenk ist für ___ Bruder.",
+      options: ["meinem", "meinen", "mein"],
+      answer: "meinen",
+      explanation: "A für Akkusativot kér. der Bruder → für meinen Bruder.",
+    },
+    {
+      id: "f3",
+      type: "choice",
+      prompt: "Er kommt gerade aus ___ Büro.",
+      options: ["das", "dem", "den"],
+      answer: "dem",
+      explanation: "Az aus Dativot kér. das Büro → aus dem Büro.",
+    },
+    {
+      id: "f4",
+      type: "gap",
+      prompt: "Wir gehen durch ___ Park.",
+      hint: "der Park",
+      answers: ["den"],
+      explanation: "A durch Akkusativot kér. der Park → durch den Park.",
+    },
+    {
+      id: "f5",
+      type: "choice",
+      prompt: "Ich fahre nie ohne ___ Handy weg.",
+      options: ["mein", "meinem", "meines"],
+      answer: "mein",
+      explanation: "Az ohne Akkusativot kér. das Handy semlegesnemű, Akkusativban: mein Handy.",
+    },
+    {
+      id: "f6",
+      type: "gap",
+      prompt: "Nach ___ Kurs gehen wir essen.",
+      hint: "der Kurs",
+      answers: ["dem"],
+      explanation: "A nach Dativot kér. der Kurs → nach dem Kurs.",
+    },
+    {
+      id: "f7",
+      type: "choice",
+      prompt: "Sie wohnt noch bei ___ Eltern.",
+      options: ["ihre", "ihren", "ihrer"],
+      answer: "ihren",
+      explanation: "A bei Dativot kér. Többes szám Dativban: ihren Eltern.",
+    },
+    {
+      id: "f8",
+      type: "choice",
+      prompt: "Ich gehe jetzt ___ Post.",
+      options: ["zum", "zur", "zu"],
+      answer: "zur",
+      explanation: "A zu Dativot kér. die Post → zu der Post → zur Post.",
+    },
+    {
+      id: "f9",
+      type: "gap",
+      prompt: "Die Kinder laufen um ___ Tisch herum.",
+      hint: "der Tisch",
+      answers: ["den"],
+      explanation: "Az um Akkusativot kér. der Tisch → um den Tisch.",
+    },
+  ],
+};

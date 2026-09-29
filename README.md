@@ -10,7 +10,7 @@ You chat in real-life situations (Bürgeramt, doctor, flat viewing, job intervie
 - **Correction on every message.** Error type (`Kasus`, `Tempus`, `Wortstellung`…), the fix, and a short explanation in Hungarian, English or Turkish.
 - **Translate and listen.** Translate any partner message into your language on demand. German is read aloud at normal or slow speed, with optional auto-read.
 - **Flashcards with SM-2.** Chat mistakes and wrong grammar answers become cards. The review page has keyboard grading, and forgotten cards come back within the same session.
-- **A2 grammar course.** 8 hand-written topics (Perfekt, Präteritum, Dativ, Wechselpräpositionen, weil/dass/wenn, comparison, adjective endings, Konjunktiv II). Each has explanations, tables, spoken examples and a graded test.
+- **A2 grammar course.** 13 hand-written topics. Each has explanations, tables, spoken examples and a graded test. The topics: Perfekt, Präteritum, Dativ, Wechselpräpositionen, weil/dass/wenn, comparison, adjective endings, Konjunktiv II, reflexive verbs, verbs with prepositions, indirect questions, time expressions, and prepositions with a fixed case.
 - **Accounts.** JWT auth, password reset by email, and per-user progress.
 
 ## Stack
@@ -18,7 +18,7 @@ You chat in real-life situations (Bürgeramt, doctor, flat viewing, job intervie
 - **Client:** React 19, TypeScript, Tailwind CSS 4, Vite, React Router, Web Speech API
 - **Server:** Node.js, Express 5, TypeScript, MongoDB Atlas (Mongoose), Zod, Nodemailer
 - **LLM:** a local model via [Ollama](https://ollama.com) (default `gemma3:4b`), or the Claude API (`claude-sonnet-5`), or a mock
-- **Tests:** Vitest (60 tests)
+- **Tests:** Vitest (65 tests)
 
 ## Engineering notes
 
@@ -73,5 +73,5 @@ In development, password-reset emails are printed to the server terminal (`EMAIL
 ## Next
 
 - Error statistics ("your weakest area is the Dativ") and targeted practice
-- More grammar topics (A2 → B1)
+- B1 grammar topics
 - Better corrections from local models (few-shot prompt, measured on a fixed test set)

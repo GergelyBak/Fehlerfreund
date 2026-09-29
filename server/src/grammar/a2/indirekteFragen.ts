@@ -1,0 +1,100 @@
+import type { GrammarTopic } from "../types.js";
+
+export const indirekteFragen: GrammarTopic = {
+  id: "indirekte-fragen",
+  level: "A2",
+  order: 11,
+  title: "Függő kérdések: Wissen Sie, wo…? / ob",
+  summary: "Udvarias, beágyazott kérdések. W-kérdőszó vagy ob, az ige a végén.",
+  errorType: "Wortstellung",
+  lesson: [
+    {
+      heading: "Mi a függő kérdés?",
+      text: "Udvariasabb, ha a kérdést egy bevezető mondatba ágyazzuk: Können Sie mir sagen, …? Wissen Sie, …? Ich weiß nicht, … A beágyazott kérdés mellékmondat, ezért a ragozott ige a végére kerül.",
+      table: {
+        headers: ["Egyenes kérdés", "Függő kérdés"],
+        rows: [
+          ["Wo ist der Bahnhof?", "Können Sie mir sagen, wo der Bahnhof ist?"],
+          ["Wann kommt der Bus?", "Wissen Sie, wann der Bus kommt?"],
+          ["Kommt er morgen?", "Ich weiß nicht, ob er morgen kommt."],
+          ["Hast du Zeit?", "Ich frage dich, ob du Zeit hast."],
+        ],
+      },
+    },
+    {
+      heading: "Kérdőszó vagy ob?",
+      text: "Ha az eredeti kérdés kérdőszóval kezdődik (wo, wann, wie, warum, was, wer…), a függő kérdést ugyanez a kérdőszó vezeti be. Ha eldöntendő kérdés volt, vagyis igennel vagy nemmel lehet rá válaszolni, az ob kötőszó vezeti be. Jelentése: „-e”.",
+      examples: [
+        { de: "Ich weiß nicht, ob das Geschäft heute offen ist.", hu: "Nem tudom, nyitva van-e ma a bolt." },
+        { de: "Können Sie mir sagen, wie viel das kostet?", hu: "Meg tudná mondani, mennyibe kerül?" },
+      ],
+      tip: "Az ob nem ugyanaz, mint a wenn. Az ob „-e” (kérdés), a wenn „ha” vagy „amikor” (feltétel, idő).",
+    },
+  ],
+  exercises: [
+    {
+      id: "i1",
+      type: "choice",
+      prompt: "Können Sie mir sagen, ___",
+      options: ["wo ist die Post?", "wo die Post ist?", "ob die Post ist?"],
+      answer: "wo die Post ist?",
+      explanation: "A függő kérdésben a ragozott ige (ist) a végére kerül. A kérdőjel a bevezető kérdés miatt marad.",
+    },
+    {
+      id: "i2",
+      type: "gap",
+      prompt: "Ich weiß nicht, ___ er heute kommt.",
+      hint: "-e",
+      answers: ["ob"],
+      explanation: "Eldöntendő kérdés (Kommt er heute?), ezért ob: „jön-e”.",
+    },
+    {
+      id: "i3",
+      type: "choice",
+      prompt: "Wissen Sie, ___ der Zug nach Berlin abfährt?",
+      options: ["wann", "ob", "wenn"],
+      answer: "wann",
+      explanation: "Az időpontra kérdezünk (Wann fährt der Zug ab?), ezért a kérdőszó marad: wann.",
+    },
+    {
+      id: "i4",
+      type: "choice",
+      prompt: "Ich frage mich, ___",
+      options: ["warum er nicht angerufen hat.", "warum hat er nicht angerufen.", "warum er hat nicht angerufen."],
+      answer: "warum er nicht angerufen hat.",
+      explanation: "A függő kérdés végére a Partizip II, majd legutoljára a ragozott segédige kerül: angerufen hat.",
+    },
+    {
+      id: "i5",
+      type: "gap",
+      prompt: "Kannst du mir sagen, ___ spät es ist?",
+      hint: "Wie spät ist es?",
+      answers: ["wie"],
+      explanation: "Az eredeti kérdés: Wie spät ist es? A függő kérdést ugyanez a kérdőszó vezeti be: wie spät es ist.",
+    },
+    {
+      id: "i6",
+      type: "choice",
+      prompt: "Sie will wissen, ___ du morgen Zeit hast.",
+      options: ["ob", "wenn", "dass"],
+      answer: "ob",
+      explanation: "Igen/nem kérdés (Hast du morgen Zeit?), ezért ob.",
+    },
+    {
+      id: "i7",
+      type: "choice",
+      prompt: "Weißt du, ___",
+      options: ["was kostet das Ticket?", "was das Ticket kostet?", "ob was das Ticket kostet?"],
+      answer: "was das Ticket kostet?",
+      explanation: "Kérdőszó (was), a ragozott ige (kostet) a végén.",
+    },
+    {
+      id: "i8",
+      type: "gap",
+      prompt: "Ich habe vergessen, ___ er wohnt.",
+      hint: "hol",
+      answers: ["wo"],
+      explanation: "Az eredeti kérdés: Wo wohnt er? A függő kérdésben: wo er wohnt.",
+    },
+  ],
+};
