@@ -1,3 +1,4 @@
+import { SpeakButtons } from '../speech/SpeakButtons'
 import type { Phrase, Situation } from './types'
 
 export function SituationPanel({
@@ -53,15 +54,18 @@ export function SituationPanel({
         <p className="text-xs text-slate-500">Kattints rá, és beíródik az üzenetedbe.</p>
         <ul className="space-y-1">
           {situation.phrases.map((p) => (
-            <li key={p.de}>
+            <li key={p.de} className="flex items-start gap-1">
               <button
                 type="button"
                 onClick={() => onPhrase(p)}
-                className="w-full rounded-lg px-2 py-1.5 text-left hover:bg-indigo-50 focus-visible:ring-2 focus-visible:ring-indigo-200 focus-visible:outline-none"
+                className="min-w-0 flex-1 rounded-lg px-2 py-1.5 text-left hover:bg-indigo-50 focus-visible:ring-2 focus-visible:ring-indigo-200 focus-visible:outline-none"
               >
                 <span className="block text-sm font-medium text-slate-800">{p.de}</span>
                 <span className="block text-xs text-slate-500">{p.hu}</span>
               </button>
+              <span className="pt-1">
+                <SpeakButtons text={p.de} compact />
+              </span>
             </li>
           ))}
         </ul>

@@ -5,6 +5,7 @@ import { errorMessage } from '../api/errors'
 import { notifyCardsChanged } from '../review/cardEvents'
 import { formatDue, formatInterval, sameSentence } from '../review/format'
 import { Highlight } from '../review/Highlight'
+import { SpeakButtons } from '../speech/SpeakButtons'
 import type { Card, CardStats, UiGrade } from '../review/types'
 
 const GRADES: { grade: UiGrade; label: string; key: string; className: string }[] = [
@@ -251,7 +252,10 @@ export function ReviewPage() {
               </p>
             )}
             <div className="space-y-1 rounded-xl bg-emerald-50 p-4 ring-1 ring-emerald-200">
-              <p className="text-sm font-medium text-emerald-800">Helyesen:</p>
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm font-medium text-emerald-800">Helyesen:</p>
+                <SpeakButtons text={card.answer} />
+              </div>
               <p className="text-lg">
                 <Highlight sentence={card.answer} fragment={card.corrected} className="bg-emerald-200 text-emerald-900" />
               </p>

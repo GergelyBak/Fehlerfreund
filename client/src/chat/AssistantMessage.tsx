@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { api } from '../api/client'
 import { errorMessage } from '../api/errors'
+import { SpeakButtons } from '../speech/SpeakButtons'
 import type { ChatMessage } from './types'
 
 export function AssistantMessage({
@@ -53,14 +54,17 @@ export function AssistantMessage({
         <p className="rounded-xl bg-sky-50 px-3 py-1.5 text-sm text-sky-900 italic ring-1 ring-sky-100">{translation}</p>
       )}
       {canTranslate && (
-        <button
-          type="button"
-          onClick={() => void toggle()}
-          disabled={loading}
-          className="px-1 text-xs font-medium text-slate-500 hover:text-indigo-600 disabled:opacity-60"
-        >
-          {loading ? 'Fordítás…' : visible ? 'Fordítás elrejtése' : '🌐 Fordítás'}
-        </button>
+        <div className="flex flex-wrap items-center gap-1">
+          <SpeakButtons text={message.content} />
+          <button
+            type="button"
+            onClick={() => void toggle()}
+            disabled={loading}
+            className="px-1 text-xs font-medium text-slate-500 hover:text-indigo-600 disabled:opacity-60"
+          >
+            {loading ? 'Fordítás…' : visible ? 'Fordítás elrejtése' : '🌐 Fordítás'}
+          </button>
+        </div>
       )}
       {error && <p className="px-1 text-xs text-red-600">{error}</p>}
     </div>

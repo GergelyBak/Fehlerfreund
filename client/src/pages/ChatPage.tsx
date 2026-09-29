@@ -9,6 +9,8 @@ import { ModeBadge } from '../chat/ModeBadge'
 import { SituationPanel } from '../chat/SituationPanel'
 import { useSituations } from '../chat/useSituations'
 import { notifyCardsChanged } from '../review/cardEvents'
+import { AutoReadToggle } from '../speech/AutoReadToggle'
+import { RATE_NORMAL, loadAutoRead, saveAutoRead, speak, stopSpeaking } from '../speech/speech'
 import type { ChatMessage, Conversation, Phrase, StoredCorrection } from '../chat/types'
 
 const MAX_LENGTH = 500
@@ -22,6 +24,7 @@ export function ChatPage() {
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState<string | null>(null)
   const [panelOpen, setPanelOpen] = useState(false)
+  const [autoRead, setAutoRead] = useState(loadAutoRead)
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const abortRef = useRef<AbortController | null>(null)
@@ -30,8 +33,11 @@ export function ChatPage() {
     api<{ conversation: Conversation }>(`/conversations/${id}`)
       .then((r) => setConversation(r.conversation))
       .catch((err) => setLoadError(errorMessage(err, 'Nem sikerült betölteni a beszélgetést.')))
-    // Abort an in-flight reply when leaving the page.
-    return () => abortRef.current?.abort()
+    // Abort an in-flight reply and stop reading aloud when leaving the page.
+    return () => {
+      abortRef.current?.abort()
+      stopSpeaking()
+    }
   }, [id])
 
   useEffect(() => {
@@ -66,6 +72,7 @@ export function ChatPage() {
     const controller = new AbortController()
     abortRef.current = controller
     let failed = false
+    let replyText = ''
     try {
       await postSse(
         `/conversations/${conversation.id}/messages`,
@@ -78,9 +85,12 @@ export function ChatPage() {
               userId = realId
               break
             }
-            case 'delta':
-              updateMessage(assistantId, (m) => ({ ...m, content: m.content + (data as { text: string }).text }))
+            case 'delta': {
+              const chunk = (data as { text: string }).text
+              replyText += chunk
+              updateMessage(assistantId, (m) => ({ ...m, content: m.content + chunk }))
               break
+            }
             case 'correction': {
               const { correction, cardsAdded } = data as { correction: StoredCorrection; cardsAdded?: number }
               updateMessage(userId, (m) => ({ ...m, correction, cardsAdded, pending: false }))
@@ -91,6 +101,8 @@ export function ChatPage() {
               const realId = (data as { assistantMessageId: string }).assistantMessageId
               updateMessage(assistantId, (m) => ({ ...m, id: realId, streaming: false }))
               assistantId = realId
+              // Same key as the message's own 🔊 button, so that button shows it playing.
+              if (autoRead && replyText.trim()) speak(replyText, { key: `${replyText}|normal`, rate: RATE_NORMAL })
               break
             }
             case 'error':
@@ -191,6 +203,14 @@ export function ChatPage() {
                 Szint: {conversation.level}
                 <ModeBadge />
               </p>
+              <AutoReadToggle
+                on={autoRead}
+                onChange={(on) => {
+                  setAutoRead(on)
+                  saveAutoRead(on)
+                  if (!on) stopSpeaking()
+                }}
+              />
             </div>
           </div>
           <Link to="/" className="text-sm text-slate-600 hover:text-slate-900">
