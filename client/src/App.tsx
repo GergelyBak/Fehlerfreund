@@ -7,6 +7,7 @@ import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
 import { SituationsPage } from './pages/SituationsPage'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
+import { ReviewPage } from './pages/ReviewPage'
 import { ResetPasswordPage } from './pages/ResetPasswordPage'
 
 export default function App() {
@@ -22,6 +23,7 @@ export default function App() {
             <Route element={<Layout />}>
               <Route index element={<SituationsPage />} />
               <Route path="chat/:id" element={<ChatPage />} />
+              <Route path="review" element={<ReviewPage />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -12,6 +12,7 @@ import { HttpError } from "../lib/HttpError.js";
 import { initSse, sendEvent } from "../lib/sse.js";
 import { llm, type CorrectionResult } from "../llm/index.js";
 import { assertWithinBudget } from "../llm/usage.js";
+import { addCardsFromCorrection } from "../srs/cards.js";
 
 // Caps context size (and cost) per conversation.
 const MAX_MESSAGES = 60;
@@ -130,7 +131,8 @@ const SendSchema = z.object({
  * Streams the reply as Server-Sent Events:
  *   user_message { id }                         learner's message was saved
  *   delta        { text }                       next chunk of the partner's reply
- *   correction   { messageId, correction }      may arrive before, during or after the deltas
+ *   correction   { messageId, correction,       may arrive before, during or after the deltas
+ *                  cardsAdded }
  *   done         { assistantMessageId }         reply finished and saved
  *   error        { error }                      reply failed; the learner's message is kept
  */
@@ -167,9 +169,22 @@ router.post("/:id/messages", aiLimiter, validateBody(SendSchema), async (req, re
       console.error("Correction failed:", err);
       return { ok: false, reason: "api_error", promptVersion: "unknown", model: "unknown" };
     })
-    .then((result) => {
+    .then(async (result) => {
       const stored = toStoredCorrection(result);
-      sendEvent(res, "correction", { messageId: userMessage._id.toString(), correction: stored });
+      // Cards are a bonus: if creating them fails, the chat still goes on.
+      const cardsAdded = result.ok
+        ? await addCardsFromCorrection({
+            userId,
+            sourceSentence: text,
+            correction: result.correction,
+            conversationId: convo._id,
+            situationId: convo.situationId,
+          }).catch((err: unknown) => {
+            console.error("Creating cards failed:", err);
+            return 0;
+          })
+        : 0;
+      sendEvent(res, "correction", { messageId: userMessage._id.toString(), correction: stored, cardsAdded });
       return stored;
     });
 

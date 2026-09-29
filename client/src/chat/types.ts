@@ -43,6 +43,8 @@ export interface ChatMessage {
   role: 'user' | 'assistant'
   content: string
   correction: StoredCorrection | null
+  // How many flashcards this message produced (only known right after sending).
+  cardsAdded?: number
   // Client-only flags while a reply is in flight.
   pending?: boolean
   streaming?: boolean

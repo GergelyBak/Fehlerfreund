@@ -1,11 +1,33 @@
-import { NavLink, Outlet } from 'react-router'
+import { useEffect, useState } from 'react'
+import { NavLink, Outlet, useLocation } from 'react-router'
+import { api } from '../api/client'
 import { useAuth } from '../auth/useAuth'
+import { onCardsChanged } from '../review/cardEvents'
+import type { CardStats } from '../review/types'
 
 const navClass = ({ isActive }: { isActive: boolean }) =>
-  `rounded-md px-3 py-1.5 text-sm font-medium ${isActive ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:text-slate-900'}`
+  `inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium ${isActive ? 'bg-indigo-50 text-indigo-700' : 'text-slate-600 hover:text-slate-900'}`
+
+function useDueCount() {
+  const [due, setDue] = useState<number | null>(null)
+  const location = useLocation()
+
+  useEffect(() => {
+    const refresh = () =>
+      api<CardStats>('/cards/stats')
+        .then((s) => setDue(s.due))
+        .catch(() => {})
+    void refresh()
+    return onCardsChanged(refresh)
+  }, [location.pathname])
+
+  return due
+}
 
 export function Layout() {
   const { user, logout } = useAuth()
+  const due = useDueCount()
+
   return (
     <div className="min-h-screen">
       <header className="border-b border-slate-200 bg-white">
@@ -15,6 +37,14 @@ export function Layout() {
             <nav className="flex gap-1">
               <NavLink to="/" end className={navClass}>
                 Beszélgetés
+              </NavLink>
+              <NavLink to="/review" className={navClass}>
+                Ismétlés
+                {!!due && (
+                  <span className="min-w-5 rounded-full bg-indigo-600 px-1.5 text-center text-xs leading-5 text-white">
+                    {due > 99 ? '99+' : due}
+                  </span>
+                )}
               </NavLink>
             </nav>
           </div>

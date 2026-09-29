@@ -5,6 +5,7 @@ import { errorMessage } from '../api/errors'
 import { postSse } from '../api/sse'
 import { CorrectionPanel } from '../chat/CorrectionPanel'
 import { useSituations } from '../chat/useSituations'
+import { notifyCardsChanged } from '../review/cardEvents'
 import type { ChatMessage, Conversation, StoredCorrection } from '../chat/types'
 
 const MAX_LENGTH = 500
@@ -76,8 +77,9 @@ export function ChatPage() {
               updateMessage(assistantId, (m) => ({ ...m, content: m.content + (data as { text: string }).text }))
               break
             case 'correction': {
-              const { correction } = data as { correction: StoredCorrection }
-              updateMessage(userId, (m) => ({ ...m, correction, pending: false }))
+              const { correction, cardsAdded } = data as { correction: StoredCorrection; cardsAdded?: number }
+              updateMessage(userId, (m) => ({ ...m, correction, cardsAdded, pending: false }))
+              if (cardsAdded) notifyCardsChanged()
               break
             }
             case 'done': {
@@ -171,7 +173,7 @@ export function ChatPage() {
                 {m.content}
               </div>
               <div className="flex max-w-[80%] justify-end">
-                <CorrectionPanel correction={m.correction} pending={m.pending} />
+                <CorrectionPanel correction={m.correction} pending={m.pending} cardsAdded={m.cardsAdded} />
               </div>
             </div>
           ),

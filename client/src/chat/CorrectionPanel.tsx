@@ -1,6 +1,15 @@
+import { Link } from 'react-router'
 import type { StoredCorrection } from './types'
 
-export function CorrectionPanel({ correction, pending }: { correction: StoredCorrection | null; pending?: boolean }) {
+export function CorrectionPanel({
+  correction,
+  pending,
+  cardsAdded,
+}: {
+  correction: StoredCorrection | null
+  pending?: boolean
+  cardsAdded?: number
+}) {
   if (pending && !correction) {
     return <p className="text-xs text-slate-400">Ellenőrzés…</p>
   }
@@ -39,6 +48,11 @@ export function CorrectionPanel({ correction, pending }: { correction: StoredCor
           </li>
         ))}
       </ul>
+      {!!cardsAdded && (
+        <Link to="/review" className="inline-block text-xs font-medium text-indigo-700 hover:underline">
+          🗂️ +{cardsAdded} kártya került az ismétlőpakliba
+        </Link>
+      )}
     </div>
   )
 }

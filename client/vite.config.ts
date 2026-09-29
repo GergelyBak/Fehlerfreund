@@ -8,7 +8,8 @@ export default defineConfig({
   server: {
     // Same-origin in dev, so the httpOnly auth cookie just works.
     proxy: {
-      '/api': 'http://localhost:4000',
+      // Override with API_URL to point the dev server at another backend.
+      '/api': process.env.API_URL ?? 'http://localhost:4000',
     },
   },
 })

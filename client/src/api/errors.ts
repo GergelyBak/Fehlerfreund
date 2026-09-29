@@ -13,6 +13,7 @@ const MESSAGES: Record<string, string> = {
   'Not authenticated': 'Lejárt a munkamenet, jelentkezz be újra.',
   'Invalid or expired session': 'Lejárt a munkamenet, jelentkezz be újra.',
   'Conversation not found': 'Ez a beszélgetés nem található.',
+  'Card not found': 'Ez a kártya már nem létezik.',
   'This conversation is full, start a new one': 'Ez a beszélgetés megtelt, kezdj egy újat.',
   'Too many messages per minute, slow down a little': 'Túl sok üzenet egy perc alatt, lassíts egy kicsit.',
   'Daily practice limit reached, come back tomorrow': 'Elérted a mai gyakorlási keretet, holnap folytathatod.',
