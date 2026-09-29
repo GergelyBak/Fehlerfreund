@@ -8,6 +8,7 @@ export async function* streamRoleplay(opts: RoleplayParams): AsyncGenerator<stri
     situation: opts.situation,
     role: opts.role,
     level: opts.level,
+    tasks: opts.tasks.map((t) => `- ${t}`).join("\n"),
   });
 
   const stream = anthropic.messages.stream({

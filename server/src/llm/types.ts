@@ -14,18 +14,32 @@ export type CorrectionResult =
 
 export interface RoleplayParams {
   userId: string;
+  situationId: string;
   situation: string;
   role: string;
   level: string;
-  // Full conversation so far, ending with the learner's latest message.
+  // Goals the partner should steer the learner towards (German).
+  tasks: string[];
+  // Full conversation so far, starting with the partner's opening line and
+  // ending with the learner's latest message.
   history: Anthropic.MessageParam[];
+}
+
+export interface TranslateParams {
+  userId: string;
+  text: string;
+  // "hu" | "en" | "tr"
+  targetLanguage: string;
 }
 
 // Both the live Claude implementation and the mock implement this, so routes
 // never know (or care) which one is running.
 export interface LlmProvider {
-  mode: "live" | "mock";
+  mode: "live" | "ollama" | "mock";
+  // Whether correction and reply can run at the same time without slowing each other down.
+  concurrent: boolean;
   correct(params: CorrectParams): Promise<CorrectionResult>;
   // Yields text chunks as they arrive.
   streamRoleplay(params: RoleplayParams): AsyncGenerator<string, void>;
+  translate(params: TranslateParams): Promise<{ text: string; model: string }>;
 }

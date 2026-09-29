@@ -13,6 +13,7 @@ import { initSse, sendEvent } from "../lib/sse.js";
 import { llm, type CorrectionResult } from "../llm/index.js";
 import { assertWithinBudget } from "../llm/usage.js";
 import { addCardsFromCorrection } from "../srs/cards.js";
+import { sanitizeCorrection } from "../llm/sanitize.js";
 
 // Caps context size (and cost) per conversation.
 const MAX_MESSAGES = 60;
@@ -37,6 +38,7 @@ function toPublicConversation(convo: ConversationDoc) {
     id: convo.id as string,
     situationId: convo.situationId,
     level: convo.level,
+    completedTasks: convo.completedTasks,
     createdAt: convo.createdAt,
     updatedAt: convo.updatedAt,
     messages: convo.messages.map((m) => ({
@@ -44,6 +46,7 @@ function toPublicConversation(convo: ConversationDoc) {
       role: m.role,
       content: m.content,
       correction: m.correction ?? null,
+      translation: m.translation ? { language: m.translation.language, text: m.translation.text } : null,
       createdAt: m.createdAt,
     })),
   };
@@ -104,7 +107,7 @@ router.post("/", validateBody(CreateSchema), async (req, res) => {
     userId: user._id,
     situationId,
     level: user.level,
-    messages: [{ role: "assistant", content: situation.opening }],
+    messages: [{ role: "assistant", content: situation.opening.de }],
   });
   res.status(201).json({ conversation: toPublicConversation(convo) });
 });
@@ -121,6 +124,49 @@ router.delete("/:id", async (req, res) => {
   const { deletedCount } = await Conversation.deleteOne({ _id: id, userId: req.userId });
   if (!deletedCount) throw new HttpError(404, "Conversation not found");
   res.status(204).end();
+});
+
+const TaskSchema = z.object({ taskId: z.string(), done: z.boolean() });
+
+router.patch("/:id/tasks", validateBody(TaskSchema), async (req, res) => {
+  const { taskId, done } = req.body as z.infer<typeof TaskSchema>;
+  const convo = await findOwned(req.params.id as string, req.userId!);
+  if (!getSituation(convo.situationId)?.tasks.some((t) => t.id === taskId)) {
+    throw new HttpError(400, "Unknown task");
+  }
+  const updated = await Conversation.findByIdAndUpdate(
+    convo._id,
+    done ? { $addToSet: { completedTasks: taskId } } : { $pull: { completedTasks: taskId } },
+    { new: true },
+  );
+  res.json({ completedTasks: updated?.completedTasks ?? [] });
+});
+
+router.post("/:id/messages/:messageId/translate", aiLimiter, async (req, res) => {
+  const userId = req.userId!;
+  const convo = await findOwned(req.params.id as string, userId);
+  const message = convo.messages.id(req.params.messageId as string);
+  if (!message || message.role !== "assistant") throw new HttpError(404, "Message not found");
+  const user = await User.findById(userId);
+  if (!user) throw new HttpError(401, "User no longer exists");
+
+  // Served from the cache when this message was already translated into the same language.
+  if (message.translation?.language === user.nativeLanguage && message.translation.text) {
+    res.json({ translation: message.translation.text, cached: true });
+    return;
+  }
+
+  await assertWithinBudget(userId);
+  let result;
+  try {
+    result = await llm.translate({ userId, text: message.content, targetLanguage: user.nativeLanguage });
+  } catch (err) {
+    console.error("Translation failed:", err);
+    throw new HttpError(502, "Translation failed, please try again");
+  }
+  message.set("translation", { language: user.nativeLanguage, text: result.text, model: result.model });
+  await convo.save();
+  res.json({ translation: result.text, cached: false });
 });
 
 const SendSchema = z.object({
@@ -162,40 +208,50 @@ router.post("/:id/messages", aiLimiter, validateBody(SendSchema), async (req, re
   });
   sendEvent(res, "user_message", { id: userMessage._id.toString() });
 
-  // The correction runs in parallel with the reply and is sent as soon as it's ready.
-  const correctionDone = llm
-    .correct({ userId, text, level: convo.level, nativeLanguage: user.nativeLanguage })
-    .catch((err: unknown): CorrectionResult => {
-      console.error("Correction failed:", err);
-      return { ok: false, reason: "api_error", promptVersion: "unknown", model: "unknown" };
-    })
-    .then(async (result) => {
-      const stored = toStoredCorrection(result);
-      // Cards are a bonus: if creating them fails, the chat still goes on.
-      const cardsAdded = result.ok
-        ? await addCardsFromCorrection({
-            userId,
-            sourceSentence: text,
-            correction: result.correction,
-            conversationId: convo._id,
-            situationId: convo.situationId,
-          }).catch((err: unknown) => {
-            console.error("Creating cards failed:", err);
-            return 0;
-          })
-        : 0;
-      sendEvent(res, "correction", { messageId: userMessage._id.toString(), correction: stored, cardsAdded });
-      return stored;
-    });
+  // The correction is sent as its own event as soon as it's ready.
+  const runCorrection = () =>
+    llm
+      .correct({ userId, text, level: convo.level, nativeLanguage: user.nativeLanguage })
+      .catch((err: unknown): CorrectionResult => {
+        console.error("Correction failed:", err);
+        return { ok: false, reason: "api_error", promptVersion: "unknown", model: "unknown" };
+      })
+      .then(async (raw) => {
+        // Same checks for every provider; the model's answer is never trusted as-is.
+        const result: CorrectionResult = raw.ok ? { ...raw, correction: sanitizeCorrection(text, raw.correction) } : raw;
+        const stored = toStoredCorrection(result);
+        // Cards are a bonus: if creating them fails, the chat still goes on.
+        const cardsAdded = result.ok
+          ? await addCardsFromCorrection({
+              userId,
+              sourceSentence: text,
+              correction: result.correction,
+              conversationId: convo._id,
+              situationId: convo.situationId,
+            }).catch((err: unknown) => {
+              console.error("Creating cards failed:", err);
+              return 0;
+            })
+          : 0;
+        sendEvent(res, "correction", { messageId: userMessage._id.toString(), correction: stored, cardsAdded });
+        return stored;
+      });
+
+  // Hosted models run it in parallel with the reply. A local model serves one
+  // request at a time, so there the reply goes first and the correction after,
+  // otherwise the learner would stare at an empty bubble.
+  let correctionDone = llm.concurrent ? runCorrection() : undefined;
 
   let reply = "";
   let streamFailed = false;
   try {
     for await (const chunk of llm.streamRoleplay({
       userId,
+      situationId: situation.id,
       situation: situation.scenario,
       role: situation.role,
       level: convo.level,
+      tasks: situation.tasks.map((t) => t.de),
       history: toClaudeHistory(convo),
     })) {
       // Leaving the loop early also aborts the upstream Claude request.
@@ -211,6 +267,7 @@ router.post("/:id/messages", aiLimiter, validateBody(SendSchema), async (req, re
   // Headers are already sent, so the error middleware can't respond anymore:
   // every failure past this point has to end the stream itself.
   try {
+    correctionDone ??= runCorrection();
     userMessage.set("correction", await correctionDone);
     // Keep a partial reply if the stream broke midway; it's still valid context.
     if (reply.trim()) convo.messages.push({ role: "assistant", content: reply });

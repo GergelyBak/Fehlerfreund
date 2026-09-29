@@ -1,4 +1,5 @@
 import { CorrectionSchema, type CorrectionItem } from "./correctionSchema.js";
+import { MOCK_FALLBACK, SITUATIONS, getSituation } from "../situations.js";
 import type { CorrectParams, CorrectionResult, LlmProvider, RoleplayParams } from "./types.js";
 
 // Free, offline stand-in for Claude, used during development (LLM_MODE=mock).
@@ -87,33 +88,46 @@ export function mockCorrect(text: string): CorrectionResult {
   return { ok: true, correction, promptVersion: "mock", model: "mock" };
 }
 
-const MOCK_REPLIES = [
-  "Guten Tag! Wie kann ich Ihnen helfen?",
-  "Verstehe. Haben Sie schon einen Termin?",
-  "Gut. Können Sie mir bitte Ihren Ausweis zeigen?",
-  "Danke schön. Haben Sie noch eine Frage?",
-  "Alles klar. Ich wünsche Ihnen einen schönen Tag!",
-];
+// The partner's n-th reply follows the situation's script; the opening line
+// is the first assistant message, so it is not counted.
+export function mockReply(params: Pick<RoleplayParams, "situationId" | "history">) {
+  const script = getSituation(params.situationId)?.mockScript ?? [];
+  const replies = params.history.filter((m) => m.role === "assistant").length - 1;
+  return (script[Math.max(replies, 0)] ?? MOCK_FALLBACK).de;
+}
 
 export async function* mockStreamRoleplay(
-  params: Pick<RoleplayParams, "history">,
+  params: Pick<RoleplayParams, "situationId" | "history">,
   delayMs = 40,
 ): AsyncGenerator<string, void> {
-  const turn = params.history.filter((m) => m.role === "assistant").length;
-  const reply = MOCK_REPLIES[turn % MOCK_REPLIES.length]!;
   // Word-by-word with a small delay, so the UI's streaming path is exercised.
-  for (const chunk of reply.split(/(?<= )/)) {
+  for (const chunk of mockReply(params).split(/(?<= )/)) {
     if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
     yield chunk;
   }
 }
 
+// Every German line the mock can produce, mapped to its Hungarian translation.
+const KNOWN_TRANSLATIONS = new Map<string, string>(
+  [MOCK_FALLBACK, ...SITUATIONS.flatMap((s) => [s.opening, ...s.mockScript, ...s.phrases])].map((l) => [l.de, l.hu]),
+);
+
+export function mockTranslate(text: string, targetLanguage: string) {
+  const known = targetLanguage === "hu" ? KNOWN_TRANSLATIONS.get(text.trim()) : undefined;
+  return known ?? `[Mock-fordítás] Élő módban (LLM_MODE=live) itt jelenne meg a valódi fordítás: „${text}”`;
+}
+
 export const mockProvider: LlmProvider = {
   mode: "mock",
+  concurrent: true,
   correct: async (params: CorrectParams) => {
     // Simulate a little latency so loading states are visible.
     await new Promise((r) => setTimeout(r, 300));
     return mockCorrect(params.text);
   },
   streamRoleplay: (params) => mockStreamRoleplay(params),
+  translate: async ({ text, targetLanguage }) => {
+    await new Promise((r) => setTimeout(r, 250));
+    return { text: mockTranslate(text, targetLanguage), model: "mock" };
+  },
 };

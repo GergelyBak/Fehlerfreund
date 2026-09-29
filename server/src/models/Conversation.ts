@@ -33,6 +33,11 @@ const messageSchema = new Schema(
     role: { type: String, enum: ["user", "assistant"], required: true },
     content: { type: String, required: true },
     correction: { type: storedCorrectionSchema, default: undefined },
+    // Cached translation of a partner message, so asking twice is free.
+    translation: {
+      type: new Schema({ language: String, text: String, model: String }, { _id: false }),
+      default: undefined,
+    },
   },
   { timestamps: { createdAt: true, updatedAt: false } },
 );
@@ -44,6 +49,8 @@ const conversationSchema = new Schema(
     // Snapshot of the learner's level when the conversation started.
     level: { type: String, enum: LEVELS, required: true },
     messages: { type: [messageSchema], default: [] },
+    // Ids of the situation tasks the learner has ticked off.
+    completedTasks: { type: [String], default: [] },
   },
   { timestamps: true },
 );

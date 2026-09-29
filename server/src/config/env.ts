@@ -9,8 +9,10 @@ const EnvSchema = z
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
     PORT: z.coerce.number().int().positive().default(4000),
     MONGODB_URI: z.string().startsWith("mongodb"),
-    // mock = free canned responses for development; live = real Claude calls.
-    LLM_MODE: z.enum(["mock", "live"]).default("mock"),
+    // mock = free canned responses; ollama = free local model; live = Claude API (paid).
+    LLM_MODE: z.enum(["mock", "ollama", "live"]).default("mock"),
+    OLLAMA_URL: z.url().default("http://localhost:11434"),
+    OLLAMA_MODEL: z.string().min(1).default("gemma3:4b"),
     ANTHROPIC_API_KEY: optionalString,
     JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters"),
     CLIENT_ORIGIN: z.url().default("http://localhost:5173"),

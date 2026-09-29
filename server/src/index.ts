@@ -7,5 +7,7 @@ await connectDb();
 
 app.listen(env.PORT, () => {
   console.log(`Server listening on http://localhost:${env.PORT}`);
-  console.log(`LLM mode: ${llm.mode}${llm.mode === "mock" ? " (no Claude calls, no cost)" : ""}`);
+  const note = { mock: " (canned replies, no cost)", ollama: " (local model, no cost)", live: " (Claude API, paid)" }[llm.mode];
+  console.log(`LLM mode: ${llm.mode}${note}`);
+  if (llm.mode === "ollama") void import("./llm/ollama.js").then(async (m) => console.log(`Ollama: ${await m.checkOllama()}`));
 });

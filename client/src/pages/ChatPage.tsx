@@ -3,10 +3,12 @@ import { Link, useParams } from 'react-router'
 import { api, ApiError } from '../api/client'
 import { errorMessage } from '../api/errors'
 import { postSse } from '../api/sse'
+import { AssistantMessage } from '../chat/AssistantMessage'
 import { CorrectionPanel } from '../chat/CorrectionPanel'
+import { SituationPanel } from '../chat/SituationPanel'
 import { useSituations } from '../chat/useSituations'
 import { notifyCardsChanged } from '../review/cardEvents'
-import type { ChatMessage, Conversation, StoredCorrection } from '../chat/types'
+import type { ChatMessage, Conversation, Phrase, StoredCorrection } from '../chat/types'
 
 const MAX_LENGTH = 500
 
@@ -18,7 +20,9 @@ export function ChatPage() {
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState<string | null>(null)
+  const [panelOpen, setPanelOpen] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
   const abortRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
@@ -120,6 +124,37 @@ export function ChatPage() {
     }
   }
 
+  async function toggleTask(taskId: string, done: boolean) {
+    if (!conversation) return
+    const previous = conversation.completedTasks
+    // Optimistic: tick immediately, roll back if the server says no.
+    setConversation((c) =>
+      c && {
+        ...c,
+        completedTasks: done ? [...c.completedTasks, taskId] : c.completedTasks.filter((t) => t !== taskId),
+      },
+    )
+    try {
+      const res = await api<{ completedTasks: string[] }>(`/conversations/${conversation.id}/tasks`, {
+        method: 'PATCH',
+        body: JSON.stringify({ taskId, done }),
+      })
+      setConversation((c) => c && { ...c, completedTasks: res.completedTasks })
+    } catch (err) {
+      setConversation((c) => c && { ...c, completedTasks: previous })
+      setSendError(errorMessage(err))
+    }
+  }
+
+  function insertPhrase(phrase: Phrase) {
+    setInput((current) => (current.trim() ? `${current.trimEnd()} ${phrase.de}` : phrase.de))
+    setPanelOpen(false)
+    inputRef.current?.focus()
+  }
+
+  const setTranslation = (messageId: string, text: string) =>
+    updateMessage(messageId, (m) => ({ ...m, translation: { language: '', text } }))
+
   function onKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -142,66 +177,97 @@ export function ChatPage() {
   const situation = situations?.find((s) => s.id === conversation.situationId)
 
   return (
-    <div className="flex h-[calc(100dvh-9rem)] flex-col gap-4">
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span className="text-2xl" aria-hidden>
-            {situation?.emoji}
-          </span>
-          <div>
-            <h1 className="font-semibold">{situation?.title ?? 'Beszélgetés'}</h1>
-            <p className="text-sm text-slate-500">Szint: {conversation.level}</p>
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_17rem]">
+      <div className="flex h-[calc(100dvh-9rem)] flex-col gap-4">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl" aria-hidden>
+              {situation?.emoji}
+            </span>
+            <div>
+              <h1 className="font-semibold">{situation?.title ?? 'Beszélgetés'}</h1>
+              <p className="text-sm text-slate-500">Szint: {conversation.level}</p>
+            </div>
           </div>
+          <Link to="/" className="text-sm text-slate-600 hover:text-slate-900">
+            ← Helyzetek
+          </Link>
         </div>
-        <Link to="/" className="text-sm text-slate-600 hover:text-slate-900">
-          ← Helyzetek
-        </Link>
+
+        <div className="flex-1 space-y-4 overflow-y-auto rounded-2xl bg-white p-4 ring-1 ring-slate-200">
+          {conversation.messages.map((m) =>
+            m.role === 'assistant' ? (
+              <AssistantMessage key={m.id} message={m} conversationId={conversation.id} onTranslated={setTranslation} />
+            ) : (
+              <div key={m.id} className="flex flex-col items-end gap-1.5">
+                <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-indigo-600 px-4 py-2 whitespace-pre-wrap text-white">
+                  {m.content}
+                </div>
+                <div className="flex max-w-[80%] justify-end">
+                  <CorrectionPanel correction={m.correction} pending={m.pending} cardsAdded={m.cardsAdded} />
+                </div>
+              </div>
+            ),
+          )}
+          <div ref={bottomRef} />
+        </div>
+
+        <form onSubmit={send} className="space-y-2">
+          {situation && (
+            <div className="lg:hidden">
+              <button
+                type="button"
+                onClick={() => setPanelOpen((o) => !o)}
+                className="text-sm font-medium text-indigo-700"
+                aria-expanded={panelOpen}
+              >
+                📋 Feladatok és kifejezések ({conversation.completedTasks.length}/{situation.tasks.length}) {panelOpen ? '▲' : '▼'}
+              </button>
+              {panelOpen && (
+                <div className="mt-2 max-h-72 overflow-y-auto rounded-xl bg-white p-3 ring-1 ring-slate-200">
+                  <SituationPanel
+                    situation={situation}
+                    completedTasks={conversation.completedTasks}
+                    onToggleTask={toggleTask}
+                    onPhrase={insertPhrase}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+          {sendError && <p className="text-sm text-red-600">{sendError}</p>}
+          <div className="flex gap-2">
+            <textarea
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={onKeyDown}
+              maxLength={MAX_LENGTH}
+              rows={2}
+              placeholder="Írj németül… (Enter: küldés, Shift+Enter: új sor)"
+              className="flex-1 resize-none rounded-xl border border-slate-300 bg-white px-3 py-2 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            />
+            <button
+              type="submit"
+              disabled={sending || !input.trim()}
+              className="rounded-xl bg-indigo-600 px-5 font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+            >
+              Küldés
+            </button>
+          </div>
+        </form>
       </div>
 
-      <div className="flex-1 space-y-4 overflow-y-auto rounded-2xl bg-white p-4 ring-1 ring-slate-200">
-        {conversation.messages.map((m) =>
-          m.role === 'assistant' ? (
-            <div key={m.id} className="flex">
-              <div className="max-w-[80%] rounded-2xl rounded-tl-sm bg-slate-100 px-4 py-2 whitespace-pre-wrap">
-                {m.content}
-                {m.streaming && <span className="ml-0.5 inline-block animate-pulse">▍</span>}
-              </div>
-            </div>
-          ) : (
-            <div key={m.id} className="flex flex-col items-end gap-1.5">
-              <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-indigo-600 px-4 py-2 whitespace-pre-wrap text-white">
-                {m.content}
-              </div>
-              <div className="flex max-w-[80%] justify-end">
-                <CorrectionPanel correction={m.correction} pending={m.pending} cardsAdded={m.cardsAdded} />
-              </div>
-            </div>
-          ),
-        )}
-        <div ref={bottomRef} />
-      </div>
-
-      <form onSubmit={send} className="space-y-1">
-        {sendError && <p className="text-sm text-red-600">{sendError}</p>}
-        <div className="flex gap-2">
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={onKeyDown}
-            maxLength={MAX_LENGTH}
-            rows={2}
-            placeholder="Írj németül… (Enter: küldés, Shift+Enter: új sor)"
-            className="flex-1 resize-none rounded-xl border border-slate-300 bg-white px-3 py-2 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+      {situation && (
+        <aside className="hidden h-[calc(100dvh-9rem)] overflow-y-auto rounded-2xl bg-white p-4 ring-1 ring-slate-200 lg:block">
+          <SituationPanel
+            situation={situation}
+            completedTasks={conversation.completedTasks}
+            onToggleTask={toggleTask}
+            onPhrase={insertPhrase}
           />
-          <button
-            type="submit"
-            disabled={sending || !input.trim()}
-            className="rounded-xl bg-indigo-600 px-5 font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
-          >
-            Küldés
-          </button>
-        </div>
-      </form>
+        </aside>
+      )}
     </div>
   )
 }

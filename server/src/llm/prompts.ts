@@ -7,8 +7,9 @@ import { fileURLToPath } from "node:url";
 const PROMPTS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../prompts");
 
 export const PROMPT_VERSIONS = {
-  roleplay: "v1",
+  roleplay: "v2",
   correction: "v1",
+  translate: "v1",
 } as const;
 
 export type PromptName = keyof typeof PROMPT_VERSIONS;

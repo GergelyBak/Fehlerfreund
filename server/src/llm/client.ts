@@ -11,4 +11,6 @@ export const MODELS = {
   // missed errors (habe/bin + fahren) and gave wrong explanations, and those
   // would become flashcards.
   correction: "claude-sonnet-5",
+  // Translates partner messages on demand.
+  translation: "claude-sonnet-5",
 } as const;
