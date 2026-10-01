@@ -15,6 +15,7 @@ const MESSAGES: Record<string, string> = {
   'Conversation not found': 'Ez a beszélgetés nem található.',
   'Card not found': 'Ez a kártya már nem létezik.',
   'Topic not found': 'Ez a témakör nem található.',
+  'Unknown error type': 'Ismeretlen hibatípus.',
   'Translation failed, please try again': 'Nem sikerült lefordítani, próbáld újra.',
   'Message not found': 'Ez az üzenet nem található.',
   'This conversation is full, start a new one': 'Ez a beszélgetés megtelt, kezdj egy újat.',

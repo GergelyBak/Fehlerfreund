@@ -2,6 +2,8 @@ import { Router } from "express";
 import { isValidObjectId } from "mongoose";
 import { z } from "zod";
 import { Card, type CardDoc } from "../models/Card.js";
+import { ReviewLog } from "../models/ReviewLog.js";
+import { ERROR_TYPES, type ErrorType } from "../llm/correctionSchema.js";
 import { requireAuth } from "../middleware/requireAuth.js";
 import { validateBody } from "../middleware/validate.js";
 import { HttpError } from "../lib/HttpError.js";
@@ -31,20 +33,34 @@ function toPublicCard(card: CardDoc) {
   };
 }
 
+// Optional ?errorType=Kasus narrows everything to one error category, for
+// targeted practice from the statistics page.
+function cardFilter(req: { userId?: string; query: Record<string, unknown> }): { userId?: string; errorType?: ErrorType } {
+  const errorType = req.query.errorType;
+  if (errorType === undefined) return { userId: req.userId };
+  if (typeof errorType !== "string" || !(ERROR_TYPES as readonly string[]).includes(errorType)) {
+    throw new HttpError(400, "Unknown error type");
+  }
+  return { userId: req.userId, errorType: errorType as ErrorType };
+}
+
 router.get("/stats", async (req, res) => {
   const now = new Date();
+  const filter = cardFilter(req);
   const [total, due, next] = await Promise.all([
-    Card.countDocuments({ userId: req.userId }),
-    Card.countDocuments({ userId: req.userId, dueAt: { $lte: now } }),
-    Card.findOne({ userId: req.userId, dueAt: { $gt: now } }).sort({ dueAt: 1 }).select({ dueAt: 1 }).lean(),
+    Card.countDocuments(filter),
+    Card.countDocuments({ ...filter, dueAt: { $lte: now } }),
+    Card.findOne({ ...filter, dueAt: { $gt: now } }).sort({ dueAt: 1 }).select({ dueAt: 1 }).lean(),
   ]);
   res.json({ total, due, nextDueAt: next?.dueAt ?? null });
 });
 
 router.get("/due", async (req, res) => {
   const limit = Math.min(Math.max(Number(req.query.limit) || 20, 1), 50);
-  // Oldest-due first, so a backlog is worked off in order.
-  const cards = await Card.find({ userId: req.userId, dueAt: { $lte: new Date() } })
+  // ?ahead=1 also returns cards that aren't due yet ("review ahead"), for
+  // practising a weak area on purpose. Oldest-due first either way.
+  const ahead = req.query.ahead === "1";
+  const cards = await Card.find({ ...cardFilter(req), ...(ahead ? {} : { dueAt: { $lte: new Date() } }) })
     .sort({ dueAt: 1 })
     .limit(limit);
   res.json({ cards: cards.map(toPublicCard) });
@@ -68,6 +84,7 @@ router.post("/:id/review", validateBody(ReviewSchema), async (req, res) => {
     lapses: card.lapses + (grade < 3 ? 1 : 0),
   });
   await card.save();
+  await ReviewLog.create({ userId: card.userId, cardId: card._id, errorType: card.errorType, grade, reviewedAt: now });
   res.json({ card: toPublicCard(card) });
 });
 

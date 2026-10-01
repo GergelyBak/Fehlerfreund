@@ -7,6 +7,7 @@ import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
 import { GrammarPage } from './pages/GrammarPage'
 import { GrammarTopicPage } from './pages/GrammarTopicPage'
 import { SituationsPage } from './pages/SituationsPage'
+import { StatsPage } from './pages/StatsPage'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { ReviewPage } from './pages/ReviewPage'
@@ -28,6 +29,7 @@ export default function App() {
               <Route path="review" element={<ReviewPage />} />
               <Route path="grammar" element={<GrammarPage />} />
               <Route path="grammar/:id" element={<GrammarTopicPage />} />
+              <Route path="stats" element={<StatsPage />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

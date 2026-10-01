@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
 import { api } from '../api/client'
 import { errorMessage } from '../api/errors'
 import { notifyCardsChanged } from '../review/cardEvents'
 import { formatDue, formatInterval, sameSentence } from '../review/format'
 import { Highlight } from '../review/Highlight'
 import { SpeakButtons } from '../speech/SpeakButtons'
+import { ERROR_LABELS } from '../stats/errorLabels'
+import type { ErrorType } from '../chat/types'
 import type { Card, CardStats, UiGrade } from '../review/types'
 
 const GRADES: { grade: UiGrade; label: string; key: string; className: string }[] = [
@@ -16,6 +18,14 @@ const GRADES: { grade: UiGrade; label: string; key: string; className: string }[
 ]
 
 export function ReviewPage() {
+  // Targeted practice from the statistics page: ?type=Kasus, optionally &ahead=1
+  // to also review cards that aren't due yet.
+  const [params] = useSearchParams()
+  const rawType = params.get('type')
+  const type = rawType && rawType in ERROR_LABELS ? (rawType as ErrorType) : null
+  const ahead = type !== null && params.get('ahead') === '1'
+  const filter = type ? `&errorType=${encodeURIComponent(type)}` : ''
+
   const [queue, setQueue] = useState<Card[] | null>(null)
   const [stats, setStats] = useState<CardStats | null>(null)
   const [reviewed, setReviewed] = useState(0)
@@ -32,7 +42,10 @@ export function ReviewPage() {
 
   useEffect(() => {
     let cancelled = false
-    Promise.all([api<{ cards: Card[] }>('/cards/due?limit=20'), api<CardStats>('/cards/stats')])
+    Promise.all([
+      api<{ cards: Card[] }>(`/cards/due?limit=20${filter}${ahead ? '&ahead=1' : ''}`),
+      api<CardStats>(`/cards/stats?${filter.slice(1)}`),
+    ])
       .then(([{ cards }, s]) => {
         if (cancelled) return
         setQueue(cards)
@@ -45,7 +58,7 @@ export function ReviewPage() {
     return () => {
       cancelled = true
     }
-  }, [reloadToken])
+  }, [reloadToken, filter, ahead])
 
   const card = queue?.[0]
 
@@ -116,6 +129,35 @@ export function ReviewPage() {
   }
   if (!queue || !stats) return <p className="text-slate-500">Betöltés…</p>
 
+  // Targeted practice with nothing due in that category
+  if (type && sessionSize === 0 && !card) {
+    const label = ERROR_LABELS[type].hu
+    return (
+      <EmptyState>
+        <p className="text-4xl">🎯</p>
+        <h1 className="text-xl font-semibold">Nincs esedékes kártya ebben: {label}</h1>
+        <p className="text-slate-600">
+          {stats.total === 0
+            ? 'Ebben a kategóriában nincs kártyád.'
+            : `${stats.total} kártyád van ebben a kategóriában, de egyik sem esedékes még.`}
+        </p>
+        <div className="flex flex-wrap justify-center gap-3">
+          {stats.total > 0 && !ahead && (
+            <Link
+              to={`/review?type=${encodeURIComponent(type)}&ahead=1`}
+              className="rounded-lg bg-indigo-600 px-4 py-2.5 font-medium text-white hover:bg-indigo-700"
+            >
+              Gyakorlás előre ({stats.total} kártya)
+            </Link>
+          )}
+          <Link to="/stats" className="rounded-lg px-4 py-2.5 font-medium text-indigo-700 ring-1 ring-indigo-200 hover:bg-indigo-50">
+            ← Statisztika
+          </Link>
+        </div>
+      </EmptyState>
+    )
+  }
+
   // Nothing due at all
   if (sessionSize === 0 && !card) {
     return (
@@ -174,7 +216,19 @@ export function ReviewPage() {
     <div className="mx-auto max-w-2xl space-y-5">
       <div className="space-y-2">
         <div className="flex items-center justify-between text-sm text-slate-500">
-          <span>Ismétlés</span>
+          {type ? (
+            <span className="flex items-center gap-2">
+              <span className="rounded-full bg-indigo-100 px-2.5 py-0.5 font-medium text-indigo-800">
+                🎯 {ERROR_LABELS[type].hu}
+                {ahead && ' · előre'}
+              </span>
+              <Link to="/review" className="hover:text-slate-800" aria-label="Szűrő törlése">
+                ✕
+              </Link>
+            </span>
+          ) : (
+            <span>Ismétlés</span>
+          )}
           <span>
             {progress} / {sessionSize}
             {queue.length > sessionSize - progress && ' · +újra'}

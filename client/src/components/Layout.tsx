@@ -24,6 +24,19 @@ function useDueCount() {
   return due
 }
 
+// Icon only on phones (five items don't fit next to the logout button), icon +
+// text from the sm breakpoint up. The text stays available to screen readers.
+function NavLabel({ icon, text }: { icon: string; text: string }) {
+  return (
+    <>
+      <span aria-hidden className="sm:hidden">
+        {icon}
+      </span>
+      <span className="sr-only sm:not-sr-only">{text}</span>
+    </>
+  )
+}
+
 export function Layout() {
   const { user, logout } = useAuth()
   const due = useDueCount()
@@ -32,22 +45,25 @@ export function Layout() {
     <div className="min-h-screen">
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3">
-          <div className="flex items-center gap-4">
-            <span className="font-bold text-indigo-600">Fehlerfreund</span>
-            <nav className="flex gap-1">
-              <NavLink to="/" end className={navClass}>
-                Beszélgetés
+          <div className="flex min-w-0 items-center gap-4">
+            <span className="hidden font-bold text-indigo-600 sm:inline">Fehlerfreund</span>
+            <nav className="-mx-1 flex gap-1 overflow-x-auto px-1 whitespace-nowrap">
+              <NavLink to="/" end className={navClass} title="Beszélgetés">
+                <NavLabel icon="💬" text="Beszélgetés" />
               </NavLink>
-              <NavLink to="/review" className={navClass}>
-                Ismétlés
+              <NavLink to="/review" className={navClass} title="Ismétlés">
+                <NavLabel icon="🗂️" text="Ismétlés" />
                 {!!due && (
                   <span className="min-w-5 rounded-full bg-indigo-600 px-1.5 text-center text-xs leading-5 text-white">
                     {due > 99 ? '99+' : due}
                   </span>
                 )}
               </NavLink>
-              <NavLink to="/grammar" className={navClass}>
-                Nyelvtan
+              <NavLink to="/grammar" className={navClass} title="Nyelvtan">
+                <NavLabel icon="📘" text="Nyelvtan" />
+              </NavLink>
+              <NavLink to="/stats" className={navClass} title="Statisztika">
+                <NavLabel icon="📊" text="Statisztika" />
               </NavLink>
             </nav>
           </div>
