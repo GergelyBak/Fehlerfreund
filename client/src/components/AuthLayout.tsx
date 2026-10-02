@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useAuth } from '../auth/useAuth'
 
 const FEATURES = [
   { icon: '💬', title: 'Valós helyzetek', text: 'Bürgeramt, orvos, lakásnézés: gyakorolj ott, ahol tényleg szükséged lesz rá.' },
@@ -7,6 +8,7 @@ const FEATURES = [
 ]
 
 export function AuthLayout({ title, subtitle, children }: { title: string; subtitle: string; children: ReactNode }) {
+  const { waking } = useAuth()
   return (
     <div className="grid min-h-dvh lg:grid-cols-2">
       <aside className="relative hidden overflow-hidden bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-800 p-12 text-white lg:flex lg:flex-col lg:justify-between">
@@ -51,6 +53,11 @@ export function AuthLayout({ title, subtitle, children }: { title: string; subti
             <h1 className="pt-4 text-3xl font-bold tracking-tight lg:pt-0">{title}</h1>
             <p className="text-slate-600">{subtitle}</p>
           </div>
+          {waking && (
+            <p className="rounded-lg bg-amber-50 px-3 py-2.5 text-sm text-amber-900 ring-1 ring-amber-200">
+              ⏳ A demó szerver épp ébred (ingyenes tárhely). Kb. fél–egy perc, addig a bejelentkezés várakozhat.
+            </p>
+          )}
           {children}
         </div>
       </main>

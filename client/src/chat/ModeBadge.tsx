@@ -1,13 +1,4 @@
-import { useEffect, useState } from 'react'
-import { api } from '../api/client'
-
-interface LlmInfo {
-  mode: 'mock' | 'ollama' | 'live'
-  model: string
-}
-
-// The mode can only change with a server restart, so one fetch per page load is enough.
-let cache: Promise<LlmInfo> | null = null
+import { useLlmInfo, type LlmInfo } from './llmInfo'
 
 const STYLES: Record<LlmInfo['mode'], { label: (model: string) => string; title: string; className: string }> = {
   mock: {
@@ -28,14 +19,7 @@ const STYLES: Record<LlmInfo['mode'], { label: (model: string) => string; title:
 }
 
 export function ModeBadge() {
-  const [info, setInfo] = useState<LlmInfo | null>(null)
-
-  useEffect(() => {
-    cache ??= api<{ llm: LlmInfo }>('/health').then((r) => r.llm)
-    cache.then(setInfo).catch(() => {
-      cache = null
-    })
-  }, [])
+  const info = useLlmInfo()
 
   if (!info) return null
   const style = STYLES[info.mode]

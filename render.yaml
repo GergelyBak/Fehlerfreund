@@ -1,0 +1,33 @@
+# Render Blueprint for the API (free plan). In the Render dashboard:
+# New → Blueprint → pick this repo. Values marked `sync: false` are asked for
+# once in the dashboard and never stored in git.
+services:
+  - type: web
+    name: fehlerfreund-api
+    runtime: node
+    plan: free
+    rootDir: server
+    # Dev dependencies (TypeScript) are needed for the build step.
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      # No GPU or memory for a local model on the free plan: the public demo
+      # uses scripted replies. Switch to "live" (Claude, paid) if you want.
+      - key: LLM_MODE
+        value: mock
+      # Vercel rewrite + Render's own proxy.
+      - key: TRUST_PROXY
+        value: "2"
+      - key: EMAIL_MODE
+        value: console
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MONGODB_URI
+        sync: false
+      - key: CLIENT_ORIGIN
+        sync: false

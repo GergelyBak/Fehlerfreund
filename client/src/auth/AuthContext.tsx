@@ -1,19 +1,45 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
-import { api, ApiError } from '../api/client'
+import { api, ApiError, SERVER_UNREACHABLE } from '../api/client'
 import type { RegisterInput, User } from './types'
 import { AuthContext } from './useAuth'
+
+const WAKE_TIMEOUT_MS = 90_000
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [waking, setWaking] = useState(false)
 
   useEffect(() => {
-    api<{ user: User }>('/auth/me')
-      .then(({ user }) => setUser(user))
-      .catch((err) => {
-        if (!(err instanceof ApiError && err.status === 401)) console.error(err)
-      })
-      .finally(() => setLoading(false))
+    // The free hosting tier puts the API to sleep after 15 idle minutes, and
+    // waking it takes up to a minute. Keep retrying the session check while
+    // the server is unreachable instead of failing on the first try.
+    let cancelled = false
+    const startedAt = Date.now()
+    const check = () => {
+      api<{ user: User }>('/auth/me')
+        .then(({ user }) => !cancelled && setUser(user))
+        .then(() => !cancelled && finish())
+        .catch((err) => {
+          if (cancelled) return
+          const unreachable = err instanceof TypeError || (err instanceof ApiError && err.message === SERVER_UNREACHABLE)
+          if (unreachable && Date.now() - startedAt < WAKE_TIMEOUT_MS) {
+            setWaking(true)
+            setTimeout(check, 4000)
+            return
+          }
+          if (!(err instanceof ApiError && err.status === 401)) console.error(err)
+          finish()
+        })
+    }
+    const finish = () => {
+      setWaking(false)
+      setLoading(false)
+    }
+    check()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const login = useCallback(async (email: string, password: string) => {
@@ -47,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, resetPassword }}>
+    <AuthContext.Provider value={{ user, loading, waking, login, register, logout, resetPassword }}>
       {children}
     </AuthContext.Provider>
   )

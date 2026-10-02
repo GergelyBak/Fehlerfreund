@@ -4,6 +4,8 @@ import type { RegisterInput, User } from './types'
 export interface AuthState {
   user: User | null
   loading: boolean
+  // True while retrying because the (sleeping) server doesn't answer yet.
+  waking: boolean
   login: (email: string, password: string) => Promise<void>
   register: (input: RegisterInput) => Promise<void>
   logout: () => Promise<void>

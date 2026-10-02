@@ -8,6 +8,10 @@ const EnvSchema = z
   .object({
     NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
     PORT: z.coerce.number().int().positive().default(4000),
+    // How many proxies sit in front of the server. In production the request
+    // passes Vercel (the /api rewrite) and Render, so it's 2 there; otherwise
+    // every visitor would share one IP in the rate limiter.
+    TRUST_PROXY: z.coerce.number().int().min(0).default(1),
     MONGODB_URI: z.string().startsWith("mongodb"),
     // mock = free canned responses; ollama = free local model; live = Claude API (paid).
     LLM_MODE: z.enum(["mock", "ollama", "live"]).default("mock"),

@@ -20,7 +20,9 @@ export function verifyToken(token: string): { sub: string } {
 export const authCookieOptions: CookieOptions = {
   httpOnly: true,
   secure: isProd,
-  sameSite: isProd ? "none" : "lax",
+  // The client reaches the API through its own origin (Vite proxy in dev, a
+  // Vercel rewrite in production), so this is always a first-party cookie.
+  sameSite: "lax",
   maxAge: MAX_AGE_MS,
   path: "/",
 };

@@ -1,5 +1,7 @@
 # Fehlerfreund
 
+[![CI](https://github.com/GergelyBak/Fehlerfreund/actions/workflows/ci.yml/badge.svg)](https://github.com/GergelyBak/Fehlerfreund/actions/workflows/ci.yml)
+
 A German conversation partner that teaches from your own mistakes.
 
 You chat in real-life situations (Bürgeramt, doctor, flat viewing, job interview…) at your CEFR level. An LLM plays the other side and corrects each message, with an explanation in your native language. Your mistakes become flashcards, and an SM-2 spaced-repetition scheduler brings them back for review. There is also a textbook-style A2 grammar course, and your wrong test answers go into the same deck.
@@ -83,6 +85,15 @@ npm run dev            # http://localhost:5173 (proxies /api to the server)
 Run the tests with `cd server && npm test`.
 
 In development, password-reset emails are printed to the server terminal (`EMAIL_MODE=console`). Set `EMAIL_MODE=smtp` to send real ones.
+
+## Deployment
+
+The public demo runs on free tiers: the client on **Vercel** (`client/vercel.json`), the API on **Render** (`render.yaml` Blueprint) and the database on **MongoDB Atlas**.
+
+- The client calls the API through a Vercel rewrite (`/api/*` → Render), so the auth cookie stays first-party and works in browsers that block third-party cookies. That puts two proxies in front of the API, hence `TRUST_PROXY=2`, which keeps per-visitor rate limits.
+- The free plan has no GPU and too little memory for a local model, so the demo chat runs with `LLM_MODE=mock`, and the app says so. Everything else (grammar, flashcards, statistics, speech) is fully functional.
+- Render free services sleep after 15 idle minutes. The client detects the unreachable API, shows a "waking up" notice and retries for up to 90 seconds.
+- GitHub Actions runs type-checks, the unit tests, lint and both builds on every push.
 
 ## Next
 
