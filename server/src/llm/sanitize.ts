@@ -1,4 +1,5 @@
 import type { Correction } from "./correctionSchema.js";
+import { containsPhrase } from "../lib/phrase.js";
 
 // Deterministic sanity checks on a correction, whichever model produced it.
 // A schema-valid answer can still be nonsense (small local models especially),
@@ -24,7 +25,11 @@ export function sanitizeCorrection(text: string, correction: Correction): Correc
       norm(c.original) !== norm(c.corrected) &&
       // The quoted mistake must actually be in what the learner wrote.
       c.original.trim() !== "" &&
-      haystack.includes(c.original.trim().toLowerCase()),
+      haystack.includes(c.original.trim().toLowerCase()) &&
+      // The fix must agree with the model's own corrected sentence. A fix that
+      // isn't in it ("wo ist → wo der ist" next to "…, wo der Bahnhof ist.")
+      // contradicts the model itself and would teach something wrong.
+      containsPhrase(correction.correctedMessage, c.corrected),
   );
 
   return {

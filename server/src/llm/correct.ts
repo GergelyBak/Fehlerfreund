@@ -9,10 +9,11 @@ import type { CorrectParams, CorrectionResult } from "./types.js";
 const LANGUAGE_NAMES: Record<string, string> = { hu: "Hungarian", en: "English", tr: "Turkish" };
 
 export async function correctMessage(opts: CorrectParams): Promise<CorrectionResult> {
-  const { text: system, version: promptVersion } = await loadPrompt("correction", {
-    level: opts.level,
-    nativeLanguage: LANGUAGE_NAMES[opts.nativeLanguage] ?? "English",
-  });
+  const { text: system, version: promptVersion } = await loadPrompt(
+    "correction",
+    { level: opts.level, nativeLanguage: LANGUAGE_NAMES[opts.nativeLanguage] ?? "English" },
+    opts.promptVersion,
+  );
   const model = MODELS.correction;
 
   let response;

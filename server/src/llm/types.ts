@@ -6,6 +6,8 @@ export interface CorrectParams {
   text: string;
   level: string;
   nativeLanguage: string;
+  // Only the eval sets this, to compare prompt versions.
+  promptVersion?: string;
 }
 
 export type CorrectionResult =

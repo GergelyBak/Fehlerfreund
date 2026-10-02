@@ -49,13 +49,23 @@ async function chat(body: Record<string, unknown>, signal?: AbortSignal) {
   return res;
 }
 
-async function complete(messages: OllamaMessage[], options: Record<string, unknown>, format?: unknown) {
-  const res = await chat({
-    messages,
-    stream: false,
-    options: { ...BASE_OPTIONS, ...options },
-    ...(format ? { format } : {}),
-  });
+// Non-streamed calls always get a token cap and a deadline: a small model can
+// occasionally keep generating without stopping, and without these limits that
+// request (and the chat message waiting on it) would hang for minutes.
+async function complete(
+  messages: OllamaMessage[],
+  options: Record<string, unknown> & { num_predict: number },
+  limits: { timeoutMs: number; format?: unknown },
+) {
+  const res = await chat(
+    {
+      messages,
+      stream: false,
+      options: { ...BASE_OPTIONS, ...options },
+      ...(limits.format ? { format: limits.format } : {}),
+    },
+    AbortSignal.timeout(limits.timeoutMs),
+  );
   const data = (await res.json()) as ChatChunk;
   if (data.error) throw new Error(`Ollama error: ${data.error}`);
   return data.message?.content ?? "";
@@ -114,18 +124,29 @@ async function* streamRoleplay(opts: RoleplayParams): AsyncGenerator<string, voi
 }
 
 async function correct(opts: CorrectParams): Promise<CorrectionResult> {
-  const { text: system, version: promptVersion } = await loadPrompt("correction", {
-    level: opts.level,
-    nativeLanguage: LANGUAGE_NAMES[opts.nativeLanguage] ?? "English",
-  });
-  const content = await complete(
-    [
-      { role: "system", content: system },
-      { role: "user", content: opts.text },
-    ],
-    { temperature: 0 },
-    CORRECTION_JSON_SCHEMA,
+  const { text: system, version: promptVersion } = await loadPrompt(
+    "correction",
+    { level: opts.level, nativeLanguage: LANGUAGE_NAMES[opts.nativeLanguage] ?? "English" },
+    opts.promptVersion,
   );
+  let content: string;
+  try {
+    content = await complete(
+      [
+        { role: "system", content: system },
+        { role: "user", content: opts.text },
+      ],
+      // Room for a few corrections with explanations, nowhere near a runaway.
+      { temperature: 0, num_predict: 600 },
+      { timeoutMs: 45_000, format: CORRECTION_JSON_SCHEMA },
+    );
+  } catch (err) {
+    if (err instanceof Error && err.name === "TimeoutError") {
+      console.warn("Ollama correction timed out");
+      return { ok: false, reason: "timeout", promptVersion, model: MODEL_LABEL };
+    }
+    throw err;
+  }
 
   // Constrained decoding makes valid JSON likely, not guaranteed: validate
   // exactly like the Claude path, and skip the correction if it doesn't fit.
@@ -133,6 +154,8 @@ async function correct(opts: CorrectParams): Promise<CorrectionResult> {
   try {
     json = JSON.parse(content);
   } catch {
+    // Usually output cut off at the token cap.
+    console.warn("Ollama correction was not valid JSON:", content.slice(0, 200));
     return { ok: false, reason: "invalid_output", promptVersion, model: MODEL_LABEL };
   }
   const parsed = CorrectionSchema.safeParse(json);
@@ -153,7 +176,8 @@ async function translate(opts: TranslateParams) {
         { role: "system", content: system },
         { role: "user", content: opts.text },
       ],
-      { temperature: 0.2 },
+      { temperature: 0.2, num_predict: 300 },
+      { timeoutMs: 30_000 },
     )
   ).trim();
   if (!text) throw new Error("Empty translation");

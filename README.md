@@ -19,7 +19,7 @@ You chat in real-life situations (Bürgeramt, doctor, flat viewing, job intervie
 - **Client:** React 19, TypeScript, Tailwind CSS 4, Vite, React Router, Web Speech API
 - **Server:** Node.js, Express 5, TypeScript, MongoDB Atlas (Mongoose), Zod, Nodemailer
 - **LLM:** a local model via [Ollama](https://ollama.com) (default `gemma3:4b`), or the Claude API (`claude-sonnet-5`), or a mock
-- **Tests:** Vitest (74 tests)
+- **Tests:** Vitest (82 tests) and a correction-quality eval
 
 ## Engineering notes
 
@@ -36,6 +36,18 @@ You chat in real-life situations (Bürgeramt, doctor, flat viewing, job intervie
   - an unchanged sentence reported as wrong.
 
   The test cases come from real small-model output.
+- **Correction quality is measured, not guessed.** `npm run eval:correction -- --prompt v2` (in `server/`) runs 28 fixed A2 sentences (18 with known errors, 10 correct) through the same path as the app: model → Zod → sanitizer. It reports recall, false alarms, error-type accuracy and whether the marked fragment is precise enough for a flashcard. Results for `gemma3:4b`:
+
+  | | prompt v1 | prompt v2 |
+  |---|---|---|
+  | Errors found (recall) | 52% | 52% |
+  | False alarms on correct sentences | 0% | 0% |
+  | Error type correct | 55% | **91%** |
+  | Precise fragment (card-ready) | 45% | **91%** |
+  | Failed outputs | 0 | 0 |
+  | Avg latency | 3.6 s | 3.4 s |
+
+  v2 adds a step-by-step checklist and worked examples. Measuring it surfaced two real bugs. First, Hungarian „…” quotes in the examples made the model close a JSON string with `”` and then emit whitespace until the request hung for 5 minutes, so non-streamed Ollama calls now have a token cap and a timeout. Second, v2 made more over-eager fixes, so the sanitizer now drops any fix that contradicts the model's own corrected sentence. That removed half of them and lost no real finds. With 28 sentences, differences of a few points are noise; the 45% → 91% jumps are not.
 - **Model choice was measured, not assumed.** On the same sentences, Claude Haiku 4.5 missed errors and explained a noun's gender wrongly, so the Claude path uses Sonnet at low effort. For running free, `gemma3:4b` gives good roleplay (about 0.8 s to first token on a 4 GB laptop GPU) but weaker corrections, which the sanitizer only partly offsets.
 - **Grammar content is hand-written, and tests are graded on the server.** Textbook material has to be correct, which a small model can't guarantee. Solutions never reach the browser before answering. Answer checking accepts any letter case and `ae`/`ss` for `ä`/`ß` (Hungarian keyboards have neither). Content-integrity tests guard the hand-written data.
 - **Flashcards and SM-2.** A chat card's front is the learner's sentence with *only that* error left in, so each card practises one rule. Repeating a known mistake bumps the card and restarts its schedule instead of creating a duplicate. SM-2 is a pure, unit-tested function (`server/src/srs/sm2.ts`), and the interval preview on each answer button comes from the same function.
@@ -75,4 +87,4 @@ In development, password-reset emails are printed to the server terminal (`EMAIL
 ## Next
 
 - B1 grammar topics
-- Better corrections from local models (few-shot prompt, measured on a fixed test set)
+- Higher recall from local models (word order and article gender are still the weak spots)

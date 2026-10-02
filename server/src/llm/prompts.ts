@@ -8,7 +8,7 @@ const PROMPTS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 
 export const PROMPT_VERSIONS = {
   roleplay: "v2",
-  correction: "v1",
+  correction: "v2",
   translate: "v1",
 } as const;
 
@@ -16,8 +16,8 @@ export type PromptName = keyof typeof PROMPT_VERSIONS;
 
 const cache = new Map<string, string>();
 
-export async function loadPrompt(name: PromptName, vars: Record<string, string> = {}) {
-  const version = PROMPT_VERSIONS[name];
+// `version` overrides the default, so the eval can compare prompt versions.
+export async function loadPrompt(name: PromptName, vars: Record<string, string> = {}, version: string = PROMPT_VERSIONS[name]) {
   const file = `${name}.${version}.md`;
   let template = cache.get(file);
   if (template === undefined) {

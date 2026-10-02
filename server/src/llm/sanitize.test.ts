@@ -53,6 +53,17 @@ describe("sanitizeCorrection", () => {
     expect(result).toEqual({ hasErrors: false, correctedMessage: ok, corrections: [] });
   });
 
+  it("drops a fix that contradicts the model's own corrected sentence", () => {
+    // Real output from gemma3:4b with prompt v2.
+    const text = "Ich weiß nicht, wo ist der Bahnhof.";
+    const result = sanitizeCorrection(text, {
+      hasErrors: true,
+      correctedMessage: "Ich weiß nicht, wo der Bahnhof ist.",
+      corrections: [item("wo ist", "wo der ist")],
+    });
+    expect(result).toEqual({ hasErrors: false, correctedMessage: text, corrections: [] });
+  });
+
   it("ignores case and punctuation when comparing", () => {
     const result = sanitizeCorrection("guten tag", {
       hasErrors: true,
