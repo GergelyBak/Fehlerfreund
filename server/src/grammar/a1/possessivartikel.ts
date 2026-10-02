@@ -1,0 +1,111 @@
+import type { GrammarTopic } from "../types.js";
+
+export const possessivartikel: GrammarTopic = {
+  id: "possessivartikel",
+  level: "A1",
+  order: 9,
+  title: "Birtokos névmás: mein, dein, sein, ihr",
+  summary: "Kié? A birtokos névmások és a végződéseik.",
+  errorType: "Artikel",
+  lesson: [
+    {
+      heading: "Kié?",
+      table: {
+        headers: ["Személy", "Birtokos névmás", "Példa"],
+        rows: [
+          ["ich", "mein", "mein Bruder"],
+          ["du", "dein", "dein Handy"],
+          ["er", "sein", "sein Auto"],
+          ["sie (ő, nő)", "ihr", "ihr Mann"],
+          ["es", "sein", "sein Spielzeug"],
+          ["wir", "unser", "unser Haus"],
+          ["ihr", "euer", "euer Lehrer"],
+          ["sie (ők)", "ihr", "ihr Garten"],
+          ["Sie (Ön)", "Ihr", "Ihr Pass"],
+        ],
+      },
+      tip: "Figyelj: sein = az ő (férfi) …-ja, ihr = az ő (nő) vagy az ő(k) …-ja. A magázó Ihr nagybetűs.",
+    },
+    {
+      heading: "Végződések",
+      text: "A birtokos névmás úgy ragozódik, mint az ein. Hímnemben és semlegesnemben nincs végződése (mein Bruder, mein Auto), nőnemben és többes számban -e (meine Schwester, meine Eltern). Akkusativban hímnemben -en: Ich sehe meinen Bruder.",
+      table: {
+        headers: ["", "hímnem", "nőnem", "semlegesnem", "többes szám"],
+        rows: [
+          ["Nominativ", "mein Bruder", "meine Schwester", "mein Kind", "meine Eltern"],
+          ["Akkusativ", "meinen Bruder", "meine Schwester", "mein Kind", "meine Eltern"],
+        ],
+      },
+      examples: [
+        { de: "Das ist meine Familie.", hu: "Ez a családom." },
+        { de: "Wie heißt deine Mutter?", hu: "Hogy hívják az anyukádat?" },
+      ],
+    },
+  ],
+  exercises: [
+    {
+      id: "po1",
+      type: "choice",
+      prompt: "Das ist ___ Schwester Anna.",
+      options: ["mein", "meine", "meinen"],
+      answer: "meine",
+      explanation: "die Schwester nőnemű, ezért meine.",
+    },
+    {
+      id: "po2",
+      type: "choice",
+      prompt: "Wie ist ___ Name? – Mein Name ist Lukas.",
+      options: ["dein", "deine", "deinen"],
+      answer: "dein",
+      explanation: "der Name hímnemű, Nominativban végződés nélkül: dein Name.",
+    },
+    {
+      id: "po3",
+      type: "choice",
+      prompt: "Peter und ___ Frau wohnen in Wien.",
+      options: ["sein", "seine", "ihre"],
+      answer: "seine",
+      explanation: "Péter felesége: az ő (férfi) → sein. die Frau nőnemű, ezért seine.",
+    },
+    {
+      id: "po4",
+      type: "choice",
+      prompt: "Anna und ___ Mann kommen aus Ungarn.",
+      options: ["sein", "ihr", "ihre"],
+      answer: "ihr",
+      explanation: "Anna férje: az ő (nő) → ihr. der Mann hímnemű, ezért végződés nélkül: ihr Mann.",
+    },
+    {
+      id: "po5",
+      type: "gap",
+      prompt: "Wir verkaufen ___ Auto.",
+      hint: "wir",
+      answers: ["unser"],
+      explanation: "wir → unser. das Auto semlegesnemű, ezért végződés nélkül: unser Auto.",
+    },
+    {
+      id: "po6",
+      type: "choice",
+      prompt: "Haben Sie ___ Pass dabei?",
+      options: ["Ihren", "ihren", "Ihr"],
+      answer: "Ihren",
+      explanation: "Magázás → Ihr (nagybetű). der Pass hímnemű, tárgy (Akkusativ): Ihren Pass.",
+    },
+    {
+      id: "po7",
+      type: "gap",
+      prompt: "Ich besuche morgen ___ Eltern.",
+      hint: "ich",
+      answers: ["meine"],
+      explanation: "Többes szám (die Eltern): meine Eltern.",
+    },
+    {
+      id: "po8",
+      type: "choice",
+      prompt: "Kinder, wo ist ___ Lehrer?",
+      options: ["euer", "eure", "unser"],
+      answer: "euer",
+      explanation: "ihr (ti) → euer. der Lehrer hímnemű, végződés nélkül: euer Lehrer.",
+    },
+  ],
+};

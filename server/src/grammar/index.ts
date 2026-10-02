@@ -1,3 +1,13 @@
+import { akkusativ } from "./a1/akkusativ.js";
+import { artikel } from "./a1/artikel.js";
+import { imperativ } from "./a1/imperativ.js";
+import { modalverben } from "./a1/modalverben.js";
+import { negation } from "./a1/negation.js";
+import { plural } from "./a1/plural.js";
+import { possessivartikel } from "./a1/possessivartikel.js";
+import { praesens } from "./a1/praesens.js";
+import { satzbau } from "./a1/satzbau.js";
+import { trennbareVerben } from "./a1/trennbareVerben.js";
 import { adjektivdeklination } from "./a2/adjektivdeklination.js";
 import { dativ } from "./a2/dativ.js";
 import { festePraepositionen } from "./a2/festePraepositionen.js";
@@ -14,6 +24,18 @@ import { zeitangaben } from "./a2/zeitangaben.js";
 import { GAP, type Exercise, type GrammarTopic } from "./types.js";
 
 export const GRAMMAR_TOPICS: GrammarTopic[] = [
+  // A1
+  praesens,
+  artikel,
+  plural,
+  akkusativ,
+  satzbau,
+  negation,
+  modalverben,
+  trennbareVerben,
+  possessivartikel,
+  imperativ,
+  // A2
   perfekt,
   praeteritum,
   dativ,
@@ -27,7 +49,7 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
   indirekteFragen,
   zeitangaben,
   festePraepositionen,
-].sort((a, b) => a.order - b.order);
+].sort((a, b) => a.level.localeCompare(b.level) || a.order - b.order);
 
 export function getTopic(id: string) {
   return GRAMMAR_TOPICS.find((t) => t.id === id);

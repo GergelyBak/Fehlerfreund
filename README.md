@@ -4,7 +4,7 @@
 
 A German conversation partner that teaches from your own mistakes.
 
-You chat in real-life situations (Bürgeramt, doctor, flat viewing, job interview…) at your CEFR level. An LLM plays the other side and corrects each message, with an explanation in your native language. Your mistakes become flashcards, and an SM-2 spaced-repetition scheduler brings them back for review. There is also a textbook-style A2 grammar course, and your wrong test answers go into the same deck.
+You chat in real-life situations (Bürgeramt, doctor, flat viewing, job interview…) at your CEFR level. An LLM plays the other side and corrects each message, with an explanation in your native language. Your mistakes become flashcards, and an SM-2 spaced-repetition scheduler brings them back for review. There is also a textbook-style A1–A2 grammar course, and your wrong test answers go into the same deck.
 
 ## Features
 
@@ -12,7 +12,7 @@ You chat in real-life situations (Bürgeramt, doctor, flat viewing, job intervie
 - **Correction on every message.** Error type (`Kasus`, `Tempus`, `Wortstellung`…), the fix, and a short explanation in Hungarian, English or Turkish.
 - **Translate and listen.** Translate any partner message into your language on demand. German is read aloud at normal or slow speed, with optional auto-read.
 - **Flashcards with SM-2.** Chat mistakes and wrong grammar answers become cards. The review page has keyboard grading, and forgotten cards come back within the same session.
-- **A2 grammar course.** 13 hand-written topics. Each has explanations, tables, spoken examples and a graded test. The topics: Perfekt, Präteritum, Dativ, Wechselpräpositionen, weil/dass/wenn, comparison, adjective endings, Konjunktiv II, reflexive verbs, verbs with prepositions, indirect questions, time expressions, and prepositions with a fixed case.
+- **Grammar course, A1 and A2.** 23 hand-written topics: 10 for A1 (present tense, articles, plural, Akkusativ, word order, nicht/kein, modal verbs, separable verbs, possessives, imperative) and 13 for A2. Each has explanations, tables, spoken examples and a graded test. The A2 topics: Perfekt, Präteritum, Dativ, Wechselpräpositionen, weil/dass/wenn, comparison, adjective endings, Konjunktiv II, reflexive verbs, verbs with prepositions, indirect questions, time expressions, and prepositions with a fixed case.
 - **Statistics.** Your weakest area, mistakes by error type, a 14-day activity chart, card maturity, grammar progress and a daily streak. One click starts targeted practice for an error type.
 - **Accounts.** JWT auth, password reset by email, and per-user progress.
 
@@ -21,7 +21,7 @@ You chat in real-life situations (Bürgeramt, doctor, flat viewing, job intervie
 - **Client:** React 19, TypeScript, Tailwind CSS 4, Vite, React Router, Web Speech API
 - **Server:** Node.js, Express 5, TypeScript, MongoDB Atlas (Mongoose), Zod, Nodemailer
 - **LLM:** a local model via [Ollama](https://ollama.com) (default `gemma3:4b`), or the Claude API (`claude-sonnet-5`), or a mock
-- **Tests:** Vitest (82 tests) and a correction-quality eval
+- **Tests:** Vitest (93 tests) and a correction-quality eval
 
 ## Engineering notes
 

@@ -1,0 +1,121 @@
+import type { GrammarTopic } from "../types.js";
+
+export const praesens: GrammarTopic = {
+  id: "praesens",
+  level: "A1",
+  order: 1,
+  title: "Jelen idő: ich bin, du hast, er wohnt",
+  summary: "Személyes névmások, igevégződések, a sein és a haben, és a tőhangváltós igék.",
+  errorType: "Verbkonjugation",
+  lesson: [
+    {
+      heading: "Igevégződések",
+      text: "A német igék személyenként más végződést kapnak. A főnévi igenévből levesszük az -en végződést (wohnen → wohn-), és a tőhöz a személynek megfelelő végződést tesszük.",
+      table: {
+        headers: ["", "végződés", "wohnen", "arbeiten"],
+        rows: [
+          ["ich", "-e", "wohne", "arbeite"],
+          ["du", "-st", "wohnst", "arbeitest"],
+          ["er / sie / es", "-t", "wohnt", "arbeitet"],
+          ["wir", "-en", "wohnen", "arbeiten"],
+          ["ihr", "-t", "wohnt", "arbeitet"],
+          ["sie / Sie", "-en", "wohnen", "arbeiten"],
+        ],
+      },
+      tip: "Ha a tő -t-re vagy -d-re végződik (arbeiten, finden), a du, az er és az ihr alakba egy -e- kerül, hogy ki lehessen mondani: du arbeitest, er findet.",
+    },
+    {
+      heading: "sein és haben",
+      table: {
+        headers: ["", "sein (lenni)", "haben (birtokolni)"],
+        rows: [
+          ["ich", "bin", "habe"],
+          ["du", "bist", "hast"],
+          ["er / sie / es", "ist", "hat"],
+          ["wir", "sind", "haben"],
+          ["ihr", "seid", "habt"],
+          ["sie / Sie", "sind", "haben"],
+        ],
+      },
+      examples: [
+        { de: "Ich bin Anna und ich bin 25 Jahre alt.", hu: "Anna vagyok, 25 éves." },
+        { de: "Hast du heute Zeit?", hu: "Ráérsz ma?" },
+      ],
+    },
+    {
+      heading: "Tőhangváltós igék",
+      text: "Néhány rendhagyó ige a du és az er/sie/es alakban megváltoztatja a tő magánhangzóját. A többi személyben szabályos marad.",
+      table: {
+        headers: ["Ige", "du", "er / sie / es"],
+        rows: [
+          ["fahren (utazik)", "fährst", "fährt"],
+          ["schlafen (alszik)", "schläfst", "schläft"],
+          ["sprechen (beszél)", "sprichst", "spricht"],
+          ["essen (eszik)", "isst", "isst"],
+          ["nehmen (vesz)", "nimmst", "nimmt"],
+          ["lesen (olvas)", "liest", "liest"],
+        ],
+      },
+    },
+  ],
+  exercises: [
+    { id: "pr1", type: "gap", prompt: "Ich ___ aus Ungarn.", hint: "kommen", answers: ["komme"], explanation: "ich + -e: ich komme." },
+    { id: "pr2", type: "gap", prompt: "Wo ___ du?", hint: "wohnen", answers: ["wohnst"], explanation: "du + -st: du wohnst." },
+    {
+      id: "pr3",
+      type: "choice",
+      prompt: "Wir ___ Studenten.",
+      options: ["sind", "seid", "ist"],
+      answer: "sind",
+      explanation: "A sein wir alakja: wir sind. A seid az ihr alak.",
+    },
+    {
+      id: "pr4",
+      type: "choice",
+      prompt: "___ du Geschwister?",
+      options: ["Hast", "Hat", "Habt"],
+      answer: "Hast",
+      explanation: "A haben du alakja: du hast.",
+    },
+    {
+      id: "pr5",
+      type: "gap",
+      prompt: "Er ___ in einer Bank.",
+      hint: "arbeiten",
+      answers: ["arbeitet"],
+      explanation: "A tő -t-re végződik (arbeit-), ezért er alakban -et: er arbeitet.",
+    },
+    {
+      id: "pr6",
+      type: "gap",
+      prompt: "Ich ___ ein bisschen Deutsch.",
+      hint: "sprechen",
+      answers: ["spreche"],
+      explanation: "A tőhangváltás csak a du és az er/sie/es alakot érinti, az ich alak szabályos: ich spreche.",
+    },
+    {
+      id: "pr7",
+      type: "gap",
+      prompt: "Sie ___ jeden Tag mit dem Bus.",
+      hint: "fahren (ő, nő)",
+      answers: ["fährt"],
+      explanation: "A fahren tőhangváltós ige: er/sie fährt.",
+    },
+    {
+      id: "pr8",
+      type: "choice",
+      prompt: "Was ___ ihr am Wochenende?",
+      options: ["macht", "machen", "machst"],
+      answer: "macht",
+      explanation: "ihr + -t: ihr macht.",
+    },
+    {
+      id: "pr9",
+      type: "gap",
+      prompt: "Mein Sohn ___ gern Bücher.",
+      hint: "lesen",
+      answers: ["liest"],
+      explanation: "A lesen tőhangváltós ige: er liest.",
+    },
+  ],
+};

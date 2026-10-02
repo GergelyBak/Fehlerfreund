@@ -24,7 +24,7 @@ export interface Stats {
   errorTypes: ErrorTypeStat[]
   cards: { total: number; due: number; new: number; learning: number; mature: number }
   grammar: {
-    topics: { id: string; order: number; title: string; bestScore: number | null }[]
+    topics: { id: string; level: string; order: number; title: string; bestScore: number | null }[]
     attempted: number
     passed: number
   }

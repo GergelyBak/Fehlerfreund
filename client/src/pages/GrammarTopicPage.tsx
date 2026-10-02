@@ -44,7 +44,7 @@ export function GrammarTopicPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="space-y-2">
-        <Link to="/grammar" className="text-sm text-slate-600 hover:text-slate-900">
+        <Link to={`/grammar?level=${topic.level}`} className="text-sm text-slate-600 hover:text-slate-900">
           ← Témakörök
         </Link>
         <div className="flex flex-wrap items-center gap-2">

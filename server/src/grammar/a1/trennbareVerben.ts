@@ -1,0 +1,101 @@
+import type { GrammarTopic } from "../types.js";
+
+export const trennbareVerben: GrammarTopic = {
+  id: "trennbare-verben",
+  level: "A1",
+  order: 8,
+  title: "Elváló igekötős igék: aufstehen, einkaufen",
+  summary: "Mikor válik le az igekötő, hová kerül, és mikor marad egyben.",
+  errorType: "Wortstellung",
+  lesson: [
+    {
+      heading: "Mi az elváló igekötő?",
+      text: "Sok német igének van igekötője (auf-, an-, ein-, aus-, mit-, zurück-, fern-…). Jelen időben a ragozott ige a 2. helyen áll, az igekötő pedig leválik, és a mondat legvégére kerül.",
+      table: {
+        headers: ["Főnévi igenév", "Mondat", "Jelentés"],
+        rows: [
+          ["aufstehen", "Ich stehe um 7 Uhr auf.", "Hétkor kelek fel."],
+          ["einkaufen", "Wir kaufen am Samstag ein.", "Szombaton bevásárolunk."],
+          ["anrufen", "Er ruft seine Mutter an.", "Felhívja az anyját."],
+          ["fernsehen", "Sie sieht jeden Abend fern.", "Minden este tévézik."],
+          ["mitkommen", "Kommst du mit?", "Jössz velünk?"],
+        ],
+      },
+    },
+    {
+      heading: "Mikor marad egyben?",
+      text: "Ha a mondatban módbeli ige is van, az elváló igekötős ige főnévi igenévként, egyben áll a végén: Ich muss morgen früh aufstehen.",
+      tip: "A be-, ver-, er-, ent- és ge- igekötő sosem válik le: Ich bezahle. Ich verstehe.",
+      examples: [
+        { de: "Ich rufe dich morgen an.", hu: "Holnap felhívlak." },
+        { de: "Kannst du heute einkaufen?", hu: "Tudsz ma bevásárolni?" },
+      ],
+    },
+  ],
+  exercises: [
+    {
+      id: "t1",
+      type: "choice",
+      prompt: "Jeden Tag ___",
+      options: ["ich aufstehe um 6 Uhr.", "stehe ich um 6 Uhr auf.", "ich stehe auf um 6 Uhr."],
+      answer: "stehe ich um 6 Uhr auf.",
+      explanation: "Az ige a 2. helyen (stehe), az alany utána, az igekötő (auf) a mondat végén.",
+    },
+    {
+      id: "t2",
+      type: "choice",
+      prompt: "Wir ___",
+      options: ["kaufen heute ein.", "einkaufen heute.", "ein kaufen heute."],
+      answer: "kaufen heute ein.",
+      explanation: "Az igekötő leválik, és a mondat végére kerül: wir kaufen … ein.",
+    },
+    {
+      id: "t3",
+      type: "gap",
+      prompt: "Er ruft seine Freundin ___.",
+      hint: "anrufen",
+      answers: ["an"],
+      explanation: "anrufen: az an a mondat végére kerül.",
+    },
+    {
+      id: "t4",
+      type: "gap",
+      prompt: "Wann kommst du ___? – Morgen um zehn.",
+      hint: "zurückkommen",
+      answers: ["zurück"],
+      explanation: "zurückkommen: a zurück a mondat végére kerül.",
+    },
+    {
+      id: "t5",
+      type: "choice",
+      prompt: "Ich muss morgen früh ___.",
+      options: ["aufstehen", "stehe auf", "auf stehe"],
+      answer: "aufstehen",
+      explanation: "Módbeli ige mellett az elváló igekötős ige egyben, főnévi igenévként áll a végén.",
+    },
+    {
+      id: "t6",
+      type: "gap",
+      prompt: "Siehst du gern ___?",
+      hint: "fernsehen",
+      answers: ["fern"],
+      explanation: "fernsehen: a fern a mondat végére kerül.",
+    },
+    {
+      id: "t7",
+      type: "choice",
+      prompt: "Kommst du heute Abend ___?",
+      options: ["mit", "an", "auf"],
+      answer: "mit",
+      explanation: "mitkommen = velünk jön.",
+    },
+    {
+      id: "t8",
+      type: "choice",
+      prompt: "Ich ___ die Rechnung.",
+      options: ["bezahle", "zahle be", "be zahle"],
+      answer: "bezahle",
+      explanation: "A be- nem elváló igekötő: ich bezahle.",
+    },
+  ],
+};

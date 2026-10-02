@@ -242,8 +242,22 @@ export function CardStageBar({ cards }: { cards: Stats['cards'] }) {
   )
 }
 
-// --- Grammar: one meter per topic, in course order ---
+// --- Grammar: one meter per topic, grouped by level, in course order ---
 export function GrammarMeters({ topics }: { topics: Stats['grammar']['topics'] }) {
+  const levels = [...new Set(topics.map((t) => t.level))]
+  return (
+    <div className="space-y-4">
+      {levels.map((level) => (
+        <div key={level} className="space-y-1.5">
+          <h3 className="text-xs font-semibold tracking-wide text-slate-500 uppercase">{level}</h3>
+          <TopicMeters topics={topics.filter((t) => t.level === level)} />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function TopicMeters({ topics }: { topics: Stats['grammar']['topics'] }) {
   return (
     <ul className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
       {topics.map((t) => {

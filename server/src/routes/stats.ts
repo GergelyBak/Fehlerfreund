@@ -140,6 +140,7 @@ router.get("/", async (req, res) => {
   const progressByTopic = new Map(grammar.map((g) => [g.topicId, g]));
   const grammarTopics = GRAMMAR_TOPICS.map((t) => ({
     id: t.id,
+    level: t.level,
     order: t.order,
     title: t.title,
     bestScore: progressByTopic.get(t.id)?.bestScore ?? null,

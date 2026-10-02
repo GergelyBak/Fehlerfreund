@@ -5,9 +5,15 @@ import { GAP } from "./types.js";
 
 // Hand-written content is easy to break with a typo; these guard it.
 describe("grammar content", () => {
-  it("has unique topic ids and orders", () => {
+  it("has unique topic ids, and unique lesson numbers within a level", () => {
     expect(new Set(GRAMMAR_TOPICS.map((t) => t.id)).size).toBe(GRAMMAR_TOPICS.length);
-    expect(new Set(GRAMMAR_TOPICS.map((t) => t.order)).size).toBe(GRAMMAR_TOPICS.length);
+    const keys = GRAMMAR_TOPICS.map((t) => `${t.level}-${t.order}`);
+    expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  it("is sorted by level, then lesson number", () => {
+    const keys = GRAMMAR_TOPICS.map((t) => `${t.level}-${String(t.order).padStart(2, "0")}`);
+    expect(keys).toEqual([...keys].sort());
   });
 
   it.each(GRAMMAR_TOPICS.map((t) => [t.id, t] as const))("%s is well-formed", (_id, topic) => {
