@@ -1,0 +1,103 @@
+import type { GrammarTopic } from "../types.js";
+
+export const plusquamperfekt: GrammarTopic = {
+  id: "plusquamperfekt",
+  level: "B1",
+  order: 7,
+  title: "Plusquamperfekt: hatte gemacht, war gegangen",
+  summary: "Előidejűség a múltban: ami egy másik múltbeli esemény előtt történt.",
+  errorType: "Tempus",
+  lesson: [
+    {
+      heading: "A múlt előtti múlt",
+      text: "A Plusquamperfekt azt fejezi ki, hogy valami egy másik múltbeli esemény előtt már megtörtént. Képzése olyan, mint a Perfekté, csak a segédige Präteritumban áll: hatte vagy war + Partizip II.",
+      table: {
+        headers: ["", "haben-nel", "sein-nel"],
+        rows: [
+          ["ich", "hatte gegessen", "war gefahren"],
+          ["du", "hattest gegessen", "warst gefahren"],
+          ["er / sie / es", "hatte gegessen", "war gefahren"],
+          ["wir", "hatten gegessen", "waren gefahren"],
+          ["ihr", "hattet gegessen", "wart gefahren"],
+          ["sie / Sie", "hatten gegessen", "waren gefahren"],
+        ],
+      },
+      tip: "Hogy haben vagy sein, ugyanaz a szabály, mint a Perfektnél: helyváltoztatás és állapotváltozás → sein, minden más → haben.",
+    },
+    {
+      heading: "Tipikus: nachdem",
+      text: "A nachdem utáni mellékmondatban a korábbi esemény áll. Ha a főmondat Präteritumban vagy Perfektben van, a nachdem-mondat Plusquamperfektben.",
+      examples: [
+        { de: "Nachdem wir gegessen hatten, gingen wir ins Kino.", hu: "Miután ettünk, moziba mentünk." },
+        { de: "Als ich ankam, war der Zug schon abgefahren.", hu: "Amikor odaértem, a vonat már elment." },
+        { de: "Er hatte seinen Pass vergessen und konnte nicht fliegen.", hu: "Otthon felejtette az útlevelét, és nem tudott repülni." },
+      ],
+    },
+  ],
+  exercises: [
+    {
+      id: "pq1",
+      type: "choice",
+      prompt: "Nachdem wir gegessen ___, gingen wir spazieren.",
+      options: ["hatten", "haben", "waren"],
+      answer: "hatten",
+      explanation: "Előidejűség a múltban: hatte + Partizip II. Az essen haben-t kér.",
+    },
+    {
+      id: "pq2",
+      type: "choice",
+      prompt: "Als ich am Bahnhof ankam, ___ der Zug schon abgefahren.",
+      options: ["hatte", "war", "ist"],
+      answer: "war",
+      explanation: "abfahren helyváltoztatás, ezért sein: war abgefahren.",
+    },
+    {
+      id: "pq3",
+      type: "gap",
+      prompt: "Er ___ seinen Pass zu Hause vergessen.",
+      hint: "haben, Plusquamperfekt",
+      answers: ["hatte"],
+      explanation: "vergessen haben-nel képzi a múltat, Plusquamperfektben: hatte vergessen.",
+    },
+    {
+      id: "pq4",
+      type: "gap",
+      prompt: "Nachdem sie nach Berlin ___ war, suchte sie eine Wohnung.",
+      hint: "ziehen",
+      answers: ["gezogen"],
+      explanation: "ziehen → gezogen (költözés, sein-nel).",
+    },
+    {
+      id: "pq5",
+      type: "choice",
+      prompt: "Ich ___ den Film schon gesehen, deshalb blieb ich zu Hause.",
+      options: ["hatte", "war", "habe"],
+      answer: "hatte",
+      explanation: "A film megnézése korábban történt: hatte gesehen.",
+    },
+    {
+      id: "pq6",
+      type: "choice",
+      prompt: "Nachdem er den ganzen Tag gearbeitet hatte, ___",
+      options: ["war er sehr müde.", "er war sehr müde.", "ist er sehr müde gewesen."],
+      answer: "war er sehr müde.",
+      explanation: "A mellékmondat után a főmondat az igével kezdődik (inverzió), és Präteritumban áll.",
+    },
+    {
+      id: "pq7",
+      type: "choice",
+      prompt: "Wir ___ uns lange nicht gesehen, als wir uns zufällig trafen.",
+      options: ["hatten", "waren", "wurden"],
+      answer: "hatten",
+      explanation: "sich sehen haben-nel: hatten gesehen.",
+    },
+    {
+      id: "pq8",
+      type: "gap",
+      prompt: "Die Gäste waren schon ___, als wir kamen.",
+      hint: "gehen",
+      answers: ["gegangen"],
+      explanation: "gehen → gegangen, sein-nel: waren gegangen.",
+    },
+  ],
+};

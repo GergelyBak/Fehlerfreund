@@ -1,0 +1,116 @@
+import type { GrammarTopic } from "../types.js";
+
+export const relativsaetze: GrammarTopic = {
+  id: "relativsaetze",
+  level: "B1",
+  order: 1,
+  title: "Vonatkozó mellékmondatok: der, den, dem, dessen",
+  summary: "Aki, akit, akinek: a vonatkozó névmás neme a főnévhez, esete a mellékmondathoz igazodik.",
+  errorType: "Kasus",
+  lesson: [
+    {
+      heading: "Mi a vonatkozó mellékmondat?",
+      text: "A vonatkozó mellékmondat (Relativsatz) egy főnevet ír le közelebbről. A vonatkozó névmás (der, die, das…) neme és száma ahhoz a főnévhez igazodik, amelyre vonatkozik. Az esetét viszont az dönti el, milyen szerepe van a mellékmondatban. A ragozott ige a mellékmondat végére kerül.",
+      examples: [
+        { de: "Das ist der Mann, der neben mir wohnt.", hu: "Ez az a férfi, aki mellettem lakik." },
+        { de: "Das ist der Mann, den ich gestern gesehen habe.", hu: "Ez az a férfi, akit tegnap láttam." },
+        { de: "Das ist der Mann, dem ich geholfen habe.", hu: "Ez az a férfi, akinek segítettem." },
+      ],
+    },
+    {
+      heading: "A vonatkozó névmások",
+      table: {
+        headers: ["", "hímnem", "nőnem", "semlegesnem", "többes szám"],
+        rows: [
+          ["Nominativ", "der", "die", "das", "die"],
+          ["Akkusativ", "den", "die", "das", "die"],
+          ["Dativ", "dem", "der", "dem", "denen"],
+          ["Genitiv", "dessen", "deren", "dessen", "deren"],
+        ],
+      },
+      tip: "Szinte teljesen egyezik a határozott névelővel. Eltérés csak a Dativ többes számban (denen) és a Genitivben (dessen, deren) van.",
+    },
+    {
+      heading: "Elöljáróval",
+      text: "Ha az ige vagy a kifejezés elöljárót kér, az elöljáró a vonatkozó névmás elé kerül, és meghatározza az esetét.",
+      examples: [
+        { de: "Das ist die Freundin, mit der ich in Urlaub fahre.", hu: "Ez az a barátnőm, akivel szabadságra megyek." },
+        { de: "Die Stadt, in der ich wohne, ist klein.", hu: "A város, ahol lakom, kicsi." },
+      ],
+    },
+  ],
+  exercises: [
+    {
+      id: "r1",
+      type: "choice",
+      prompt: "Das ist der Kollege, ___ mir immer hilft.",
+      options: ["der", "den", "dem"],
+      answer: "der",
+      explanation: "A kolléga az alany a mellékmondatban (ő segít), ezért Nominativ: der.",
+    },
+    {
+      id: "r2",
+      type: "choice",
+      prompt: "Wie heißt die Frau, ___ du gestern getroffen hast?",
+      options: ["die", "der", "den"],
+      answer: "die",
+      explanation: "Kit találtál? Tárgy, tehát Akkusativ, nőnem: die.",
+    },
+    {
+      id: "r3",
+      type: "choice",
+      prompt: "Das ist das Buch, ___ ich dir empfohlen habe.",
+      options: ["das", "dem", "dessen"],
+      answer: "das",
+      explanation: "Mit ajánlottam? Tárgy (Akkusativ), semlegesnem: das.",
+    },
+    {
+      id: "r4",
+      type: "choice",
+      prompt: "Der Mann, ___ ich den Weg gezeigt habe, war Tourist.",
+      options: ["den", "dem", "der"],
+      answer: "dem",
+      explanation: "jemandem etwas zeigen: kinek mutattam meg? Dativ, hímnem: dem.",
+    },
+    {
+      id: "r5",
+      type: "gap",
+      prompt: "Die Kinder, mit ___ ich spiele, sind sehr nett.",
+      hint: "die Kinder, mit + Dativ",
+      answers: ["denen"],
+      explanation: "A mit Dativot kér. Többes szám Dativban a vonatkozó névmás: denen.",
+    },
+    {
+      id: "r6",
+      type: "choice",
+      prompt: "Ich suche eine Wohnung, ___ einen Balkon hat.",
+      options: ["die", "der", "das"],
+      answer: "die",
+      explanation: "A lakásnak van erkélye, tehát a lakás az alany: Nominativ, nőnem: die.",
+    },
+    {
+      id: "r7",
+      type: "choice",
+      prompt: "Die Stadt, in ___ ich wohne, ist sehr schön.",
+      options: ["die", "der", "dem"],
+      answer: "der",
+      explanation: "Hol lakom? in + Dativ, die Stadt nőnemű: in der.",
+    },
+    {
+      id: "r8",
+      type: "choice",
+      prompt: "Das ist mein Freund, ___ Schwester in Wien wohnt.",
+      options: ["dessen", "deren", "der"],
+      answer: "dessen",
+      explanation: "Akinek a húga… Birtokviszony, Genitiv. A barát hímnemű, ezért dessen.",
+    },
+    {
+      id: "r9",
+      type: "choice",
+      prompt: "Kennst du den Film, ___",
+      options: ["der gestern im Kino lief?", "der lief gestern im Kino?", "lief der gestern im Kino?"],
+      answer: "der gestern im Kino lief?",
+      explanation: "A vonatkozó mellékmondatban a ragozott ige (lief) a végére kerül.",
+    },
+  ],
+};

@@ -1,0 +1,110 @@
+import type { GrammarTopic } from "../types.js";
+
+export const konjunktiv2Vergangenheit: GrammarTopic = {
+  id: "konjunktiv2-vergangenheit",
+  level: "B1",
+  order: 8,
+  title: "Konjunktiv II múlt időben: hätte gemacht",
+  summary: "Ami nem történt meg: elszalasztott lehetőségek, megbánás, utólagos tanács.",
+  errorType: "Tempus",
+  lesson: [
+    {
+      heading: "Képzése",
+      text: "A múltbeli Konjunktiv II olyan dolgokról szól, amik nem történtek meg. Képzése: hätte vagy wäre + Partizip II. A haben/sein választás ugyanaz, mint a Perfektnél.",
+      table: {
+        headers: ["", "haben-nel", "sein-nel"],
+        rows: [
+          ["ich", "hätte gewusst", "wäre gekommen"],
+          ["du", "hättest gewusst", "wärst gekommen"],
+          ["er / sie / es", "hätte gewusst", "wäre gekommen"],
+          ["wir", "hätten gewusst", "wären gekommen"],
+          ["ihr", "hättet gewusst", "wärt gekommen"],
+          ["sie / Sie", "hätten gewusst", "wären gekommen"],
+        ],
+      },
+      examples: [
+        { de: "Wenn ich das gewusst hätte, wäre ich früher gekommen.", hu: "Ha ezt tudtam volna, korábban jöttem volna." },
+        { de: "Ich hätte gern mehr Zeit gehabt.", hu: "Szívesen lett volna több időm." },
+      ],
+    },
+    {
+      heading: "Módbeli igével: hätte … sollen / können",
+      text: "Módbeli igével a mondat végén két főnévi igenév áll, a módbeli ige az utolsó: hätte + Infinitiv + módbeli ige Infinitivben.",
+      examples: [
+        { de: "Du hättest früher anrufen sollen.", hu: "Korábban kellett volna telefonálnod." },
+        { de: "Wir hätten den Bus nehmen können.", hu: "Mehettünk volna busszal." },
+      ],
+      tip: "Nem „hätte gesollt”, hanem „hätte … sollen”. Ez a kettős Infinitiv.",
+    },
+  ],
+  exercises: [
+    {
+      id: "k1",
+      type: "choice",
+      prompt: "Wenn ich das gewusst ___, hätte ich dir geholfen.",
+      options: ["hätte", "wäre", "würde"],
+      answer: "hätte",
+      explanation: "wissen haben-nel: hätte gewusst.",
+    },
+    {
+      id: "k2",
+      type: "choice",
+      prompt: "Wenn der Bus pünktlich gewesen wäre, ___ ich nicht zu spät gekommen.",
+      options: ["wäre", "hätte", "würde"],
+      answer: "wäre",
+      explanation: "kommen sein-nel: wäre gekommen.",
+    },
+    {
+      id: "k3",
+      type: "gap",
+      prompt: "Ich ___ gern mitgekommen, aber ich war krank.",
+      hint: "sein, Konjunktiv II",
+      answers: ["wäre", "waere"],
+      explanation: "mitkommen helyváltoztatás, sein-nel: ich wäre mitgekommen.",
+    },
+    {
+      id: "k4",
+      type: "choice",
+      prompt: "Du hättest früher anrufen ___.",
+      options: ["sollen", "gesollt", "sollst"],
+      answer: "sollen",
+      explanation: "Módbeli igével kettős Infinitiv: hätte … anrufen sollen.",
+    },
+    {
+      id: "k5",
+      type: "gap",
+      prompt: "Wir hätten den Zug ___ können.",
+      hint: "nehmen",
+      answers: ["nehmen"],
+      explanation: "Módbeli ige mellett a fő ige Infinitivben marad: nehmen können.",
+    },
+    {
+      id: "k6",
+      type: "choice",
+      prompt: "An deiner Stelle ___ ich das nicht gemacht.",
+      options: ["hätte", "wäre", "habe"],
+      answer: "hätte",
+      explanation: "machen haben-nel: hätte gemacht. Utólagos tanács a múltra.",
+    },
+    {
+      id: "k7",
+      type: "choice",
+      prompt: "Wenn du mich gefragt hättest, ___",
+      options: [
+        "hätte ich es dir gesagt.",
+        "ich hätte es dir gesagt.",
+        "hätte ich es dir sagen.",
+      ],
+      answer: "hätte ich es dir gesagt.",
+      explanation: "A wenn-mellékmondat után a főmondat igével kezdődik: hätte ich … gesagt.",
+    },
+    {
+      id: "k8",
+      type: "gap",
+      prompt: "Fast ___ ich den Termin vergessen!",
+      hint: "haben, Konjunktiv II",
+      answers: ["hätte", "haette"],
+      explanation: "Majdnem megtörtént, de nem: hätte vergessen.",
+    },
+  ],
+};

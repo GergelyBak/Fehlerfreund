@@ -1,0 +1,123 @@
+import type { GrammarTopic } from "../types.js";
+
+export const praeteritumErzaehlen: GrammarTopic = {
+  id: "praeteritum-erzaehlen",
+  level: "B1",
+  order: 6,
+  title: "Präteritum minden igével: elbeszélés",
+  summary: "Írott múlt idő a sein/haben/módbeli igéken túl: gyenge, erős és vegyes igék.",
+  errorType: "Tempus",
+  lesson: [
+    {
+      heading: "Mikor használjuk?",
+      text: "Beszédben a Perfekt a gyakoribb, de írásban (történetek, újságcikkek, levelek, életrajz) a Präteritum a szokásos. B1 szinten már minden gyakori igét fel kell ismerni és használni ebben az alakban.",
+    },
+    {
+      heading: "Gyenge (szabályos) igék: -te",
+      table: {
+        headers: ["", "machen", "arbeiten", "kaufen"],
+        rows: [
+          ["ich", "machte", "arbeitete", "kaufte"],
+          ["du", "machtest", "arbeitetest", "kauftest"],
+          ["er / sie / es", "machte", "arbeitete", "kaufte"],
+          ["wir", "machten", "arbeiteten", "kauften"],
+          ["ihr", "machtet", "arbeitetet", "kauftet"],
+          ["sie / Sie", "machten", "arbeiteten", "kauften"],
+        ],
+      },
+      tip: "Ha a tő -t vagy -d végű, egy -e- kerül be: arbeitete, redete. Egyes szám 1. és 3. személy mindig egyforma.",
+    },
+    {
+      heading: "Erős (rendhagyó) igék: tőhangváltás, -te nélkül",
+      table: {
+        headers: ["Infinitiv", "Präteritum", "Jelentés"],
+        rows: [
+          ["gehen", "ging", "ment"],
+          ["kommen", "kam", "jött"],
+          ["fahren", "fuhr", "utazott"],
+          ["sehen", "sah", "látott"],
+          ["finden", "fand", "talált"],
+          ["geben", "gab", "adott"],
+          ["schreiben", "schrieb", "írt"],
+          ["sprechen", "sprach", "beszélt"],
+        ],
+      },
+      tip: "Erős igéknél az ich és er/sie/es alak végződés nélküli: ich ging, er kam. A többes számban -en: wir gingen.",
+    },
+    {
+      heading: "Vegyes igék: tőhangváltás + -te",
+      examples: [
+        { de: "denken → dachte", hu: "gondolt" },
+        { de: "wissen → wusste", hu: "tudott" },
+        { de: "bringen → brachte", hu: "hozott" },
+        { de: "kennen → kannte", hu: "ismert" },
+      ],
+    },
+  ],
+  exercises: [
+    {
+      id: "pe1",
+      type: "gap",
+      prompt: "Gestern ___ ich lange im Büro.",
+      hint: "arbeiten",
+      answers: ["arbeitete"],
+      explanation: "Gyenge ige, -t végű tő, ezért -ete: ich arbeitete.",
+    },
+    {
+      id: "pe2",
+      type: "choice",
+      prompt: "Nach dem Essen ___ wir spazieren.",
+      options: ["gingen", "gehten", "gangen"],
+      answer: "gingen",
+      explanation: "A gehen erős ige: ging, többes szám: wir gingen.",
+    },
+    {
+      id: "pe3",
+      type: "choice",
+      prompt: "Der Zug ___ pünktlich in München an.",
+      options: ["kam", "kommte", "kamte"],
+      answer: "kam",
+      explanation: "ankommen → kam … an. Erős ige, nincs -te.",
+    },
+    {
+      id: "pe4",
+      type: "gap",
+      prompt: "Letzten Sommer ___ wir mit dem Auto nach Italien.",
+      hint: "fahren",
+      answers: ["fuhren"],
+      explanation: "fahren → fuhr, többes szám: wir fuhren.",
+    },
+    {
+      id: "pe5",
+      type: "choice",
+      prompt: "Ich ___, dass du heute keine Zeit hast.",
+      options: ["dachte", "denkte", "dacht"],
+      answer: "dachte",
+      explanation: "A denken vegyes ige: tőhangváltás és -te: dachte.",
+    },
+    {
+      id: "pe6",
+      type: "choice",
+      prompt: "Er ___ die Antwort nicht.",
+      options: ["wusste", "wisste", "weißte"],
+      answer: "wusste",
+      explanation: "A wissen vegyes ige: wusste.",
+    },
+    {
+      id: "pe7",
+      type: "gap",
+      prompt: "Sie ___ ihrer Mutter einen langen Brief.",
+      hint: "schreiben",
+      answers: ["schrieb"],
+      explanation: "schreiben → schrieb (erős ige, er/sie alak végződés nélkül).",
+    },
+    {
+      id: "pe8",
+      type: "choice",
+      prompt: "Endlich ___ ich meinen Schlüssel unter dem Sofa.",
+      options: ["fand", "findete", "fund"],
+      answer: "fand",
+      explanation: "finden → fand.",
+    },
+  ],
+};

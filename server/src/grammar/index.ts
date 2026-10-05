@@ -21,6 +21,16 @@ import { reflexiv } from "./a2/reflexiv.js";
 import { verbenMitPraepositionen } from "./a2/verbenMitPraepositionen.js";
 import { wechselpraepositionen } from "./a2/wechselpraepositionen.js";
 import { zeitangaben } from "./a2/zeitangaben.js";
+import { doppelkonjunktionen } from "./b1/doppelkonjunktionen.js";
+import { genitiv } from "./b1/genitiv.js";
+import { konjunktiv2Vergangenheit } from "./b1/konjunktiv2Vergangenheit.js";
+import { nDeklination } from "./b1/nDeklination.js";
+import { passiv } from "./b1/passiv.js";
+import { plusquamperfekt } from "./b1/plusquamperfekt.js";
+import { praeteritumErzaehlen } from "./b1/praeteritumErzaehlen.js";
+import { relativsaetze } from "./b1/relativsaetze.js";
+import { temporaleNebensaetze } from "./b1/temporaleNebensaetze.js";
+import { zuInfinitiv } from "./b1/zuInfinitiv.js";
 import { GAP, type Exercise, type GrammarTopic } from "./types.js";
 
 export const GRAMMAR_TOPICS: GrammarTopic[] = [
@@ -49,6 +59,17 @@ export const GRAMMAR_TOPICS: GrammarTopic[] = [
   indirekteFragen,
   zeitangaben,
   festePraepositionen,
+  // B1
+  relativsaetze,
+  passiv,
+  genitiv,
+  temporaleNebensaetze,
+  zuInfinitiv,
+  praeteritumErzaehlen,
+  plusquamperfekt,
+  konjunktiv2Vergangenheit,
+  nDeklination,
+  doppelkonjunktionen,
 ].sort((a, b) => a.level.localeCompare(b.level) || a.order - b.order);
 
 export function getTopic(id: string) {

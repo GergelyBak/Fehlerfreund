@@ -1,0 +1,105 @@
+import type { GrammarTopic } from "../types.js";
+
+export const zuInfinitiv: GrammarTopic = {
+  id: "zu-infinitiv",
+  level: "B1",
+  order: 5,
+  title: "zu + Infinitiv, um … zu, damit",
+  summary: "Mikor kell a zu a főnévi igenév elé, és hogyan fejezzük ki a célt.",
+  errorType: "Wortstellung",
+  lesson: [
+    {
+      heading: "Mikor kell a zu?",
+      text: "Sok ige, főnév és melléknév után a második ige zu + főnévi igenév alakban, a mondat végén áll. A módbeli igék (können, müssen, wollen…) után viszont nincs zu.",
+      table: {
+        headers: ["Kifejezés", "Példa"],
+        rows: [
+          ["vorhaben / planen", "Ich plane, ein Auto zu kaufen."],
+          ["versuchen", "Er versucht, pünktlich zu sein."],
+          ["Lust haben", "Hast du Lust, mitzukommen?"],
+          ["es ist wichtig / schwer", "Es ist wichtig, regelmäßig zu üben."],
+          ["vergessen", "Ich habe vergessen, dich anzurufen."],
+        ],
+      },
+      tip: "Elváló igekötős igéknél a zu az igekötő és az ige közé kerül, egybeírva: anzurufen, mitzukommen, einzukaufen.",
+    },
+    {
+      heading: "um … zu, ohne … zu, statt … zu",
+      table: {
+        headers: ["Szerkezet", "Jelentés", "Példa"],
+        rows: [
+          ["um … zu", "azért, hogy", "Ich lerne Deutsch, um in Deutschland zu arbeiten."],
+          ["ohne … zu", "anélkül, hogy", "Er ging, ohne etwas zu sagen."],
+          ["statt … zu", "ahelyett, hogy", "Statt zu lernen, sieht er fern."],
+        ],
+      },
+      tip: "Az um … zu csak akkor használható, ha a két tagmondat alanya ugyanaz. Ha különböző, damit kell: Ich spreche langsam, damit du mich verstehst.",
+    },
+  ],
+  exercises: [
+    {
+      id: "z1",
+      type: "choice",
+      prompt: "Ich habe vergessen, ___",
+      options: ["dich anrufen.", "dich anzurufen.", "dich zu anrufen."],
+      answer: "dich anzurufen.",
+      explanation: "A vergessen után zu + Infinitiv áll. Elváló igekötős igénél a zu középre kerül: anzurufen.",
+    },
+    {
+      id: "z2",
+      type: "choice",
+      prompt: "Es ist wichtig, jeden Tag ___",
+      options: ["zu üben.", "üben.", "übt."],
+      answer: "zu üben.",
+      explanation: "Az „es ist wichtig” után zu + Infinitiv áll.",
+    },
+    {
+      id: "z3",
+      type: "choice",
+      prompt: "Ich kann morgen leider nicht ___",
+      options: ["kommen.", "zu kommen.", "komme."],
+      answer: "kommen.",
+      explanation: "Módbeli ige (können) után nincs zu.",
+    },
+    {
+      id: "z4",
+      type: "gap",
+      prompt: "Ich lerne Deutsch, ___ in Deutschland zu arbeiten.",
+      hint: "azért, hogy",
+      answers: ["um"],
+      explanation: "Cél, és a két tagmondat alanya ugyanaz (ich), ezért um … zu.",
+    },
+    {
+      id: "z5",
+      type: "gap",
+      prompt: "Hast du Lust, heute Abend ___?",
+      hint: "mitkommen",
+      answers: ["mitzukommen"],
+      explanation: "Lust haben + zu + Infinitiv. Elváló igekötős ige: mit + zu + kommen, egybeírva.",
+    },
+    {
+      id: "z6",
+      type: "choice",
+      prompt: "Er ist gegangen, ___ sich zu verabschieden.",
+      options: ["ohne", "um", "statt"],
+      answer: "ohne",
+      explanation: "Anélkül ment el, hogy elköszönt volna: ohne … zu.",
+    },
+    {
+      id: "z7",
+      type: "choice",
+      prompt: "Ich spreche langsam, ___ du mich verstehst.",
+      options: ["um", "damit", "ohne"],
+      answer: "damit",
+      explanation: "Cél, de a két alany különböző (ich, du), ezért damit, nem um … zu.",
+    },
+    {
+      id: "z8",
+      type: "choice",
+      prompt: "Wir haben vor, im Sommer nach Spanien ___",
+      options: ["zu fahren.", "fahren.", "zu fährt."],
+      answer: "zu fahren.",
+      explanation: "A vorhaben után zu + Infinitiv áll a mondat végén.",
+    },
+  ],
+};

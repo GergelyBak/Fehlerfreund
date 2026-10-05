@@ -11,7 +11,7 @@ export function GrammarPage() {
   const { user } = useAuth()
   // The level tab lives in the URL, so "back" from a lesson returns to the same tab.
   const [params, setParams] = useSearchParams()
-  const level = params.get('level') ?? (user?.level === 'A1' ? 'A1' : 'A2')
+  const level = params.get('level') ?? (user?.level === 'A1' || user?.level === 'A2' ? user.level : 'B1')
 
   useEffect(() => {
     api<{ topics: TopicSummary[] }>('/grammar/topics')

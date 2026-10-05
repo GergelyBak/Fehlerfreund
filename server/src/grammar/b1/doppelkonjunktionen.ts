@@ -1,0 +1,100 @@
+import type { GrammarTopic } from "../types.js";
+
+export const doppelkonjunktionen: GrammarTopic = {
+  id: "doppelkonjunktionen",
+  level: "B1",
+  order: 10,
+  title: "Páros kötőszók: sowohl … als auch, weder … noch",
+  summary: "Is-is, sem-sem, vagy-vagy, nemcsak-hanem: és a je … desto.",
+  errorType: "Wortwahl",
+  lesson: [
+    {
+      heading: "A páros kötőszók",
+      table: {
+        headers: ["Kötőszó", "Jelentés", "Példa"],
+        rows: [
+          ["sowohl … als auch", "is … is", "Ich spreche sowohl Englisch als auch Deutsch."],
+          ["weder … noch", "sem … sem", "Er trinkt weder Kaffee noch Tee."],
+          ["entweder … oder", "vagy … vagy", "Wir fahren entweder ans Meer oder in die Berge."],
+          ["nicht nur … sondern auch", "nemcsak … hanem … is", "Sie ist nicht nur klug, sondern auch lustig."],
+          ["zwar … aber", "ugyan … de", "Die Wohnung ist zwar klein, aber günstig."],
+        ],
+      },
+      tip: "A weder … noch már maga a tagadás: nem kell mellé nicht vagy kein. Er hat weder Zeit noch Geld.",
+    },
+    {
+      heading: "je … desto",
+      text: "Minél …, annál …: a je után mellékmondat áll (ige a végén), a desto után középfok, majd a főmondat igéje.",
+      examples: [
+        { de: "Je mehr ich übe, desto besser spreche ich.", hu: "Minél többet gyakorlok, annál jobban beszélek." },
+        { de: "Je später es wird, desto müder bin ich.", hu: "Minél később van, annál fáradtabb vagyok." },
+      ],
+    },
+  ],
+  exercises: [
+    {
+      id: "d1",
+      type: "choice",
+      prompt: "Ich spreche sowohl Ungarisch ___ Deutsch.",
+      options: ["als auch", "noch", "oder"],
+      answer: "als auch",
+      explanation: "sowohl … als auch: is … is.",
+    },
+    {
+      id: "d2",
+      type: "choice",
+      prompt: "Er hat weder Zeit ___ Geld.",
+      options: ["noch", "oder", "und"],
+      answer: "noch",
+      explanation: "weder … noch: sem … sem.",
+    },
+    {
+      id: "d3",
+      type: "gap",
+      prompt: "Wir fahren ___ nach Spanien oder nach Italien.",
+      hint: "vagy … vagy",
+      answers: ["entweder"],
+      explanation: "entweder … oder: vagy … vagy.",
+    },
+    {
+      id: "d4",
+      type: "choice",
+      prompt: "Sie ist nicht nur intelligent, ___ auch sehr hilfsbereit.",
+      options: ["sondern", "aber", "sowie"],
+      answer: "sondern",
+      explanation: "nicht nur … sondern auch: nemcsak … hanem … is.",
+    },
+    {
+      id: "d5",
+      type: "choice",
+      prompt: "Die Wohnung ist zwar klein, ___ sehr hell.",
+      options: ["aber", "sondern", "noch"],
+      answer: "aber",
+      explanation: "zwar … aber: ugyan … de.",
+    },
+    {
+      id: "d6",
+      type: "gap",
+      prompt: "Je mehr ich lerne, ___ besser verstehe ich.",
+      hint: "annál",
+      answers: ["desto", "umso"],
+      explanation: "je … desto (vagy umso): minél …, annál ….",
+    },
+    {
+      id: "d7",
+      type: "choice",
+      prompt: "Je früher wir losfahren, ___",
+      options: ["desto weniger Stau gibt es.", "desto es gibt weniger Stau.", "desto weniger Stau es gibt."],
+      answer: "desto weniger Stau gibt es.",
+      explanation: "A desto + középfok után közvetlenül a ragozott ige jön: desto weniger Stau gibt es.",
+    },
+    {
+      id: "d8",
+      type: "choice",
+      prompt: "Ich trinke weder Alkohol ___",
+      options: ["noch rauche ich.", "noch rauche ich nicht.", "oder rauche ich."],
+      answer: "noch rauche ich.",
+      explanation: "A weder … noch már tagad, nicht nem kell mellé.",
+    },
+  ],
+};
