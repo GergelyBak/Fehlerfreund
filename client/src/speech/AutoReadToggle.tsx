@@ -7,12 +7,12 @@ export function AutoReadToggle({ on, onChange }: { on: boolean; onChange: (on: b
 
   return (
     <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500">
-      <label className="inline-flex cursor-pointer items-center gap-1.5 font-medium text-slate-600">
-        <input type="checkbox" checked={on} onChange={(e) => onChange(e.target.checked)} className="accent-indigo-600" />
+      <label className="inline-flex cursor-pointer items-center gap-1.5 py-1.5 font-medium text-slate-600 sm:py-0">
+        <input type="checkbox" checked={on} onChange={(e) => onChange(e.target.checked)} className="size-4 accent-indigo-600" />
         🔊 Automatikus felolvasás
       </label>
       {voice ? (
-        <span title="A böngésző által adott német hang">· {voice.name.replace(/^Microsoft /, '')}</span>
+        <span className="hidden sm:inline" title="A böngésző által adott német hang">· {voice.name.replace(/^Microsoft /, '')}</span>
       ) : (
         <span
           className="text-amber-700"

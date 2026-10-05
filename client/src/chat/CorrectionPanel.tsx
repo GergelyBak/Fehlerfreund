@@ -49,7 +49,7 @@ export function CorrectionPanel({
         ))}
       </ul>
       {!!cardsAdded && (
-        <Link to="/review" className="inline-block text-xs font-medium text-indigo-700 hover:underline">
+        <Link to="/review" className="inline-block py-2 text-xs font-medium text-indigo-700 hover:underline sm:py-0">
           🗂️ +{cardsAdded} kártya került az ismétlőpakliba
         </Link>
       )}

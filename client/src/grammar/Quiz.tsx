@@ -73,19 +73,28 @@ export function Quiz({
 
       <ol className="space-y-3">
         {exercises.map((e, i) => (
-          <li key={e.id} className="space-y-3 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+          <li key={e.id} className="space-y-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-5">
             <div className="flex gap-3">
               <span className="text-sm font-semibold text-slate-400">{i + 1}.</span>
               <div className="min-w-0 flex-1 space-y-3">
                 {e.type === 'gap' ? (
-                  <GapSentence
-                    exercise={e}
-                    value={answers[e.id] ?? ''}
-                    result={resultById.get(e.id)}
-                    onChange={(v) => setAnswer(e.id, v)}
-                    onFocus={() => setActiveGap(e.id)}
-                    inputRef={(el) => (el ? inputs.current.set(e.id, el) : inputs.current.delete(e.id))}
-                  />
+                  <>
+                    <GapSentence
+                      exercise={e}
+                      value={answers[e.id] ?? ''}
+                      result={resultById.get(e.id)}
+                      onChange={(v) => setAnswer(e.id, v)}
+                      onFocus={() => setActiveGap(e.id)}
+                      inputRef={(el) => (el ? inputs.current.set(e.id, el) : inputs.current.delete(e.id))}
+                    />
+                    {activeGap === e.id && !result && (
+                      // Phones: the letters sit right under the gap being typed in,
+                      // where the on-screen keyboard can't cover them.
+                      <div className="sm:hidden">
+                        <CharButtons onInsert={insertChar} />
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <ChoiceQuestion
                     exercise={e}
@@ -102,24 +111,12 @@ export function Quiz({
       </ol>
 
       {!result && (
-        <div className="sticky bottom-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white/95 p-4 shadow-lg ring-1 ring-slate-200 backdrop-blur">
-          <div className="flex flex-wrap items-center gap-1">
+        <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white/95 p-3 shadow-lg ring-1 ring-slate-200 backdrop-blur sm:bottom-4 sm:p-4">
+          <div className="hidden items-center gap-1 sm:flex">
             <span className="mr-1 text-xs text-slate-500">Különleges betűk:</span>
-            {SPECIAL_CHARS.map((c) => (
-              <button
-                key={c}
-                type="button"
-                // Keep focus in the input while clicking.
-                onMouseDown={(ev) => ev.preventDefault()}
-                onClick={() => insertChar(c)}
-                disabled={!activeGap}
-                className="size-8 rounded-md bg-slate-100 font-medium text-slate-800 hover:bg-indigo-100 disabled:opacity-40"
-              >
-                {c}
-              </button>
-            ))}
+            <CharButtons onInsert={insertChar} disabled={!activeGap} />
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-1 items-center justify-end gap-3 sm:flex-none">
             {error && <span className="text-sm text-red-600">{error}</span>}
             {empty > 0 && <span className="text-sm text-slate-500">{empty} üres</span>}
             <button
@@ -133,6 +130,27 @@ export function Quiz({
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+// ä ö ü ß buttons for keyboards without them (e.g. Hungarian ones).
+function CharButtons({ onInsert, disabled }: { onInsert: (c: string) => void; disabled?: boolean }) {
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {SPECIAL_CHARS.map((c) => (
+        <button
+          key={c}
+          type="button"
+          // Keep focus (and the phone keyboard) in the input while tapping.
+          onMouseDown={(ev) => ev.preventDefault()}
+          onClick={() => onInsert(c)}
+          disabled={disabled}
+          className="size-10 rounded-lg bg-slate-100 text-lg font-medium text-slate-800 hover:bg-indigo-100 disabled:opacity-40 sm:size-8 sm:text-base"
+        >
+          {c}
+        </button>
+      ))}
     </div>
   )
 }

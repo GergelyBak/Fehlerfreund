@@ -191,14 +191,28 @@ export function ChatPage() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_17rem]">
-      <div className="flex h-[calc(100dvh-9rem)] flex-col gap-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl" aria-hidden>
+      {/* Viewport minus the 3.5rem header and main's vertical padding. */}
+      <div className="flex h-[calc(100dvh-5.5rem)] flex-col gap-3 sm:h-[calc(100dvh-8rem)] sm:gap-4">
+        <div className="flex items-start gap-1 sm:items-center sm:justify-between sm:gap-4">
+          {/* Phones: a compact back arrow instead of the text link. */}
+          <Link
+            to="/"
+            aria-label="Vissza a helyzetekhez"
+            className="-ml-2 grid size-10 shrink-0 place-items-center rounded-lg text-xl text-slate-600 hover:bg-slate-100 sm:hidden"
+          >
+            ←
+          </Link>
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="hidden text-2xl sm:inline" aria-hidden>
               {situation?.emoji}
             </span>
-            <div>
-              <h1 className="font-semibold">{situation?.title ?? 'Beszélgetés'}</h1>
+            <div className="min-w-0">
+              <h1 className="truncate font-semibold">
+                <span className="sm:hidden" aria-hidden>
+                  {situation?.emoji}{' '}
+                </span>
+                {situation?.title ?? 'Beszélgetés'}
+              </h1>
               <p className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
                 Szint: {conversation.level}
                 <ModeBadge />
@@ -213,7 +227,7 @@ export function ChatPage() {
               />
             </div>
           </div>
-          <Link to="/" className="text-sm text-slate-600 hover:text-slate-900">
+          <Link to="/" className="hidden rounded-lg px-2 py-2 text-sm text-slate-600 hover:text-slate-900 sm:inline-block">
             ← Helyzetek
           </Link>
         </div>
@@ -242,7 +256,7 @@ export function ChatPage() {
               <button
                 type="button"
                 onClick={() => setPanelOpen((o) => !o)}
-                className="text-sm font-medium text-indigo-700"
+                className="py-2 text-sm font-medium text-indigo-700"
                 aria-expanded={panelOpen}
               >
                 📋 Feladatok és kifejezések ({conversation.completedTasks.length}/{situation.tasks.length}) {panelOpen ? '▲' : '▼'}
@@ -268,7 +282,10 @@ export function ChatPage() {
               onKeyDown={onKeyDown}
               maxLength={MAX_LENGTH}
               rows={2}
-              placeholder="Írj németül… (Enter: küldés, Shift+Enter: új sor)"
+              placeholder="Írj németül…"
+              title="Enter: küldés, Shift+Enter: új sor"
+              // Phone keyboards show a "send" key instead of a plain return.
+              enterKeyHint="send"
               className="flex-1 resize-none rounded-xl border border-slate-300 bg-white px-3 py-2 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
             />
             <button
@@ -283,7 +300,7 @@ export function ChatPage() {
       </div>
 
       {situation && (
-        <aside className="hidden h-[calc(100dvh-9rem)] overflow-y-auto rounded-2xl bg-white p-4 ring-1 ring-slate-200 lg:block">
+        <aside className="hidden h-[calc(100dvh-8rem)] overflow-y-auto rounded-2xl bg-white p-4 ring-1 ring-slate-200 lg:block">
           <SituationPanel
             situation={situation}
             completedTasks={conversation.completedTasks}

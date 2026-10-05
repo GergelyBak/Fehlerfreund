@@ -355,7 +355,7 @@ export function ReviewPage() {
             </button>
           </span>
         ) : (
-          <button onClick={() => setConfirmDelete(true)} className="text-slate-400 hover:text-slate-600 hover:underline">
+          <button onClick={() => setConfirmDelete(true)} className="py-2 text-slate-400 hover:text-slate-600 hover:underline">
             Hibás a javítás? Kártya törlése
           </button>
         )}

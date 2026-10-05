@@ -70,7 +70,7 @@ export function LoginPage() {
           />
         </Field>
         <div className="-mt-2 text-right">
-          <Link to="/forgot-password" className="text-sm font-medium text-indigo-600 hover:underline">
+          <Link to="/forgot-password" className="inline-block py-2 text-sm font-medium text-indigo-600 hover:underline">
             Elfelejtetted a jelszavad?
           </Link>
         </div>

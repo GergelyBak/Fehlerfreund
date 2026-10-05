@@ -60,7 +60,7 @@ export function AssistantMessage({
             type="button"
             onClick={() => void toggle()}
             disabled={loading}
-            className="px-1 text-xs font-medium text-slate-500 hover:text-indigo-600 disabled:opacity-60"
+            className="min-h-9 rounded-md px-2 text-xs font-medium text-slate-500 hover:text-indigo-600 disabled:opacity-60 sm:min-h-0 sm:px-1"
           >
             {loading ? 'Fordítás…' : visible ? 'Fordítás elrejtése' : '🌐 Fordítás'}
           </button>

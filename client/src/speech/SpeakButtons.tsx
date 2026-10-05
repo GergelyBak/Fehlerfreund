@@ -26,7 +26,7 @@ export function SpeakButtons({ text, compact }: { text: string; compact?: boolea
             }}
             title={playing ? 'Leállítás' : `${b.label} (németül)`}
             aria-label={playing ? 'Leállítás' : `${b.label} németül`}
-            className={`rounded-md px-1.5 py-0.5 text-xs font-medium transition ${
+            className={`min-h-9 rounded-md px-2 text-xs font-medium transition sm:min-h-0 sm:px-1.5 sm:py-0.5 ${
               playing ? 'bg-indigo-100 text-indigo-700' : 'text-slate-500 hover:bg-slate-100 hover:text-indigo-600'
             }`}
           >
