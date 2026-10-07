@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import type { RegisterInput, User } from './types'
+import type { RegisterInput, User, UserUpdate } from './types'
 
 export interface AuthState {
   user: User | null
@@ -10,6 +10,7 @@ export interface AuthState {
   register: (input: RegisterInput) => Promise<void>
   logout: () => Promise<void>
   resetPassword: (token: string, password: string) => Promise<void>
+  updateMe: (patch: UserUpdate) => Promise<void>
 }
 
 export const AuthContext = createContext<AuthState | null>(null)

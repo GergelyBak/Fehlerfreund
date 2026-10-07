@@ -9,7 +9,7 @@ import type { CorrectParams, CorrectionResult, LlmProvider, RoleplayParams, Tran
 // Same prompts and the same Zod schema as the Claude provider, so the modes
 // stay comparable.
 
-const LANGUAGE_NAMES: Record<string, string> = { hu: "Hungarian", en: "English", tr: "Turkish" };
+const LANGUAGE_NAMES: Record<string, string> = { hu: "Hungarian", en: "English" };
 const MODEL_LABEL = `ollama:${env.OLLAMA_MODEL}`;
 // A 4k context is plenty for one conversation and lets a 4B model fit fully
 // into a 4 GB laptop GPU (the 16k default spills over to the CPU).

@@ -3,7 +3,7 @@ import { loadPrompt } from "./prompts.js";
 import { recordUsage } from "./usage.js";
 import type { TranslateParams } from "./types.js";
 
-const LANGUAGE_NAMES: Record<string, string> = { hu: "Hungarian", en: "English", tr: "Turkish" };
+const LANGUAGE_NAMES: Record<string, string> = { hu: "Hungarian", en: "English" };
 
 export async function translateText(opts: TranslateParams) {
   const { text: system } = await loadPrompt("translate", {

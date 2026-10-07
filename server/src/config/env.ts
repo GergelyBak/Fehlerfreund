@@ -28,6 +28,9 @@ const EnvSchema = z
     SMTP_USER: optionalString,
     SMTP_PASS: optionalString,
     MAIL_FROM: optionalString,
+    // Shared secret for the n8n reminder workflow. Unset = the internal
+    // reminder endpoints are switched off.
+    REMINDER_API_KEY: z.preprocess((v) => (v === "" ? undefined : v), z.string().min(32).optional()),
   })
   .refine((e) => e.LLM_MODE === "mock" || e.ANTHROPIC_API_KEY, {
     message: "ANTHROPIC_API_KEY is required when LLM_MODE=live",

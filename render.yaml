@@ -31,3 +31,7 @@ services:
         sync: false
       - key: CLIENT_ORIGIN
         sync: false
+      # Shared secret for the n8n reminder workflow (n8n/README.md). Copy the
+      # generated value into the n8n "Fehlerfreund API key" credential.
+      - key: REMINDER_API_KEY
+        generateValue: true

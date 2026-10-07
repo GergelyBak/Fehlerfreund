@@ -9,11 +9,12 @@ You chat in real-life situations (Bürgeramt, doctor, flat viewing, job intervie
 ## Features
 
 - **Roleplay chat.** 10 situations, each with 3 goals to tick off and useful phrases that insert into the message box. Replies stream live.
-- **Correction on every message.** Error type (`Kasus`, `Tempus`, `Wortstellung`…), the fix, and a short explanation in Hungarian, English or Turkish.
+- **Correction on every message.** Error type (`Kasus`, `Tempus`, `Wortstellung`…), the fix, and a short explanation in Hungarian or English.
 - **Translate and listen.** Translate any partner message into your language on demand. German is read aloud at normal or slow speed, with optional auto-read.
 - **Flashcards with SM-2.** Chat mistakes and wrong grammar answers become cards. The review page has keyboard grading, and forgotten cards come back within the same session.
 - **Grammar course, A1 to B1.** 33 hand-written topics: 10 for A1 (present tense, articles, plural, Akkusativ, word order, nicht/kein, modal verbs, separable verbs, possessives, imperative), 13 for A2 and 10 for B1. Each has explanations, tables, spoken examples and a graded test. The A2 topics: Perfekt, Präteritum, Dativ, Wechselpräpositionen, weil/dass/wenn, comparison, adjective endings, Konjunktiv II, reflexive verbs, verbs with prepositions, indirect questions, time expressions, and prepositions with a fixed case. The B1 topics: relative clauses, Passiv, Genitiv, temporal clauses (als/wenn, bevor, nachdem), zu-infinitive and um … zu, Präteritum for storytelling, Plusquamperfekt, past Konjunktiv II, n-declension, and paired conjunctions (sowohl … als auch, je … desto).
 - **Statistics.** Your weakest area, mistakes by error type, a 14-day activity chart, card maturity, grammar progress and a daily streak. One click starts targeted practice for an error type.
+- **Daily reminder email.** Opt-in and sent by an [n8n workflow](n8n/README.md): it goes out at the learner's chosen local hour, but only when cards are due or a streak is about to break. It is sent at most once a day and has a one-click unsubscribe.
 - **Accounts.** JWT auth, password reset by email, and per-user progress.
 
 ## Stack
@@ -21,7 +22,7 @@ You chat in real-life situations (Bürgeramt, doctor, flat viewing, job intervie
 - **Client:** React 19, TypeScript, Tailwind CSS 4, Vite, React Router, Web Speech API
 - **Server:** Node.js, Express 5, TypeScript, MongoDB Atlas (Mongoose), Zod, Nodemailer
 - **LLM:** a local model via [Ollama](https://ollama.com) (default `gemma3:4b`), or the Claude API (`claude-sonnet-5`), or a mock
-- **Tests:** Vitest (103 tests) and a correction-quality eval
+- **Tests:** Vitest (115 tests) and a correction-quality eval
 
 ## Engineering notes
 
@@ -54,6 +55,7 @@ You chat in real-life situations (Bürgeramt, doctor, flat viewing, job intervie
 - **Grammar content is hand-written, and tests are graded on the server.** Textbook material has to be correct, which a small model can't guarantee. Solutions never reach the browser before answering. Answer checking accepts any letter case and `ae`/`ss` for `ä`/`ß` (Hungarian keyboards have neither). Content-integrity tests guard the hand-written data.
 - **Flashcards and SM-2.** A chat card's front is the learner's sentence with *only that* error left in, so each card practises one rule. Repeating a known mistake bumps the card and restarts its schedule instead of creating a duplicate. SM-2 is a pure, unit-tested function (`server/src/srs/sm2.ts`), and the interval preview on each answer button comes from the same function.
 - **Statistics in the learner's time zone.** Daily activity is grouped with MongoDB `$dateToString` in the browser's IANA time zone, and the streak logic works on calendar days, so a late-evening session or a daylight-saving change can't break a streak. The helpers are pure and unit-tested (`server/src/stats/compute.ts`).
+- **Reminders: n8n delivers, the API decides.** Every hour the workflow asks the API who needs an email right now and gets back the finished, localized messages. It sends them, then confirms each one, so a failed send is retried on the next run and a sent one is never repeated that day. Time zones, the "only if there's something to say" rule and the wording all live in unit-tested TypeScript (`server/src/reminders/compose.ts`), not in workflow expressions. The internal endpoints need a bearer key that is compared in constant time. Unsubscribe links are HMAC-signed, and opening one only asks for confirmation, because mail scanners follow links.
 - **Versioned prompts** live in `server/prompts/*.vN.md`, and the version is stored with each correction.
 - **Production concerns:**
   - Auth uses a JWT in an httpOnly cookie.
@@ -84,7 +86,7 @@ npm run dev            # http://localhost:5173 (proxies /api to the server)
 
 Run the tests with `cd server && npm test`.
 
-In development, password-reset emails are printed to the server terminal (`EMAIL_MODE=console`). Set `EMAIL_MODE=smtp` to send real ones.
+In development, password-reset emails are printed to the server terminal (`EMAIL_MODE=console`). Set `EMAIL_MODE=smtp` to send real ones. The daily reminder needs `REMINDER_API_KEY` and the n8n workflow; see [n8n/README.md](n8n/README.md).
 
 ## Deployment
 
@@ -97,5 +99,5 @@ The public demo runs on free tiers: the client on **Vercel** (`client/vercel.jso
 
 ## Next
 
-- B1 grammar topics
+- Pronunciation practice with speech recognition
 - Higher recall from local models (word order and article gender are still the weak spots)

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { api, ApiError, SERVER_UNREACHABLE } from '../api/client'
-import type { RegisterInput, User } from './types'
+import type { RegisterInput, User, UserUpdate } from './types'
 import { AuthContext } from './useAuth'
 
 const WAKE_TIMEOUT_MS = 90_000
@@ -72,8 +72,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(user)
   }, [])
 
+  const updateMe = useCallback(async (patch: UserUpdate) => {
+    const { user } = await api<{ user: User }>('/auth/me', {
+      method: 'PATCH',
+      body: JSON.stringify(patch),
+    })
+    setUser(user)
+  }, [])
+
   return (
-    <AuthContext.Provider value={{ user, loading, waking, login, register, logout, resetPassword }}>
+    <AuthContext.Provider value={{ user, loading, waking, login, register, logout, resetPassword, updateMe }}>
       {children}
     </AuthContext.Provider>
   )

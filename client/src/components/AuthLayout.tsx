@@ -41,7 +41,7 @@ export function AuthLayout({ title, subtitle, children }: { title: string; subti
             ))}
           </ul>
         </div>
-        <p className="text-sm text-indigo-200">A1–B2 szint · magyar, angol és török magyarázatok</p>
+        <p className="text-sm text-indigo-200">A1–B2 szint · magyar és angol magyarázatok</p>
       </aside>
 
       <main className="flex items-center justify-center px-4 py-10 sm:px-8">

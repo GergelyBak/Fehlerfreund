@@ -4,6 +4,7 @@ import { api } from '../api/client'
 import { errorMessage } from '../api/errors'
 import { ActivityChart, Card, CardStageBar, ErrorTypeBars, GrammarMeters, StatTile } from '../stats/charts'
 import { ERROR_LABELS } from '../stats/errorLabels'
+import { ReminderSettings } from '../stats/ReminderSettings'
 import type { Stats } from '../stats/types'
 
 const pct = (x: number) => `${Math.round(x * 100)}%`
@@ -138,6 +139,8 @@ export function StatsPage() {
           </div>
         </>
       )}
+
+      <ReminderSettings />
     </div>
   )
 }

@@ -30,7 +30,7 @@ export interface RoleplayParams {
 export interface TranslateParams {
   userId: string;
   text: string;
-  // "hu" | "en" | "tr"
+  // "hu" | "en"
   targetLanguage: string;
 }
 

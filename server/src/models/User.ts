@@ -1,6 +1,6 @@
 import { Schema, model, type HydratedDocument, type InferSchemaType } from "mongoose";
 
-export const NATIVE_LANGUAGES = ["hu", "en", "tr"] as const;
+export const NATIVE_LANGUAGES = ["hu", "en"] as const;
 export const LEVELS = ["A1", "A2", "B1", "B2"] as const;
 
 const userSchema = new Schema(
@@ -14,6 +14,14 @@ const userSchema = new Schema(
     // can't be used to reset passwords.
     passwordResetTokenHash: { type: String, select: false },
     passwordResetExpires: { type: Date, select: false },
+    // Daily email reminder (sent by the n8n workflow). Opt-in.
+    reminders: {
+      enabled: { type: Boolean, default: false },
+      hour: { type: Number, min: 0, max: 23, default: 18 }, // local hour
+      timeZone: { type: String, default: "Europe/Budapest" },
+      // "YYYY-MM-DD" in the user's time zone, so at most one email a day.
+      lastSentDay: String,
+    },
   },
   { timestamps: true },
 );

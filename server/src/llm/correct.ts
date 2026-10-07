@@ -6,7 +6,7 @@ import { loadPrompt } from "./prompts.js";
 import { recordUsage } from "./usage.js";
 import type { CorrectParams, CorrectionResult } from "./types.js";
 
-const LANGUAGE_NAMES: Record<string, string> = { hu: "Hungarian", en: "English", tr: "Turkish" };
+const LANGUAGE_NAMES: Record<string, string> = { hu: "Hungarian", en: "English" };
 
 export async function correctMessage(opts: CorrectParams): Promise<CorrectionResult> {
   const { text: system, version: promptVersion } = await loadPrompt(

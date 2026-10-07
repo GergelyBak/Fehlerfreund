@@ -10,6 +10,7 @@ import { authLimiter, resetLimiter } from "../middleware/rateLimit.js";
 import { AUTH_COOKIE, authCookieOptions, signToken } from "../lib/jwt.js";
 import { HttpError } from "../lib/HttpError.js";
 import { passwordResetMail, sendMail } from "../lib/mailer.js";
+import { isValidTimeZone } from "../stats/compute.js";
 
 const router = Router();
 
@@ -31,6 +32,13 @@ const UpdateMeSchema = z
     displayName: z.string().trim().min(1).max(50),
     nativeLanguage: z.enum(NATIVE_LANGUAGES),
     level: z.enum(LEVELS),
+    reminders: z
+      .object({
+        enabled: z.boolean(),
+        hour: z.number().int().min(0).max(23),
+        timeZone: z.string().refine(isValidTimeZone, "Unknown time zone"),
+      })
+      .partial(),
   })
   .partial();
 
@@ -41,6 +49,11 @@ function toPublic(user: UserDoc) {
     displayName: user.displayName,
     nativeLanguage: user.nativeLanguage,
     level: user.level,
+    reminders: {
+      enabled: user.reminders?.enabled ?? false,
+      hour: user.reminders?.hour ?? 18,
+      timeZone: user.reminders?.timeZone ?? "Europe/Budapest",
+    },
   };
 }
 
@@ -77,7 +90,11 @@ router.get("/me", requireAuth, async (req, res) => {
 });
 
 router.patch("/me", requireAuth, validateBody(UpdateMeSchema), async (req, res) => {
-  const user = await User.findByIdAndUpdate(req.userId, req.body, { new: true, runValidators: true });
+  const { reminders, ...rest } = req.body as z.infer<typeof UpdateMeSchema>;
+  // Dotted keys, so changing one reminder setting keeps the others (and lastSentDay).
+  const update: Record<string, unknown> = { ...rest };
+  for (const [key, value] of Object.entries(reminders ?? {})) update[`reminders.${key}`] = value;
+  const user = await User.findByIdAndUpdate(req.userId, { $set: update }, { new: true, runValidators: true });
   if (!user) throw new HttpError(401, "User no longer exists");
   res.json({ user: toPublic(user) });
 });
