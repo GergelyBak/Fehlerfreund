@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router'
-import { ERROR_LABELS } from './errorLabels'
+import { useI18n } from '../i18n/context'
 import { CHART, type ActivityDay, type ErrorTypeStat, type Stats } from './types'
 
 export function Card({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
@@ -47,11 +47,12 @@ export function StatTile({
 
 // --- Errors by type: horizontal bars, the weakest area emphasised ---
 export function ErrorTypeBars({ items }: { items: ErrorTypeStat[] }) {
+  const { t } = useI18n()
   const max = Math.max(...items.map((i) => i.mistakes), 1)
   return (
     <ul className="space-y-2.5">
       {items.map((item, idx) => {
-        const label = ERROR_LABELS[item.errorType]
+        const label = t.errorTypes[item.errorType].label
         const width = (item.mistakes / max) * 100
         const href = `/review?type=${encodeURIComponent(item.errorType)}${item.due ? '' : '&ahead=1'}`
         return (
@@ -59,10 +60,10 @@ export function ErrorTypeBars({ items }: { items: ErrorTypeStat[] }) {
             <Link
               to={href}
               className="group grid grid-cols-[8.5rem_1fr] items-center gap-3 rounded-lg px-1 py-1 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-indigo-200 focus-visible:outline-none sm:grid-cols-[11rem_1fr]"
-              title={`${label.hu} (${item.errorType}): ${item.mistakes} hiba, ${item.cards} kártya, ${item.due} esedékes. Kattints a gyakorláshoz.`}
+              title={t.charts.errorBarTitle(label, item.errorType, item.mistakes, item.cards, item.due)}
             >
               <span className="min-w-0">
-                <span className="block truncate text-sm font-medium text-slate-800">{label.hu}</span>
+                <span className="block truncate text-sm font-medium text-slate-800">{label}</span>
                 <span className="block truncate text-xs text-slate-500">{item.errorType}</span>
               </span>
               <span className="flex items-center gap-2">
@@ -87,12 +88,13 @@ export function ErrorTypeBars({ items }: { items: ErrorTypeStat[] }) {
 }
 
 // --- Activity: stacked columns (messages + reviews) per day, with tooltip ---
-const DAY_FMT = new Intl.DateTimeFormat('hu-HU', { month: 'short', day: 'numeric', timeZone: 'UTC' })
-const WEEKDAY_FMT = new Intl.DateTimeFormat('hu-HU', { weekday: 'short', timeZone: 'UTC' })
 const dateOf = (key: string) => new Date(`${key}T12:00:00Z`)
 
 export function ActivityChart({ days }: { days: ActivityDay[] }) {
   const [hover, setHover] = useState<number | null>(null)
+  const { t } = useI18n()
+  const DAY_FMT = new Intl.DateTimeFormat(t.locale, { month: 'short', day: 'numeric', timeZone: 'UTC' })
+  const WEEKDAY_FMT = new Intl.DateTimeFormat(t.locale, { weekday: 'short', timeZone: 'UTC' })
   const totals = days.map((d) => d.messages + d.reviews)
   const max = Math.max(...totals, 1)
   // A clean top tick: round the max up to a "nice" number.
@@ -103,8 +105,8 @@ export function ActivityChart({ days }: { days: ActivityDay[] }) {
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-4 text-sm text-slate-600">
-        <LegendSwatch color={CHART.accent} label="Üzenetek" />
-        <LegendSwatch color={CHART.second} label="Ismétlések" />
+        <LegendSwatch color={CHART.accent} label={t.charts.messages} />
+        <LegendSwatch color={CHART.second} label={t.charts.reviews} />
       </div>
 
       <div className="relative flex gap-2">
@@ -119,7 +121,7 @@ export function ActivityChart({ days }: { days: ActivityDay[] }) {
             {days.map((d, i) => {
               const mh = (d.messages / top) * PLOT
               const rh = (d.reviews / top) * PLOT
-              const label = `${DAY_FMT.format(dateOf(d.date))}: ${d.messages} üzenet, ${d.reviews} ismétlés`
+              const label = t.charts.dayAria(DAY_FMT.format(dateOf(d.date)), d.messages, d.reviews)
               return (
                 <button
                   key={d.date}
@@ -150,15 +152,15 @@ export function ActivityChart({ days }: { days: ActivityDay[] }) {
                         i < days.length / 2 ? 'left-0' : 'right-0'
                       }`}
                     >
-                      <span className="block font-semibold">{totals[i]} tevékenység</span>
+                      <span className="block font-semibold">{t.charts.activities(totals[i]!)}</span>
                       <span className="block text-slate-300">{DAY_FMT.format(dateOf(d.date))}</span>
                       <span className="mt-1 flex items-center gap-1.5">
                         <span className="inline-block h-0.5 w-3" style={{ background: CHART.accent }} />
-                        <b>{d.messages}</b> üzenet
+                        <b>{d.messages}</b> {t.charts.messageUnit}
                       </span>
                       <span className="flex items-center gap-1.5">
                         <span className="inline-block h-0.5 w-3" style={{ background: CHART.second }} />
-                        <b>{d.reviews}</b> ismétlés
+                        <b>{d.reviews}</b> {t.charts.reviewUnit}
                       </span>
                     </span>
                   )}
@@ -168,19 +170,19 @@ export function ActivityChart({ days }: { days: ActivityDay[] }) {
           </div>
           <div className="mt-1 flex justify-between text-xs text-slate-400">
             <span>{DAY_FMT.format(dateOf(days[0]!.date))}</span>
-            <span>ma</span>
+            <span>{t.charts.today}</span>
           </div>
         </div>
       </div>
 
       <details className="text-sm">
-        <summary className="cursor-pointer text-slate-500 hover:text-slate-700">Táblázatként</summary>
+        <summary className="cursor-pointer text-slate-500 hover:text-slate-700">{t.charts.asTable}</summary>
         <table className="mt-2 w-full text-left">
           <thead className="text-slate-500">
             <tr>
-              <th className="py-1 font-medium">Nap</th>
-              <th className="py-1 text-right font-medium">Üzenetek</th>
-              <th className="py-1 text-right font-medium">Ismétlések</th>
+              <th className="py-1 font-medium">{t.charts.day}</th>
+              <th className="py-1 text-right font-medium">{t.charts.messages}</th>
+              <th className="py-1 text-right font-medium">{t.charts.reviews}</th>
             </tr>
           </thead>
           <tbody className="tabular-nums">
@@ -211,10 +213,11 @@ function LegendSwatch({ color, label }: { color: string; label: string }) {
 
 // --- Card stages: one part-to-whole bar, ordered new → learning → mature ---
 export function CardStageBar({ cards }: { cards: Stats['cards'] }) {
+  const { t } = useI18n()
   const parts = [
-    { key: 'new', label: 'Új', value: cards.new, color: CHART.stageNew },
-    { key: 'learning', label: 'Tanulás alatt', value: cards.learning, color: CHART.stageLearning },
-    { key: 'mature', label: 'Megy (21+ nap)', value: cards.mature, color: CHART.stageMature },
+    { key: 'new', label: t.charts.stageNew, value: cards.new, color: CHART.stageNew },
+    { key: 'learning', label: t.charts.stageLearning, value: cards.learning, color: CHART.stageLearning },
+    { key: 'mature', label: t.charts.stageMature, value: cards.mature, color: CHART.stageMature },
   ]
   return (
     <div className="space-y-3">

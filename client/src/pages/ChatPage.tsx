@@ -12,12 +12,14 @@ import { notifyCardsChanged } from '../review/cardEvents'
 import { AutoReadToggle } from '../speech/AutoReadToggle'
 import { RATE_NORMAL, loadAutoRead, saveAutoRead, speak, stopSpeaking } from '../speech/speech'
 import type { ChatMessage, Conversation, Phrase, StoredCorrection } from '../chat/types'
+import { activeMessages, useI18n } from '../i18n/context'
 
 const MAX_LENGTH = 500
 
 export function ChatPage() {
   const { id } = useParams<{ id: string }>()
   const { situations } = useSituations()
+  const { t } = useI18n()
   const [conversation, setConversation] = useState<Conversation | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [input, setInput] = useState('')
@@ -32,7 +34,7 @@ export function ChatPage() {
   useEffect(() => {
     api<{ conversation: Conversation }>(`/conversations/${id}`)
       .then((r) => setConversation(r.conversation))
-      .catch((err) => setLoadError(errorMessage(err, 'Nem sikerült betölteni a beszélgetést.')))
+      .catch((err) => setLoadError(errorMessage(err, activeMessages().chat.loadFailed)))
     // Abort an in-flight reply and stop reading aloud when leaving the page.
     return () => {
       abortRef.current?.abort()
@@ -116,7 +118,7 @@ export function ChatPage() {
     } catch (err) {
       if (controller.signal.aborted) return
       failed = true
-      setSendError(errorMessage(err, 'A kapcsolat megszakadt.'))
+      setSendError(errorMessage(err, t.common.connectionLost))
       // The message never reached the server: give the text back for retrying.
       if (err instanceof ApiError) {
         setInput(text)
@@ -180,12 +182,12 @@ export function ChatPage() {
       <div className="space-y-3">
         <p className="text-red-600">{loadError}</p>
         <Link to="/" className="text-indigo-600 hover:underline">
-          ← Vissza a helyzetekhez
+          {t.chat.backToSituations}
         </Link>
       </div>
     )
   }
-  if (!conversation) return <p className="text-slate-500">Betöltés…</p>
+  if (!conversation) return <p className="text-slate-500">{t.common.loading}</p>
 
   const situation = situations?.find((s) => s.id === conversation.situationId)
 
@@ -197,7 +199,7 @@ export function ChatPage() {
           {/* Phones: a compact back arrow instead of the text link. */}
           <Link
             to="/"
-            aria-label="Vissza a helyzetekhez"
+            aria-label={t.chat.backAria}
             className="-ml-2 grid size-10 shrink-0 place-items-center rounded-lg text-xl text-slate-600 hover:bg-slate-100 sm:hidden"
           >
             ←
@@ -211,10 +213,10 @@ export function ChatPage() {
                 <span className="sm:hidden" aria-hidden>
                   {situation?.emoji}{' '}
                 </span>
-                {situation?.title ?? 'Beszélgetés'}
+                {situation?.title ?? t.chat.fallbackTitle}
               </h1>
               <p className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
-                Szint: {conversation.level}
+                {t.chat.level(conversation.level)}
                 <ModeBadge />
               </p>
               <AutoReadToggle
@@ -228,7 +230,7 @@ export function ChatPage() {
             </div>
           </div>
           <Link to="/" className="hidden rounded-lg px-2 py-2 text-sm text-slate-600 hover:text-slate-900 sm:inline-block">
-            ← Helyzetek
+            {t.chat.situations}
           </Link>
         </div>
 
@@ -259,7 +261,7 @@ export function ChatPage() {
                 className="py-2 text-sm font-medium text-indigo-700"
                 aria-expanded={panelOpen}
               >
-                📋 Feladatok és kifejezések ({conversation.completedTasks.length}/{situation.tasks.length}) {panelOpen ? '▲' : '▼'}
+                {t.chat.panelToggle(conversation.completedTasks.length, situation.tasks.length)} {panelOpen ? '▲' : '▼'}
               </button>
               {panelOpen && (
                 <div className="mt-2 max-h-72 overflow-y-auto rounded-xl bg-white p-3 ring-1 ring-slate-200">
@@ -282,8 +284,8 @@ export function ChatPage() {
               onKeyDown={onKeyDown}
               maxLength={MAX_LENGTH}
               rows={2}
-              placeholder="Írj németül…"
-              title="Enter: küldés, Shift+Enter: új sor"
+              placeholder={t.chat.placeholder}
+              title={t.chat.inputTitle}
               // Phone keyboards show a "send" key instead of a plain return.
               enterKeyHint="send"
               className="flex-1 resize-none rounded-xl border border-slate-300 bg-white px-3 py-2 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
@@ -293,7 +295,7 @@ export function ChatPage() {
               disabled={sending || !input.trim()}
               className="rounded-xl bg-indigo-600 px-5 font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
             >
-              Küldés
+              {t.chat.send}
             </button>
           </div>
         </form>

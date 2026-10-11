@@ -3,12 +3,14 @@ import { Link, useSearchParams } from 'react-router'
 import { api } from '../api/client'
 import { errorMessage } from '../api/errors'
 import { useAuth } from '../auth/useAuth'
+import { activeMessages, useI18n } from '../i18n/context'
 import { PASS_SCORE, type TopicSummary } from '../grammar/types'
 
 export function GrammarPage() {
   const [topics, setTopics] = useState<TopicSummary[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const { user } = useAuth()
+  const { t } = useI18n()
   // The level tab lives in the URL, so "back" from a lesson returns to the same tab.
   const [params, setParams] = useSearchParams()
   const level = params.get('level') ?? (user?.level === 'A1' || user?.level === 'A2' ? user.level : 'B1')
@@ -16,7 +18,7 @@ export function GrammarPage() {
   useEffect(() => {
     api<{ topics: TopicSummary[] }>('/grammar/topics')
       .then((r) => setTopics(r.topics))
-      .catch((err) => setError(errorMessage(err, 'Nem sikerült betölteni a témaköröket.')))
+      .catch((err) => setError(errorMessage(err, activeMessages().grammar.loadFailed)))
   }, [])
 
   const levels = [...new Set((topics ?? []).map((t) => t.level))]
@@ -26,20 +28,20 @@ export function GrammarPage() {
   return (
     <div className="space-y-6">
       <div className="space-y-1">
-        <h1 className="text-2xl font-bold">📘 Nyelvtan</h1>
-        <p className="text-slate-600">
-          Tankönyvi sorrendben: olvasd el a tananyagot, aztán oldd meg a tesztet. A rossz válaszaidból kártyák lesznek az
-          ismétlőpakliban.
-        </p>
+        <h1 className="text-2xl font-bold">{t.grammar.title}</h1>
+        <p className="text-slate-600">{t.grammar.intro}</p>
+        {t.grammar.onlyHungarian && (
+          <p className="rounded-xl bg-sky-50 px-4 py-3 text-sm text-sky-900 ring-1 ring-sky-100">🇭🇺 {t.grammar.onlyHungarian}</p>
+        )}
         {topics && (
           <p className="text-sm text-slate-500">
-            {level}: {passed} / {shown.length} témakör teljesítve (legalább {Math.round(PASS_SCORE * 100)}%)
+            {t.grammar.passed(level, passed, shown.length, Math.round(PASS_SCORE * 100))}
           </p>
         )}
       </div>
 
       {levels.length > 1 && (
-        <div className="inline-flex gap-1 rounded-xl bg-slate-100 p-1" role="tablist" aria-label="Szint">
+        <div className="inline-flex gap-1 rounded-xl bg-slate-100 p-1" role="tablist" aria-label={t.grammar.levelTabs}>
           {levels.map((l) => (
             <button
               key={l}
@@ -59,13 +61,13 @@ export function GrammarPage() {
       {error && <p className="text-red-600">{error}</p>}
 
       <ol className="grid gap-3 sm:grid-cols-2">
-        {shown.map((t) => {
-          const best = t.progress?.bestScore ?? 0
+        {shown.map((topic) => {
+          const best = topic.progress?.bestScore ?? 0
           const done = best >= PASS_SCORE
           return (
-            <li key={t.id}>
+            <li key={topic.id}>
               <Link
-                to={`/grammar/${t.id}`}
+                to={`/grammar/${topic.id}`}
                 className="flex h-full gap-4 rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200 transition hover:ring-indigo-400"
               >
                 <span
@@ -73,21 +75,21 @@ export function GrammarPage() {
                     done ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-50 text-indigo-700'
                   }`}
                 >
-                  {done ? '✓' : t.order}
+                  {done ? '✓' : topic.order}
                 </span>
                 <span className="min-w-0 flex-1 space-y-1.5">
-                  <span className="block font-semibold">{t.title}</span>
-                  <span className="block text-sm text-slate-600">{t.summary}</span>
+                  <span className="block font-semibold">{topic.title}</span>
+                  <span className="block text-sm text-slate-600">{topic.summary}</span>
                   <span className="flex items-center gap-2 text-xs text-slate-500">
-                    <span>{t.exerciseCount} feladat</span>
-                    {t.progress && (
+                    <span>{t.grammar.exercises(topic.exerciseCount)}</span>
+                    {topic.progress && (
                       <>
                         <span aria-hidden>·</span>
-                        <span>Legjobb: {Math.round(best * 100)}%</span>
+                        <span>{t.grammar.best(Math.round(best * 100))}</span>
                       </>
                     )}
                   </span>
-                  {t.progress && (
+                  {topic.progress && (
                     <span className="block h-1.5 overflow-hidden rounded-full bg-slate-100">
                       <span
                         className={`block h-full rounded-full ${done ? 'bg-emerald-500' : 'bg-indigo-400'}`}

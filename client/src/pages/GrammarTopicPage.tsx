@@ -4,12 +4,14 @@ import { api } from '../api/client'
 import { errorMessage } from '../api/errors'
 import { Lesson } from '../grammar/Lesson'
 import { Quiz } from '../grammar/Quiz'
+import { activeMessages, useI18n } from '../i18n/context'
 import type { Progress, Topic } from '../grammar/types'
 
 type Tab = 'lesson' | 'quiz'
 
 export function GrammarTopicPage() {
   const { id } = useParams<{ id: string }>()
+  const { t } = useI18n()
   const [topic, setTopic] = useState<Topic | null>(null)
   const [progress, setProgress] = useState<Progress | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -21,7 +23,7 @@ export function GrammarTopicPage() {
         setTopic(r.topic)
         setProgress(r.progress)
       })
-      .catch((err) => setError(errorMessage(err, 'Nem sikerült betölteni a témakört.')))
+      .catch((err) => setError(errorMessage(err, activeMessages().grammar.topicLoadFailed)))
   }, [id])
 
   function openTab(next: Tab) {
@@ -34,26 +36,26 @@ export function GrammarTopicPage() {
       <div className="space-y-3">
         <p className="text-red-600">{error}</p>
         <Link to="/grammar" className="text-indigo-600 hover:underline">
-          ← Vissza a témakörökhöz
+          {t.grammar.backToTopics}
         </Link>
       </div>
     )
   }
-  if (!topic) return <p className="text-slate-500">Betöltés…</p>
+  if (!topic) return <p className="text-slate-500">{t.common.loading}</p>
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div className="space-y-2">
         <Link to={`/grammar?level=${topic.level}`} className="-ml-1 inline-block px-1 py-2 text-sm text-slate-600 hover:text-slate-900">
-          ← Témakörök
+          {t.grammar.topics}
         </Link>
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-semibold text-indigo-700">
-            {topic.level} · {topic.order}. lecke
+            {t.grammar.lessonBadge(topic.level, topic.order)}
           </span>
           {progress && (
             <span className="text-xs text-slate-500">
-              Legjobb eredmény: {Math.round(progress.bestScore * 100)}% · {progress.attempts} próbálkozás
+              {t.grammar.bestResult(Math.round(progress.bestScore * 100), progress.attempts)}
             </span>
           )}
         </div>
@@ -64,8 +66,8 @@ export function GrammarTopicPage() {
       <div className="flex gap-1 rounded-xl bg-slate-100 p-1" role="tablist">
         {(
           [
-            ['lesson', '📖 Tananyag'],
-            ['quiz', `✏️ Teszt (${topic.exercises.length} feladat)`],
+            ['lesson', t.grammar.lessonTab],
+            ['quiz', t.grammar.quizTab(topic.exercises.length)],
           ] as const
         ).map(([key, label]) => (
           <button
@@ -89,7 +91,7 @@ export function GrammarTopicPage() {
             onClick={() => openTab('quiz')}
             className="w-full rounded-lg bg-indigo-600 px-4 py-3 font-medium text-white hover:bg-indigo-700"
           >
-            Tovább a teszthez →
+            {t.grammar.toQuiz}
           </button>
         </>
       ) : (

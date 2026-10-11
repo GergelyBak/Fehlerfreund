@@ -1,3 +1,4 @@
+import { useI18n } from '../i18n/context'
 import { useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes } from 'react'
 
 export function Field({
@@ -45,6 +46,7 @@ export function Input({ invalid, className = '', ...props }: InputProps) {
 
 export function PasswordInput(props: Omit<InputProps, 'type'>) {
   const [visible, setVisible] = useState(false)
+  const { t } = useI18n()
   return (
     <div className="relative">
       <Input {...props} type={visible ? 'text' : 'password'} className="pr-11" />
@@ -52,7 +54,7 @@ export function PasswordInput(props: Omit<InputProps, 'type'>) {
         type="button"
         onClick={() => setVisible((v) => !v)}
         className="absolute inset-y-0 right-0 grid w-11 place-items-center text-slate-400 hover:text-slate-700"
-        aria-label={visible ? 'Jelszó elrejtése' : 'Jelszó megjelenítése'}
+        aria-label={visible ? t.common.hidePassword : t.common.showPassword}
       >
         {visible ? <EyeOffIcon /> : <EyeIcon />}
       </button>

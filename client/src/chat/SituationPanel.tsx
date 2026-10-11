@@ -1,5 +1,6 @@
 import { SpeakButtons } from '../speech/SpeakButtons'
 import type { Phrase, Situation } from './types'
+import { useI18n } from '../i18n/context'
 
 export function SituationPanel({
   situation,
@@ -12,6 +13,7 @@ export function SituationPanel({
   onToggleTask: (taskId: string, done: boolean) => void
   onPhrase: (phrase: Phrase) => void
 }) {
+  const { t } = useI18n()
   const doneCount = situation.tasks.filter((t) => completedTasks.includes(t.id)).length
   const allDone = doneCount === situation.tasks.length
 
@@ -19,14 +21,14 @@ export function SituationPanel({
     <div className="space-y-6">
       <section className="space-y-2">
         <div className="flex items-baseline justify-between">
-          <h2 className="text-sm font-semibold text-slate-700">Feladatok</h2>
+          <h2 className="text-sm font-semibold text-slate-700">{t.panel.tasks}</h2>
           <span className="text-xs text-slate-500">
             {doneCount} / {situation.tasks.length}
           </span>
         </div>
         {allDone && (
           <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-700">
-            🎉 Minden feladat kész! Szép munka.
+            {t.panel.allDone}
           </p>
         )}
         <ul className="space-y-1.5">
@@ -41,7 +43,7 @@ export function SituationPanel({
                     onChange={(e) => onToggleTask(task.id, e.target.checked)}
                     className="mt-0.5 size-4 accent-indigo-600"
                   />
-                  <span className={done ? 'text-slate-400 line-through' : 'text-slate-700'}>{task.hu}</span>
+                  <span className={done ? 'text-slate-400 line-through' : 'text-slate-700'}>{task.text}</span>
                 </label>
               </li>
             )
@@ -50,8 +52,8 @@ export function SituationPanel({
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold text-slate-700">Hasznos kifejezések</h2>
-        <p className="text-xs text-slate-500">Kattints rá, és beíródik az üzenetedbe.</p>
+        <h2 className="text-sm font-semibold text-slate-700">{t.panel.phrases}</h2>
+        <p className="text-xs text-slate-500">{t.panel.phrasesHint}</p>
         <ul className="space-y-1">
           {situation.phrases.map((p) => (
             <li key={p.de} className="flex items-start gap-1">
@@ -61,7 +63,7 @@ export function SituationPanel({
                 className="min-w-0 flex-1 rounded-lg px-2 py-1.5 text-left hover:bg-indigo-50 focus-visible:ring-2 focus-visible:ring-indigo-200 focus-visible:outline-none"
               >
                 <span className="block text-sm font-medium text-slate-800">{p.de}</span>
-                <span className="block text-xs text-slate-500">{p.hu}</span>
+                <span className="block text-xs text-slate-500">{p.translation}</span>
               </button>
               <span className="pt-1">
                 <SpeakButtons text={p.de} compact />

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { errorMessage } from '../api/errors'
 import { useAuth } from '../auth/useAuth'
+import { useI18n } from '../i18n/context'
 import type { ReminderSettings as Settings } from '../auth/types'
 import { Card } from './charts'
 
@@ -9,6 +10,7 @@ const browserTimeZone = () => Intl.DateTimeFormat().resolvedOptions().timeZone
 
 export function ReminderSettings() {
   const { user, updateMe } = useAuth()
+  const { t } = useI18n()
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   if (!user) return null
@@ -29,8 +31,8 @@ export function ReminderSettings() {
 
   return (
     <Card
-      title="Napi emlékeztető"
-      subtitle="E-mailt kapsz, ha kártyák várnak ismétlésre, vagy ha még nem gyakoroltál aznap, és megszakadna a sorozatod."
+      title={t.reminders.title}
+      subtitle={t.reminders.subtitle}
     >
       <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
         <label className="flex min-h-9 cursor-pointer items-center gap-3">
@@ -50,11 +52,11 @@ export function ReminderSettings() {
               }`}
             />
           </button>
-          <span className="text-sm font-medium">{enabled ? 'Bekapcsolva' : 'Kikapcsolva'}</span>
+          <span className="text-sm font-medium">{enabled ? t.reminders.on : t.reminders.off}</span>
         </label>
 
         <label className="flex items-center gap-2 text-sm text-slate-600">
-          Időpont
+          {t.reminders.time}
           <select
             value={hour}
             disabled={saving || !enabled}
@@ -71,7 +73,7 @@ export function ReminderSettings() {
       </div>
       {enabled && (
         <p className="text-xs text-slate-500">
-          Legfeljebb napi egy levél, a(z) {user.email} címre. Minden levél alján egy kattintással leiratkozhatsz.
+          {t.reminders.note(user.email)}
         </p>
       )}
       {error && <p className="text-sm text-red-600">{error}</p>}

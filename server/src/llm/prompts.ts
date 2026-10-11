@@ -8,7 +8,7 @@ const PROMPTS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 
 export const PROMPT_VERSIONS = {
   roleplay: "v2",
-  correction: "v2",
+  correction: "v3",
   translate: "v1",
 } as const;
 

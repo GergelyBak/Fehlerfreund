@@ -7,9 +7,11 @@ import { RecentConversations } from '../chat/RecentConversations'
 import { useLlmInfo } from '../chat/llmInfo'
 import { useSituations } from '../chat/useSituations'
 import type { Conversation, ConversationSummary } from '../chat/types'
+import { useI18n } from '../i18n/context'
 
 export function SituationsPage() {
   const { user } = useAuth()
+  const { t } = useI18n()
   const navigate = useNavigate()
   const { situations, error: situationsError } = useSituations()
   const llm = useLlmInfo()
@@ -33,7 +35,7 @@ export function SituationsPage() {
       })
       navigate(`/chat/${conversation.id}`)
     } catch (err) {
-      setError(errorMessage(err, 'Nem sikerült elindítani a beszélgetést.'))
+      setError(errorMessage(err, t.situations.startFailed))
       setStarting(null)
     }
   }
@@ -44,18 +46,18 @@ export function SituationsPage() {
     <div className="space-y-10">
       <section className="space-y-4">
         <div>
-          <h1 className="text-2xl font-bold">Hallo, {user?.displayName}!</h1>
+          <h1 className="text-2xl font-bold">{t.situations.hello(user?.displayName ?? '')}</h1>
           <p className="text-slate-600">
-            Válassz egy helyzetet. A beszélgetőtársad a te szintedhez (<strong>{user?.level}</strong>) igazítja a nyelvezetét,
-            az üzeneteidet pedig közben javítjuk.
+            {t.situations.introBefore}
+            <strong>{user?.level}</strong>
+            {t.situations.introAfter}
           </p>
         </div>
         {llm?.available === false && (
           <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900 ring-1 ring-amber-200">
-            😴 <strong>A beszélgetőtárs most offline.</strong> A nyelvi modell ({llm.model}, Ollama) ingyenesen, a fejlesztő saját
-            gépén fut, és az most nincs bekapcsolva. A nyelvtan, a kártyák, a statisztika és a felolvasás ettől függetlenül működik.{' '}
+            😴 <strong>{t.situations.offlineTitle}</strong> {t.situations.offlineText(llm.model)}{' '}
             <a href="https://github.com/GergelyBak/Fehlerfreund" className="font-medium underline" target="_blank" rel="noreferrer">
-              Részletek a GitHubon
+              {t.situations.offlineLink}
             </a>
             .
           </p>
@@ -79,7 +81,7 @@ export function SituationsPage() {
                   <span className="space-y-1">
                     <span className="block font-semibold">{s.title}</span>
                     <span className="block text-sm text-slate-600">{s.description}</span>
-                    {starting === s.id && <span className="block text-sm text-indigo-600">Indítás…</span>}
+                    {starting === s.id && <span className="block text-sm text-indigo-600">{t.situations.starting}</span>}
                   </span>
                 </button>
               ))}

@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
 import { AuthProvider } from './auth/AuthContext'
+import { I18nProvider } from './i18n/I18nProvider'
 import { RequireAuth } from './auth/RequireAuth'
 import { Layout } from './components/Layout'
 import { ChatPage } from './pages/ChatPage'
@@ -17,6 +18,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <I18nProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
@@ -34,6 +36,7 @@ export default function App() {
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </I18nProvider>
       </AuthProvider>
     </BrowserRouter>
   )

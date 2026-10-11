@@ -3,6 +3,7 @@ import { api } from '../api/client'
 import { errorMessage } from '../api/errors'
 import { SpeakButtons } from '../speech/SpeakButtons'
 import type { ChatMessage } from './types'
+import { useI18n } from '../i18n/context'
 
 export function AssistantMessage({
   message,
@@ -13,6 +14,7 @@ export function AssistantMessage({
   conversationId: string
   onTranslated: (messageId: string, text: string) => void
 }) {
+  const { t } = useI18n()
   const [loading, setLoading] = useState(false)
   const [visible, setVisible] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -37,7 +39,7 @@ export function AssistantMessage({
       )
       onTranslated(message.id, res.translation)
     } catch (err) {
-      setError(errorMessage(err, 'Nem sikerült lefordítani.'))
+      setError(errorMessage(err, t.message.translateFailed))
       setVisible(false)
     } finally {
       setLoading(false)
@@ -62,7 +64,7 @@ export function AssistantMessage({
             disabled={loading}
             className="min-h-9 rounded-md px-2 text-xs font-medium text-slate-500 hover:text-indigo-600 disabled:opacity-60 sm:min-h-0 sm:px-1"
           >
-            {loading ? 'Fordítás…' : visible ? 'Fordítás elrejtése' : '🌐 Fordítás'}
+            {loading ? t.message.translating : visible ? t.message.hideTranslation : t.message.translate}
           </button>
         </div>
       )}

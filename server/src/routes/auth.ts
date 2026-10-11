@@ -115,7 +115,7 @@ router.post("/forgot-password", resetLimiter, validateBody(ForgotSchema), async 
     const link = `${env.CLIENT_ORIGIN}/reset-password?token=${token}`;
     // Not awaited: the response time must not reveal whether the account
     // exists, and a slow mail server shouldn't hold up the request.
-    sendMail(passwordResetMail(user.email, user.displayName, link)).catch((err) =>
+    sendMail(passwordResetMail(user.email, user.displayName, link, user.nativeLanguage ?? "hu")).catch((err) =>
       console.error("Sending password reset email failed:", err),
     );
   }

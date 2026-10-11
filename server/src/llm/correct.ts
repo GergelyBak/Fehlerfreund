@@ -2,18 +2,12 @@ import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { anthropic, MODELS } from "./client.js";
 import { CorrectionSchema } from "./correctionSchema.js";
-import { loadPrompt } from "./prompts.js";
+import { loadCorrectionPrompt } from "./correctionPrompt.js";
 import { recordUsage } from "./usage.js";
 import type { CorrectParams, CorrectionResult } from "./types.js";
 
-const LANGUAGE_NAMES: Record<string, string> = { hu: "Hungarian", en: "English" };
-
 export async function correctMessage(opts: CorrectParams): Promise<CorrectionResult> {
-  const { text: system, version: promptVersion } = await loadPrompt(
-    "correction",
-    { level: opts.level, nativeLanguage: LANGUAGE_NAMES[opts.nativeLanguage] ?? "English" },
-    opts.promptVersion,
-  );
+  const { text: system, version: promptVersion } = await loadCorrectionPrompt(opts);
   const model = MODELS.correction;
 
   let response;

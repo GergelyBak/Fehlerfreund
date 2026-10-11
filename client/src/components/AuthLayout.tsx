@@ -1,14 +1,11 @@
 import type { ReactNode } from 'react'
 import { useAuth } from '../auth/useAuth'
-
-const FEATURES = [
-  { icon: '💬', title: 'Valós helyzetek', text: 'Bürgeramt, orvos, lakásnézés: gyakorolj ott, ahol tényleg szükséged lesz rá.' },
-  { icon: '✏️', title: 'Azonnali javítás', text: 'Minden üzeneted alatt ott a javítás, magyar magyarázattal.' },
-  { icon: '🔁', title: 'A hibáidból tanulsz', text: 'A hibáid kártyákká válnak, és ismétléssel rögzülnek.' },
-]
+import { useI18n } from '../i18n/context'
+import { LanguageSwitch } from '../i18n/LanguageSwitch'
 
 export function AuthLayout({ title, subtitle, children }: { title: string; subtitle: string; children: ReactNode }) {
   const { waking } = useAuth()
+  const { t } = useI18n()
   return (
     <div className="grid min-h-dvh lg:grid-cols-2">
       <aside className="relative hidden overflow-hidden bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-800 p-12 text-white lg:flex lg:flex-col lg:justify-between">
@@ -16,19 +13,17 @@ export function AuthLayout({ title, subtitle, children }: { title: string; subti
         <div className="space-y-10">
           <div className="space-y-3">
             <h2 className="text-4xl leading-tight font-bold">
-              Beszélgess németül.
+              {t.authLayout.headline1}
               <br />
-              Tanulj a saját hibáidból.
+              {t.authLayout.headline2}
             </h2>
-            <p className="max-w-md text-indigo-100">
-              A Fehlerfreund beszélgetőtárs, aki nem csak válaszol, hanem meg is mutatja, hol hibáztál, és miért.
-            </p>
+            <p className="max-w-md text-indigo-100">{t.authLayout.intro}</p>
           </div>
 
-          <ExampleCorrection />
+          <ExampleCorrection explanation={t.authLayout.exampleExplanation} />
 
           <ul className="space-y-4">
-            {FEATURES.map((f) => (
+            {t.authLayout.features.map((f) => (
               <li key={f.title} className="flex gap-3">
                 <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-white/10 text-lg" aria-hidden>
                   {f.icon}
@@ -41,22 +36,25 @@ export function AuthLayout({ title, subtitle, children }: { title: string; subti
             ))}
           </ul>
         </div>
-        <p className="text-sm text-indigo-200">A1–B2 szint · magyar és angol magyarázatok</p>
+        <p className="text-sm text-indigo-200">{t.authLayout.footer}</p>
       </aside>
 
       <main className="flex items-center justify-center px-4 py-10 sm:px-8">
         <div className="w-full max-w-md space-y-8">
           <div className="space-y-2">
-            <div className="lg:hidden">
-              <Logo />
+            <div className="flex items-center justify-between gap-3">
+              <span className="lg:hidden">
+                <Logo />
+              </span>
+              <span className="ml-auto">
+                <LanguageSwitch />
+              </span>
             </div>
             <h1 className="pt-4 text-3xl font-bold tracking-tight lg:pt-0">{title}</h1>
             <p className="text-slate-600">{subtitle}</p>
           </div>
           {waking && (
-            <p className="rounded-lg bg-amber-50 px-3 py-2.5 text-sm text-amber-900 ring-1 ring-amber-200">
-              ⏳ A demó szerver épp ébred (ingyenes tárhely). Kb. fél–egy perc, addig a bejelentkezés várakozhat.
-            </p>
+            <p className="rounded-lg bg-amber-50 px-3 py-2.5 text-sm text-amber-900 ring-1 ring-amber-200">{t.authLayout.waking}</p>
           )}
           {children}
         </div>
@@ -80,7 +78,7 @@ function Logo({ light }: { light?: boolean }) {
 }
 
 // A static preview of what a correction looks like in the chat.
-function ExampleCorrection() {
+function ExampleCorrection({ explanation }: { explanation: string }) {
   return (
     <div className="max-w-md space-y-2 rounded-2xl bg-white/10 p-4 ring-1 ring-white/15 backdrop-blur">
       <div className="ml-auto w-fit max-w-[90%] rounded-2xl rounded-tr-sm bg-white px-4 py-2 text-slate-900">
@@ -93,7 +91,7 @@ function ExampleCorrection() {
           <span className="font-medium text-emerald-700">mit dem Bus</span>
           <span className="rounded-full bg-amber-200 px-2 py-0.5 text-xs font-medium text-amber-900">Kasus</span>
         </div>
-        <p className="text-slate-600">A „mit” után mindig Dativ áll.</p>
+        <p className="text-slate-600">{explanation}</p>
       </div>
     </div>
   )

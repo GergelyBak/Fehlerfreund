@@ -4,11 +4,13 @@ import { useAuth } from '../auth/useAuth'
 import { errorMessage } from '../api/errors'
 import { AuthLayout } from '../components/AuthLayout'
 import { Alert, Button, Field, Input, PasswordInput } from '../components/ui'
+import { useI18n } from '../i18n/context'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export function LoginPage() {
   const { user, login } = useAuth()
+  const { t } = useI18n()
   const navigate = useNavigate()
   const location = useLocation()
   const [email, setEmail] = useState('')
@@ -22,8 +24,8 @@ export function LoginPage() {
 
   function validate() {
     const errors: typeof fieldErrors = {}
-    if (!EMAIL_RE.test(email.trim())) errors.email = 'Adj meg egy érvényes e-mail-címet.'
-    if (!password) errors.password = 'Add meg a jelszavad.'
+    if (!EMAIL_RE.test(email.trim())) errors.email = t.form.invalidEmail
+    if (!password) errors.password = t.login.passwordMissing
     setFieldErrors(errors)
     return Object.keys(errors).length === 0
   }
@@ -45,22 +47,22 @@ export function LoginPage() {
   }
 
   return (
-    <AuthLayout title="Üdv újra!" subtitle="Jelentkezz be, és folytasd a gyakorlást ott, ahol abbahagytad.">
+    <AuthLayout title={t.login.title} subtitle={t.login.subtitle}>
       <form onSubmit={onSubmit} noValidate className="space-y-5">
         {error && <Alert>{error}</Alert>}
-        <Field label="E-mail-cím" htmlFor="email" error={fieldErrors.email}>
+        <Field label={t.form.email} htmlFor="email" error={fieldErrors.email}>
           <Input
             id="email"
             type="email"
             autoComplete="email"
             autoFocus
-            placeholder="te@pelda.hu"
+            placeholder={t.form.emailPlaceholder}
             value={email}
             invalid={!!fieldErrors.email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </Field>
-        <Field label="Jelszó" htmlFor="password" error={fieldErrors.password}>
+        <Field label={t.form.password} htmlFor="password" error={fieldErrors.password}>
           <PasswordInput
             id="password"
             autoComplete="current-password"
@@ -71,17 +73,17 @@ export function LoginPage() {
         </Field>
         <div className="-mt-2 text-right">
           <Link to="/forgot-password" className="inline-block py-2 text-sm font-medium text-indigo-600 hover:underline">
-            Elfelejtetted a jelszavad?
+            {t.login.forgot}
           </Link>
         </div>
         <Button type="submit" loading={submitting} className="w-full">
-          {submitting ? 'Bejelentkezés…' : 'Bejelentkezés'}
+          {submitting ? t.login.submitting : t.login.submit}
         </Button>
       </form>
       <p className="text-center text-sm text-slate-600">
-        Még nincs fiókod?{' '}
+        {t.login.noAccount}{' '}
         <Link to="/register" className="font-medium text-indigo-600 hover:underline">
-          Regisztrálj ingyen
+          {t.login.register}
         </Link>
       </p>
     </AuthLayout>

@@ -12,6 +12,7 @@ You chat in real-life situations (Bürgeramt, doctor, flat viewing, job intervie
 
 - **Roleplay chat.** 10 situations, each with 3 goals to tick off and useful phrases that insert into the message box. Replies stream live.
 - **Correction on every message.** Error type (`Kasus`, `Tempus`, `Wortstellung`…), the fix, and a short explanation in Hungarian or English.
+- **English and Hungarian UI.** The app, situations, emails and explanations follow the account's language. A HU/EN switch in the header changes it instantly. Before sign-in, the browser language decides. The grammar lessons themselves are in Hungarian for now.
 - **Translate and listen.** Translate any partner message into your language on demand. German is read aloud at normal or slow speed, with optional auto-read.
 - **Flashcards with SM-2.** Chat mistakes and wrong grammar answers become cards. The review page has keyboard grading, and forgotten cards come back within the same session.
 - **Grammar course, A1 to B1.** 33 hand-written topics: 10 for A1 (present tense, articles, plural, Akkusativ, word order, nicht/kein, modal verbs, separable verbs, possessives, imperative), 13 for A2 and 10 for B1. Each has explanations, tables, spoken examples and a graded test. The A2 topics: Perfekt, Präteritum, Dativ, Wechselpräpositionen, weil/dass/wenn, comparison, adjective endings, Konjunktiv II, reflexive verbs, verbs with prepositions, indirect questions, time expressions, and prepositions with a fixed case. The B1 topics: relative clauses, Passiv, Genitiv, temporal clauses (als/wenn, bevor, nachdem), zu-infinitive and um … zu, Präteritum for storytelling, Plusquamperfekt, past Konjunktiv II, n-declension, and paired conjunctions (sowohl … als auch, je … desto).
@@ -24,7 +25,7 @@ You chat in real-life situations (Bürgeramt, doctor, flat viewing, job intervie
 - **Client:** React 19, TypeScript, Tailwind CSS 4, Vite, React Router, Web Speech API
 - **Server:** Node.js, Express 5, TypeScript, MongoDB Atlas (Mongoose), Zod, Nodemailer
 - **LLM:** a local model via [Ollama](https://ollama.com) (default `gemma3:4b`), or the Claude API (`claude-sonnet-5`)
-- **Tests:** Vitest (112 tests) and a correction-quality eval
+- **Tests:** Vitest (116 tests) and a correction-quality eval
 
 ## Engineering notes
 
@@ -58,6 +59,8 @@ You chat in real-life situations (Bürgeramt, doctor, flat viewing, job intervie
 - **Statistics in the learner's time zone.** Daily activity is grouped with MongoDB `$dateToString` in the browser's IANA time zone, and the streak logic works on calendar days, so a late-evening session or a daylight-saving change can't break a streak. The helpers are pure and unit-tested (`server/src/stats/compute.ts`).
 - **Reminders: n8n delivers, the API decides.** Every hour the workflow asks the API who needs an email right now and gets back the finished, localized messages. It sends them, then confirms each one, so a failed send is retried on the next run and a sent one is never repeated that day. Time zones, the "only if there's something to say" rule and the wording all live in unit-tested TypeScript (`server/src/reminders/compose.ts`), not in workflow expressions. The internal endpoints need a bearer key that is compared in constant time. Unsubscribe links are HMAC-signed, and opening one only asks for confirmation, because mail scanners follow links.
 - **Versioned prompts** live in `server/prompts/*.vN.md`, and the version is stored with each correction.
+- **Few-shot examples set the language, not the instruction.** Adding English exposed a bug: with v2's Hungarian worked examples, English learners got Hungarian or even German explanations from `gemma3:4b`, even though the prompt asked for English (5 of 6 test sentences, plus 1 broken JSON). In v3 the examples are rendered in the learner's language (`server/src/llm/correctionPrompt.ts`), and the result was 6 of 6 in English. A test pins the Hungarian v3 prompt to be byte-identical to v2, so v2's measured quality still holds.
+- **Typed UI translations without a library.** `client/src/i18n/hu.ts` is the source; `en.ts` is typed against it, so a missing or misspelled key is a compile error rather than a blank on screen. Server error messages stay English and are mapped per language on the client.
 - **Production concerns:**
   - Auth uses a JWT in an httpOnly cookie.
   - There are per-user rate limits and a daily token budget.

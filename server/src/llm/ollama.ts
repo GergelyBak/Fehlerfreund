@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { env } from "../config/env.js";
 import { CorrectionSchema } from "./correctionSchema.js";
+import { loadCorrectionPrompt } from "./correctionPrompt.js";
 import { loadPrompt } from "./prompts.js";
 import {
   LlmUnavailableError,
@@ -139,11 +140,7 @@ async function* streamRoleplay(opts: RoleplayParams): AsyncGenerator<string, voi
 }
 
 async function correct(opts: CorrectParams): Promise<CorrectionResult> {
-  const { text: system, version: promptVersion } = await loadPrompt(
-    "correction",
-    { level: opts.level, nativeLanguage: LANGUAGE_NAMES[opts.nativeLanguage] ?? "English" },
-    opts.promptVersion,
-  );
+  const { text: system, version: promptVersion } = await loadCorrectionPrompt(opts);
   let content: string;
   try {
     content = await complete(

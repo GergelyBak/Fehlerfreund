@@ -2,27 +2,29 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { api } from '../api/client'
 import { errorMessage } from '../api/errors'
+import { activeMessages, useI18n } from '../i18n/context'
 import { notifyCardsChanged } from '../review/cardEvents'
 import { formatDue, formatInterval, sameSentence } from '../review/format'
 import { Highlight } from '../review/Highlight'
 import { SpeakButtons } from '../speech/SpeakButtons'
-import { ERROR_LABELS } from '../stats/errorLabels'
-import type { ErrorType } from '../chat/types'
+import { isErrorType } from '../stats/errorLabels'
 import type { Card, CardStats, UiGrade } from '../review/types'
 
-const GRADES: { grade: UiGrade; label: string; key: string; className: string }[] = [
-  { grade: 1, label: 'Nem tudtam', key: '1', className: 'bg-red-50 text-red-700 ring-red-200 hover:bg-red-100' },
-  { grade: 3, label: 'Nehéz', key: '2', className: 'bg-amber-50 text-amber-800 ring-amber-200 hover:bg-amber-100' },
-  { grade: 4, label: 'Jó', key: '3', className: 'bg-emerald-50 text-emerald-700 ring-emerald-200 hover:bg-emerald-100' },
-  { grade: 5, label: 'Könnyű', key: '4', className: 'bg-sky-50 text-sky-700 ring-sky-200 hover:bg-sky-100' },
+// Labels come from the messages (t.review.grades).
+const GRADES: { grade: UiGrade; key: string; className: string }[] = [
+  { grade: 1, key: '1', className: 'bg-red-50 text-red-700 ring-red-200 hover:bg-red-100' },
+  { grade: 3, key: '2', className: 'bg-amber-50 text-amber-800 ring-amber-200 hover:bg-amber-100' },
+  { grade: 4, key: '3', className: 'bg-emerald-50 text-emerald-700 ring-emerald-200 hover:bg-emerald-100' },
+  { grade: 5, key: '4', className: 'bg-sky-50 text-sky-700 ring-sky-200 hover:bg-sky-100' },
 ]
 
 export function ReviewPage() {
+  const { t } = useI18n()
   // Targeted practice from the statistics page: ?type=Kasus, optionally &ahead=1
   // to also review cards that aren't due yet.
   const [params] = useSearchParams()
   const rawType = params.get('type')
-  const type = rawType && rawType in ERROR_LABELS ? (rawType as ErrorType) : null
+  const type = isErrorType(rawType) ? rawType : null
   const ahead = type !== null && params.get('ahead') === '1'
   const filter = type ? `&errorType=${encodeURIComponent(type)}` : ''
 
@@ -54,7 +56,8 @@ export function ReviewPage() {
         setReviewed(0)
         setError(null)
       })
-      .catch((err) => !cancelled && setError(errorMessage(err, 'Nem sikerült betölteni a kártyákat.')))
+      // activeMessages, not t: a language switch shouldn't reload the cards.
+      .catch((err) => !cancelled && setError(errorMessage(err, activeMessages().review.loadFailed)))
     return () => {
       cancelled = true
     }
@@ -85,12 +88,12 @@ export function ReviewPage() {
         notifyCardsChanged()
         nextCard()
       } catch (err) {
-        setError(errorMessage(err, 'Nem sikerült menteni az értékelést.'))
+        setError(errorMessage(err, t.review.gradeFailed))
       } finally {
         setBusy(false)
       }
     },
-    [card, busy, nextCard],
+    [card, busy, nextCard, t],
   )
 
   async function deleteCard() {
@@ -103,7 +106,7 @@ export function ReviewPage() {
       notifyCardsChanged()
       nextCard()
     } catch (err) {
-      setError(errorMessage(err, 'Nem sikerült törölni a kártyát.'))
+      setError(errorMessage(err, t.review.deleteFailed))
     } finally {
       setBusy(false)
     }
@@ -127,31 +130,26 @@ export function ReviewPage() {
   if (error && !queue) {
     return <p className="text-red-600">{error}</p>
   }
-  if (!queue || !stats) return <p className="text-slate-500">Betöltés…</p>
+  if (!queue || !stats) return <p className="text-slate-500">{t.common.loading}</p>
 
   // Targeted practice with nothing due in that category
   if (type && sessionSize === 0 && !card) {
-    const label = ERROR_LABELS[type].hu
     return (
       <EmptyState>
         <p className="text-4xl">🎯</p>
-        <h1 className="text-xl font-semibold">Nincs esedékes kártya ebben: {label}</h1>
-        <p className="text-slate-600">
-          {stats.total === 0
-            ? 'Ebben a kategóriában nincs kártyád.'
-            : `${stats.total} kártyád van ebben a kategóriában, de egyik sem esedékes még.`}
-        </p>
+        <h1 className="text-xl font-semibold">{t.review.noneDueIn(t.errorTypes[type].label)}</h1>
+        <p className="text-slate-600">{stats.total === 0 ? t.review.noCardsInCategory : t.review.noneDueYet(stats.total)}</p>
         <div className="flex flex-wrap justify-center gap-3">
           {stats.total > 0 && !ahead && (
             <Link
               to={`/review?type=${encodeURIComponent(type)}&ahead=1`}
               className="rounded-lg bg-indigo-600 px-4 py-2.5 font-medium text-white hover:bg-indigo-700"
             >
-              Gyakorlás előre ({stats.total} kártya)
+              {t.review.practiseAhead(stats.total)}
             </Link>
           )}
           <Link to="/stats" className="rounded-lg px-4 py-2.5 font-medium text-indigo-700 ring-1 ring-indigo-200 hover:bg-indigo-50">
-            ← Statisztika
+            {t.review.backToStats}
           </Link>
         </div>
       </EmptyState>
@@ -165,23 +163,21 @@ export function ReviewPage() {
         {stats.total === 0 ? (
           <>
             <p className="text-4xl">🗂️</p>
-            <h1 className="text-xl font-semibold">Még nincs kártyád</h1>
-            <p className="text-slate-600">
-              Beszélgess egyet: a hibáidból automatikusan kártyák lesznek, és itt ismételheted őket.
-            </p>
+            <h1 className="text-xl font-semibold">{t.review.noCardsTitle}</h1>
+            <p className="text-slate-600">{t.review.noCardsText}</p>
           </>
         ) : (
           <>
             <p className="text-4xl">🎉</p>
-            <h1 className="text-xl font-semibold">Mára nincs több ismétlendő kártya</h1>
+            <h1 className="text-xl font-semibold">{t.review.allDoneTitle}</h1>
             <p className="text-slate-600">
-              {stats.total} kártyád van összesen.
-              {stats.nextDueAt && <> A következő esedékes: {formatDue(stats.nextDueAt)}.</>}
+              {t.review.total(stats.total)}
+              {stats.nextDueAt && t.review.nextDue(formatDue(stats.nextDueAt))}
             </p>
           </>
         )}
         <Link to="/" className="inline-block rounded-lg bg-indigo-600 px-4 py-2.5 font-medium text-white hover:bg-indigo-700">
-          Beszélgetés indítása
+          {t.common.startChat}
         </Link>
       </EmptyState>
     )
@@ -192,17 +188,17 @@ export function ReviewPage() {
     return (
       <EmptyState>
         <p className="text-4xl">✅</p>
-        <h1 className="text-xl font-semibold">Kész! {reviewed} ismétlés ebben a körben</h1>
-        <p className="text-slate-600">Szép munka. A kártyák akkor jönnek vissza, amikor épp kezdenéd elfelejteni őket.</p>
+        <h1 className="text-xl font-semibold">{t.review.sessionDone(reviewed)}</h1>
+        <p className="text-slate-600">{t.review.sessionDoneText}</p>
         <div className="flex justify-center gap-3">
           <button
             onClick={() => setReloadToken((n) => n + 1)}
             className="rounded-lg px-4 py-2.5 font-medium text-indigo-700 ring-1 ring-indigo-200 hover:bg-indigo-50"
           >
-            Van még? Újratöltés
+            {t.review.reload}
           </button>
           <Link to="/" className="rounded-lg bg-indigo-600 px-4 py-2.5 font-medium text-white hover:bg-indigo-700">
-            Beszélgetés
+            {t.review.chat}
           </Link>
         </div>
       </EmptyState>
@@ -219,19 +215,19 @@ export function ReviewPage() {
           {type ? (
             <span className="flex items-center gap-2">
               <span className="rounded-full bg-indigo-100 px-2.5 py-0.5 font-medium text-indigo-800">
-                🎯 {ERROR_LABELS[type].hu}
-                {ahead && ' · előre'}
+                🎯 {t.errorTypes[type].label}
+                {ahead && t.review.ahead}
               </span>
-              <Link to="/review" className="hover:text-slate-800" aria-label="Szűrő törlése">
+              <Link to="/review" className="hover:text-slate-800" aria-label={t.review.clearFilter}>
                 ✕
               </Link>
             </span>
           ) : (
-            <span>Ismétlés</span>
+            <span>{t.review.review}</span>
           )}
           <span>
             {progress} / {sessionSize}
-            {queue.length > sessionSize - progress && ' · +újra'}
+            {queue.length > sessionSize - progress && t.review.again}
           </span>
         </div>
         <div className="h-1.5 overflow-hidden rounded-full bg-slate-200">
@@ -246,17 +242,15 @@ export function ReviewPage() {
         <div className="flex flex-wrap items-center gap-2 text-xs">
           <span className="rounded-full bg-amber-100 px-2.5 py-1 font-medium text-amber-900">{card.errorType}</span>
           {card.occurrences > 1 && (
-            <span className="rounded-full bg-red-50 px-2.5 py-1 font-medium text-red-700">
-              {card.occurrences}× elkövetted ezt a hibát
-            </span>
+            <span className="rounded-full bg-red-50 px-2.5 py-1 font-medium text-red-700">{t.review.occurrences(card.occurrences)}</span>
           )}
           {card.reviewCount === 0 && (
-            <span className="rounded-full bg-indigo-50 px-2.5 py-1 font-medium text-indigo-700">Új</span>
+            <span className="rounded-full bg-indigo-50 px-2.5 py-1 font-medium text-indigo-700">{t.review.new}</span>
           )}
         </div>
 
         <div className="space-y-2">
-          <p className="text-sm font-medium text-slate-500">Javítsd ki a hibát a mondatban:</p>
+          <p className="text-sm font-medium text-slate-500">{t.review.fixSentence}</p>
           <p className="text-xl leading-relaxed font-medium">
             {revealed ? (
               <Highlight sentence={card.prompt} fragment={card.original} className="bg-red-100 text-red-800" />
@@ -286,14 +280,14 @@ export function ReviewPage() {
                 }
               }}
               rows={2}
-              placeholder="Írd be a helyes mondatot (nem kötelező), vagy csak gondold végig…"
+              placeholder={t.review.typePlaceholder}
               className="w-full resize-none rounded-xl border border-slate-300 px-3 py-2 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
             />
             <button
               type="submit"
               className="w-full rounded-lg bg-indigo-600 px-4 py-2.5 font-medium text-white hover:bg-indigo-700"
             >
-              Megoldás megmutatása <span className="text-indigo-200">(Enter)</span>
+              {t.review.show} <span className="text-indigo-200">(Enter)</span>
             </button>
           </form>
         ) : (
@@ -302,12 +296,12 @@ export function ReviewPage() {
               <p
                 className={`rounded-lg px-3 py-2 text-sm ${typedCorrect ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-100 text-slate-700'}`}
               >
-                {typedCorrect ? '✓ Pontosan így!' : <>A te válaszod: {typed}</>}
+                {typedCorrect ? t.review.exactly : t.review.yourAnswer(typed)}
               </p>
             )}
             <div className="space-y-1 rounded-xl bg-emerald-50 p-4 ring-1 ring-emerald-200">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-sm font-medium text-emerald-800">Helyesen:</p>
+                <p className="text-sm font-medium text-emerald-800">{t.review.correctly}</p>
                 <SpeakButtons text={card.answer} />
               </div>
               <p className="text-lg">
@@ -320,7 +314,7 @@ export function ReviewPage() {
             </p>
 
             <div className="space-y-2">
-              <p className="text-sm text-slate-500">Mennyire ment?</p>
+              <p className="text-sm text-slate-500">{t.review.howDidItGo}</p>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                 {GRADES.map((g) => (
                   <button
@@ -329,7 +323,7 @@ export function ReviewPage() {
                     disabled={busy}
                     className={`rounded-lg px-3 py-2.5 text-center ring-1 transition disabled:opacity-50 ${g.className}`}
                   >
-                    <span className="block font-medium">{g.label}</span>
+                    <span className="block font-medium">{t.review.grades[g.grade as keyof typeof t.review.grades]}</span>
                     <span className="block text-xs opacity-75">
                       {formatInterval(card.previews[g.grade])} · <kbd>{g.key}</kbd>
                     </span>
@@ -346,17 +340,17 @@ export function ReviewPage() {
       <div className="text-center text-sm">
         {confirmDelete ? (
           <span className="space-x-3">
-            <span className="text-slate-600">Biztosan törlöd ezt a kártyát?</span>
+            <span className="text-slate-600">{t.review.confirmDelete}</span>
             <button onClick={() => void deleteCard()} disabled={busy} className="font-medium text-red-600 hover:underline">
-              Törlés
+              {t.common.delete}
             </button>
             <button onClick={() => setConfirmDelete(false)} className="text-slate-500 hover:underline">
-              Mégse
+              {t.common.cancel}
             </button>
           </span>
         ) : (
           <button onClick={() => setConfirmDelete(true)} className="py-2 text-slate-400 hover:text-slate-600 hover:underline">
-            Hibás a javítás? Kártya törlése
+            {t.review.deleteCard}
           </button>
         )}
       </div>

@@ -4,12 +4,15 @@ import { api } from '../api/client'
 import { useAuth } from '../auth/useAuth'
 import { onCardsChanged } from '../review/cardEvents'
 import type { CardStats } from '../review/types'
+import { useI18n } from '../i18n/context'
+import { LanguageSwitch } from '../i18n/LanguageSwitch'
 
+// Labels come from the messages (t.nav[key]); 'short' is the phone tab bar label.
 const NAV_ITEMS = [
-  { to: '/', icon: '💬', label: 'Beszélgetés', short: 'Chat', end: true },
-  { to: '/review', icon: '🗂️', label: 'Ismétlés', short: 'Ismétlés', badge: true },
-  { to: '/grammar', icon: '📘', label: 'Nyelvtan', short: 'Nyelvtan' },
-  { to: '/stats', icon: '📊', label: 'Statisztika', short: 'Statisztika' },
+  { to: '/', icon: '💬', key: 'chat', short: 'chatShort', end: true },
+  { to: '/review', icon: '🗂️', key: 'review', short: 'review', badge: true },
+  { to: '/grammar', icon: '📘', key: 'grammar', short: 'grammar' },
+  { to: '/stats', icon: '📊', key: 'stats', short: 'stats' },
 ] as const
 
 function useDueCount() {
@@ -39,6 +42,7 @@ function DueBadge({ due, className = '' }: { due: number | null; className?: str
 
 export function Layout() {
   const { user, logout } = useAuth()
+  const { t } = useI18n()
   const due = useDueCount()
   // Inside a conversation the chat gets the whole screen on phones; it has
   // its own back button.
@@ -63,7 +67,7 @@ export function Layout() {
                     }`
                   }
                 >
-                  {item.label}
+                  {t.nav[item.key]}
                   {'badge' in item && <DueBadge due={due} />}
                 </NavLink>
               ))}
@@ -71,11 +75,12 @@ export function Layout() {
           </div>
           <div className="flex items-center gap-1 text-sm">
             <span className="mr-2 hidden text-slate-500 md:inline">{user?.email}</span>
+            <LanguageSwitch />
             <button
               onClick={logout}
               className="rounded-lg px-3 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
             >
-              Kilépés
+              {t.nav.logout}
             </button>
           </div>
         </div>
@@ -93,7 +98,7 @@ export function Layout() {
       {!inChat && (
         <nav
           className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur sm:hidden"
-          aria-label="Fő navigáció"
+          aria-label={t.nav.mainNav}
         >
           <div className="grid h-16 grid-cols-4">
             {NAV_ITEMS.map((item) => (
@@ -115,7 +120,7 @@ export function Layout() {
                     >
                       {item.icon}
                     </span>
-                    {item.short}
+                    {t.nav[item.short]}
                     {'badge' in item && <DueBadge due={due} className="absolute top-1 left-1/2 ml-2" />}
                   </>
                 )}

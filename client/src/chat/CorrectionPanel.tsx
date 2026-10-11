@@ -1,5 +1,6 @@
 import { Link } from 'react-router'
 import type { StoredCorrection } from './types'
+import { useI18n } from '../i18n/context'
 
 export function CorrectionPanel({
   correction,
@@ -10,23 +11,24 @@ export function CorrectionPanel({
   pending?: boolean
   cardsAdded?: number
 }) {
+  const { t } = useI18n()
   if (pending && !correction) {
-    return <p className="text-xs text-slate-400">Ellenőrzés…</p>
+    return <p className="text-xs text-slate-400">{t.correction.checking}</p>
   }
   if (!correction) return null
 
   if (correction.status === 'failed') {
-    return <p className="text-xs text-slate-400">Ezt az üzenetet most nem sikerült ellenőrizni.</p>
+    return <p className="text-xs text-slate-400">{t.correction.failed}</p>
   }
 
   if (!correction.hasErrors) {
-    return <p className="text-xs font-medium text-emerald-600">✓ Hibátlan</p>
+    return <p className="text-xs font-medium text-emerald-600">{t.correction.correct}</p>
   }
 
   return (
     <div className="w-full space-y-2 rounded-xl bg-amber-50 p-3 text-sm ring-1 ring-amber-200">
       <p className="text-slate-700">
-        <span className="font-medium">Helyesen: </span>
+        <span className="font-medium">{t.correction.correctly}</span>
         {correction.correctedMessage}
       </p>
       <ul className="space-y-2">
@@ -50,7 +52,7 @@ export function CorrectionPanel({
       </ul>
       {!!cardsAdded && (
         <Link to="/review" className="inline-block py-2 text-xs font-medium text-indigo-700 hover:underline sm:py-0">
-          🗂️ +{cardsAdded} kártya került az ismétlőpakliba
+          {t.correction.cardsAdded(cardsAdded)}
         </Link>
       )}
     </div>

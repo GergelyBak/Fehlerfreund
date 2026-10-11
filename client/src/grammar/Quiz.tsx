@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import { api } from '../api/client'
 import { errorMessage } from '../api/errors'
 import { notifyCardsChanged } from '../review/cardEvents'
+import { useI18n } from '../i18n/context'
 import { GAP, PASS_SCORE, type CheckResponse, type Exercise, type ExerciseResult, type Progress } from './types'
 
 const SPECIAL_CHARS = ['ä', 'ö', 'ü', 'ß', 'Ä', 'Ö', 'Ü']
@@ -16,6 +17,7 @@ export function Quiz({
   exercises: Exercise[]
   onChecked: (progress: Progress | null) => void
 }) {
+  const { t } = useI18n()
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [result, setResult] = useState<CheckResponse | null>(null)
   const [checking, setChecking] = useState(false)
@@ -55,7 +57,7 @@ export function Quiz({
       if (res.cardsAdded) notifyCardsChanged()
       topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     } catch (err) {
-      setError(errorMessage(err, 'Nem sikerült kiértékelni a tesztet.'))
+      setError(errorMessage(err, t.quiz.checkFailed))
     } finally {
       setChecking(false)
     }
@@ -113,19 +115,19 @@ export function Quiz({
       {!result && (
         <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white/95 p-3 shadow-lg ring-1 ring-slate-200 backdrop-blur sm:bottom-4 sm:p-4">
           <div className="hidden items-center gap-1 sm:flex">
-            <span className="mr-1 text-xs text-slate-500">Különleges betűk:</span>
+            <span className="mr-1 text-xs text-slate-500">{t.quiz.specialChars}</span>
             <CharButtons onInsert={insertChar} disabled={!activeGap} />
           </div>
           <div className="flex flex-1 items-center justify-end gap-3 sm:flex-none">
             {error && <span className="text-sm text-red-600">{error}</span>}
-            {empty > 0 && <span className="text-sm text-slate-500">{empty} üres</span>}
+            {empty > 0 && <span className="text-sm text-slate-500">{t.quiz.empty(empty)}</span>}
             <button
               type="button"
               onClick={() => void check()}
               disabled={checking}
               className="rounded-lg bg-indigo-600 px-5 py-2.5 font-medium text-white hover:bg-indigo-700 disabled:opacity-60"
             >
-              {checking ? 'Ellenőrzés…' : 'Ellenőrzés'}
+              {checking ? t.quiz.checking : t.quiz.check}
             </button>
           </div>
         </div>
@@ -170,6 +172,7 @@ function GapSentence({
   onFocus: () => void
   inputRef: (el: HTMLInputElement | null) => void
 }) {
+  const { t } = useI18n()
   const [before, after] = exercise.prompt.split(GAP)
   const state = result ? (result.correct ? 'border-emerald-500 bg-emerald-50' : 'border-red-400 bg-red-50') : 'border-slate-300'
   return (
@@ -184,7 +187,7 @@ function GapSentence({
         autoComplete="off"
         autoCapitalize="off"
         spellCheck={false}
-        aria-label={`Kitöltendő${exercise.hint ? `: ${exercise.hint}` : ''}`}
+        aria-label={t.quiz.gapAria(exercise.hint)}
         size={Math.max(8, value.length + 1)}
         className={`mx-1 rounded-md border-b-2 px-2 py-0.5 text-center font-medium outline-none focus:border-indigo-500 focus:bg-indigo-50 ${state}`}
       />
@@ -244,12 +247,13 @@ function ChoiceQuestion({
 }
 
 function Feedback({ result }: { result: ExerciseResult }) {
+  const { t } = useI18n()
   return (
     <div
       className={`rounded-lg px-3 py-2 text-sm ${result.correct ? 'bg-emerald-50 text-emerald-900' : 'bg-red-50 text-red-900'}`}
     >
       <p className="font-medium">
-        {result.correct ? '✓ Helyes!' : result.given ? `✗ Helyesen: ${result.solution}` : `– Nem válaszoltál. Helyesen: ${result.solution}`}
+        {result.correct ? t.quiz.correct : result.given ? t.quiz.wrong(result.solution) : t.quiz.unanswered(result.solution)}
       </p>
       <p className="opacity-90">{result.explanation}</p>
     </div>
@@ -257,6 +261,7 @@ function Feedback({ result }: { result: ExerciseResult }) {
 }
 
 function Summary({ result, onRetry }: { result: CheckResponse; onRetry: () => void }) {
+  const { t } = useI18n()
   const pct = Math.round((result.score / result.total) * 100)
   const passed = result.score / result.total >= PASS_SCORE
   return (
@@ -270,12 +275,12 @@ function Summary({ result, onRetry }: { result: CheckResponse; onRetry: () => vo
           {result.score} / {result.total} <span className="text-lg font-semibold text-slate-600">({pct}%)</span>
         </p>
         <p className="text-sm text-slate-700">
-          {passed ? '🎉 Szép munka, ez a témakör megy!' : `Még gyakorold: ${Math.round(PASS_SCORE * 100)}%-tól számít teljesítettnek.`}
-          {result.progress && result.progress.attempts > 1 && <> Legjobb eredményed: {Math.round(result.progress.bestScore * 100)}%.</>}
+          {passed ? t.quiz.passed : t.quiz.notYet(Math.round(PASS_SCORE * 100))}
+          {result.progress && result.progress.attempts > 1 && t.quiz.bestSoFar(Math.round(result.progress.bestScore * 100))}
         </p>
         {result.cardsAdded > 0 && (
           <Link to="/review" className="inline-block text-sm font-medium text-indigo-700 hover:underline">
-            🗂️ +{result.cardsAdded} kártya került az ismétlőpakliba a hibáidból
+            {t.quiz.cardsAdded(result.cardsAdded)}
           </Link>
         )}
       </div>
@@ -284,7 +289,7 @@ function Summary({ result, onRetry }: { result: CheckResponse; onRetry: () => vo
         onClick={onRetry}
         className="rounded-lg bg-white px-4 py-2 font-medium text-indigo-700 ring-1 ring-indigo-200 hover:bg-indigo-50"
       >
-        Újra
+        {t.quiz.retry}
       </button>
     </div>
   )

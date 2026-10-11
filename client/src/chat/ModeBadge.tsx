@@ -1,36 +1,25 @@
-import { useLlmInfo, type LlmInfo } from './llmInfo'
-
-const STYLES: Record<LlmInfo['mode'], { label: (model: string) => string; title: string; className: string }> = {
-  ollama: {
-    label: (model) => `💻 ${model} · Ollama`,
-    title: 'Saját gépen futó, ingyenes nyelvi modell (Ollama).',
-    className: 'bg-emerald-100 text-emerald-800',
-  },
-  live: {
-    label: (model) => `☁️ Claude · ${model}`,
-    title: 'A Claude API válaszol (fizetős).',
-    className: 'bg-indigo-100 text-indigo-800',
-  },
-}
+import { useI18n } from '../i18n/context'
+import { useLlmInfo } from './llmInfo'
 
 export function ModeBadge() {
   const info = useLlmInfo()
+  const { t } = useI18n()
 
   if (!info) return null
   if (!info.available) {
     return (
-      <span
-        title="A nyelvi modellt futtató gép most ki van kapcsolva."
-        className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-medium text-slate-700"
-      >
-        😴 Offline
+      <span title={t.mode.offlineTitle} className="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-medium text-slate-700">
+        {t.mode.offline}
       </span>
     )
   }
-  const style = STYLES[info.mode]
-  return (
-    <span title={style.title} className={`rounded-full px-2 py-0.5 text-xs font-medium ${style.className}`}>
-      {style.label(info.model)}
+  return info.mode === 'ollama' ? (
+    <span title={t.mode.ollamaTitle} className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800">
+      💻 {info.model} · Ollama
+    </span>
+  ) : (
+    <span title={t.mode.liveTitle} className="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-800">
+      ☁️ Claude · {info.model}
     </span>
   )
 }

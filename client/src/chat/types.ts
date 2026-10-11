@@ -1,8 +1,9 @@
 import type { Level } from '../auth/types'
 
+// Texts arrive already in the learner's UI language.
 export interface Phrase {
   de: string
-  hu: string
+  translation: string
 }
 
 export interface Situation {
@@ -10,7 +11,7 @@ export interface Situation {
   emoji: string
   title: string
   description: string
-  tasks: { id: string; hu: string }[]
+  tasks: { id: string; text: string }[]
   phrases: Phrase[]
 }
 

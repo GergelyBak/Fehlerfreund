@@ -4,10 +4,12 @@ import { api } from '../api/client'
 import { errorMessage } from '../api/errors'
 import { AuthLayout } from '../components/AuthLayout'
 import { Alert, Button, Field, Input } from '../components/ui'
+import { useI18n } from '../i18n/context'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export function ForgotPasswordPage() {
+  const { t } = useI18n()
   const [email, setEmail] = useState('')
   const [fieldError, setFieldError] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -19,7 +21,7 @@ export function ForgotPasswordPage() {
     setError(null)
     const value = email.trim()
     if (!EMAIL_RE.test(value)) {
-      setFieldError('Adj meg egy érvényes e-mail-címet.')
+      setFieldError(t.form.invalidEmail)
       return
     }
     setFieldError(null)
@@ -36,23 +38,26 @@ export function ForgotPasswordPage() {
 
   if (sentTo) {
     return (
-      <AuthLayout title="Nézd meg a leveleidet" subtitle="Ha van fiók ezzel a címmel, küldtünk rá egy linket.">
+      <AuthLayout title={t.forgot.sentTitle} subtitle={t.forgot.sentSubtitle}>
         <div className="space-y-4 rounded-xl bg-white p-5 ring-1 ring-slate-200">
           <p className="text-slate-700">
-            Ha a <strong>{sentTo}</strong> címmel van regisztrált fiók, pár percen belül megérkezik a levél. A benne lévő
-            link <strong>1 óráig</strong> érvényes.
+            {t.forgot.sentBefore}
+            <strong>{sentTo}</strong>
+            {t.forgot.sentAfter}
+            <strong>{t.forgot.validFor}</strong>
+            {t.forgot.sentEnd}
           </p>
           <p className="text-sm text-slate-500">
-            Nem jött meg? Nézd meg a spam mappát is, vagy{' '}
+            {t.forgot.notArrived}
             <button type="button" onClick={() => setSentTo(null)} className="font-medium text-indigo-600 hover:underline">
-              próbáld újra
+              {t.forgot.tryAgain}
             </button>
             .
           </p>
         </div>
         <p className="text-center text-sm text-slate-600">
           <Link to="/login" className="font-medium text-indigo-600 hover:underline">
-            ← Vissza a bejelentkezéshez
+            {t.forgot.backToLogin}
           </Link>
         </p>
       </AuthLayout>
@@ -60,19 +65,16 @@ export function ForgotPasswordPage() {
   }
 
   return (
-    <AuthLayout
-      title="Elfelejtetted a jelszavad?"
-      subtitle="Semmi gond. Add meg az e-mail-címed, és küldünk egy linket, amellyel új jelszót állíthatsz be."
-    >
+    <AuthLayout title={t.forgot.title} subtitle={t.forgot.subtitle}>
       <form onSubmit={onSubmit} noValidate className="space-y-5">
         {error && <Alert>{error}</Alert>}
-        <Field label="E-mail-cím" htmlFor="email" error={fieldError ?? undefined}>
+        <Field label={t.form.email} htmlFor="email" error={fieldError ?? undefined}>
           <Input
             id="email"
             type="email"
             autoComplete="email"
             autoFocus
-            placeholder="te@pelda.hu"
+            placeholder={t.form.emailPlaceholder}
             value={email}
             invalid={!!fieldError}
             onChange={(e) => {
@@ -82,13 +84,13 @@ export function ForgotPasswordPage() {
           />
         </Field>
         <Button type="submit" loading={submitting} className="w-full">
-          {submitting ? 'Küldés…' : 'Link küldése'}
+          {submitting ? t.forgot.submitting : t.forgot.submit}
         </Button>
       </form>
       <p className="text-center text-sm text-slate-600">
-        Eszedbe jutott?{' '}
+        {t.forgot.remembered}{' '}
         <Link to="/login" className="font-medium text-indigo-600 hover:underline">
-          Jelentkezz be
+          {t.forgot.login}
         </Link>
       </p>
     </AuthLayout>

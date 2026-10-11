@@ -4,7 +4,7 @@ import { z } from "zod";
 import type Anthropic from "@anthropic-ai/sdk";
 import { Conversation, type ConversationDoc, type StoredCorrection } from "../models/Conversation.js";
 import { User } from "../models/User.js";
-import { SITUATIONS, getSituation, toPublicSituation } from "../situations.js";
+import { SITUATIONS, getSituation, isUiLanguage, toPublicSituation } from "../situations.js";
 import { requireAuth } from "../middleware/requireAuth.js";
 import { validateBody } from "../middleware/validate.js";
 import { aiLimiter } from "../middleware/rateLimit.js";
@@ -22,8 +22,10 @@ const MAX_MESSAGE_LENGTH = 500;
 const router = Router();
 router.use(requireAuth);
 
-router.get("/situations", (_req, res) => {
-  res.json({ situations: SITUATIONS.map(toPublicSituation) });
+// ?lang=hu|en picks the UI language of titles, tasks and phrase translations.
+router.get("/situations", (req, res) => {
+  const lang = isUiLanguage(req.query.lang) ? req.query.lang : "hu";
+  res.json({ situations: SITUATIONS.map((s) => toPublicSituation(s, lang)) });
 });
 
 async function findOwned(id: string, userId: string) {
