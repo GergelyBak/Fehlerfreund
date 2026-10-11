@@ -32,7 +32,13 @@ When the machine is off, the app says the conversation partner is offline (`/api
 
 ## Putting the demo online
 
-With Ollama running, start the gateway and the tunnel in two terminals:
+With Ollama running, one command starts both and Ctrl+C stops both. It needs `NGROK_DOMAIN=something.ngrok-free.app` in `.env` too.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File ollama-gateway\start.ps1
+```
+
+Or start the gateway and the tunnel by hand, in two terminals:
 
 ```bash
 cd ollama-gateway
@@ -40,7 +46,7 @@ node --env-file=.env gateway.mjs
 ```
 
 ```bash
-ngrok http --url=something.ngrok-free.app 11500
+ngrok http --domain=something.ngrok-free.app 11500
 ```
 
 The app notices within about 20 seconds. Stop both (Ctrl+C) to take the chat offline.
