@@ -1,10 +1,9 @@
 // Measures correction quality on a fixed sentence set.
 //
-//   npm run eval:correction -- --prompt v1            (Ollama, OLLAMA_MODEL from .env)
-//   npm run eval:correction -- --prompt v2 --provider mock
+//   npm run eval:correction -- --prompt v2   (Ollama, OLLAMA_MODEL from .env)
 //
-// Runs the same path as the app: provider → Zod → sanitizer. Free with
-// Ollama or mock; the paid Claude provider is deliberately not wired in here.
+// Runs the same path as the app: model → Zod → sanitizer. Free with Ollama;
+// the paid Claude provider is deliberately not wired in here.
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -17,17 +16,10 @@ import { scoreCase, summarize, type CaseResult } from "./score.js";
 const { values } = parseArgs({
   options: {
     prompt: { type: "string", default: "v1" },
-    provider: { type: "string", default: "ollama" },
   },
 });
 
-async function loadProvider(name: string): Promise<LlmProvider> {
-  if (name === "ollama") return (await import("../llm/ollama.js")).ollamaProvider;
-  if (name === "mock") return (await import("../llm/mock.js")).mockProvider;
-  throw new Error(`Unknown provider "${name}" (use ollama or mock)`);
-}
-
-const provider = await loadProvider(values.provider!);
+const provider: LlmProvider = (await import("../llm/ollama.js")).ollamaProvider;
 const label = `${provider.mode}:${provider.model} · correction.${values.prompt}`;
 console.log(`\nCorrection eval — ${label} — ${CORRECTION_CASES.length} sentences\n`);
 

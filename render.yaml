@@ -16,15 +16,31 @@ services:
         value: production
       - key: NODE_VERSION
         value: "22"
-      # No GPU or memory for a local model on the free plan: the public demo
-      # uses scripted replies. Switch to "live" (Claude, paid) if you want.
+      # No GPU or memory for a model on the free plan: the model runs on the
+      # developer's machine and is reached through ollama-gateway + a tunnel
+      # (see ollama-gateway/README.md).
       - key: LLM_MODE
-        value: mock
+        value: ollama
+      - key: OLLAMA_MODEL
+        value: gemma3:4b
+      # The tunnel's public URL, e.g. https://something.ngrok-free.app
+      - key: OLLAMA_URL
+        sync: false
+      # Same value as GATEWAY_TOKEN on the machine running the gateway.
+      - key: OLLAMA_API_KEY
+        sync: false
       # Vercel rewrite + Render's own proxy.
       - key: TRUST_PROXY
         value: "2"
+      # Render's free plan blocks outgoing SMTP, so emails (password reset)
+      # go through Brevo's HTTP API. MAIL_FROM must be a sender verified in
+      # Brevo, e.g. "Fehlerfreund <you@gmail.com>".
       - key: EMAIL_MODE
-        value: console
+        value: brevo
+      - key: BREVO_API_KEY
+        sync: false
+      - key: MAIL_FROM
+        sync: false
       - key: JWT_SECRET
         generateValue: true
       - key: MONGODB_URI

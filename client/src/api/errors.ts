@@ -23,7 +23,9 @@ const MESSAGES: Record<string, string> = {
   'Daily practice limit reached, come back tomorrow': 'Elérted a mai gyakorlási keretet, holnap folytathatod.',
   "The conversation partner couldn't answer, please try again":
     'A beszélgetőtárs most nem tudott válaszolni, próbáld újra.',
-  'Saving the conversation failed': 'Nem sikerült menteni a beszélgetést.',
+  'The conversation partner is offline right now':
+    'A beszélgetőtárs most offline: a nyelvi modellt futtató gép ki van kapcsolva. Próbáld később.',
+  'Saving the conversation failed':'Nem sikerült menteni a beszélgetést.',
 }
 
 export function errorMessage(err: unknown, fallback = 'Valami hiba történt, próbáld újra.') {

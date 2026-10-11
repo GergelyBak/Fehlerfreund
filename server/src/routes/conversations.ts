@@ -10,7 +10,7 @@ import { validateBody } from "../middleware/validate.js";
 import { aiLimiter } from "../middleware/rateLimit.js";
 import { HttpError } from "../lib/HttpError.js";
 import { initSse, sendEvent } from "../lib/sse.js";
-import { llm, type CorrectionResult } from "../llm/index.js";
+import { llm, LlmUnavailableError, type CorrectionResult } from "../llm/index.js";
 import { assertWithinBudget } from "../llm/usage.js";
 import { addCardsFromCorrection } from "../srs/cards.js";
 import { sanitizeCorrection } from "../llm/sanitize.js";
@@ -162,6 +162,7 @@ router.post("/:id/messages/:messageId/translate", aiLimiter, async (req, res) =>
     result = await llm.translate({ userId, text: message.content, targetLanguage: user.nativeLanguage });
   } catch (err) {
     console.error("Translation failed:", err);
+    if (err instanceof LlmUnavailableError) throw new HttpError(503, "The conversation partner is offline right now");
     throw new HttpError(502, "Translation failed, please try again");
   }
   message.set("translation", { language: user.nativeLanguage, text: result.text, model: result.model });
@@ -244,6 +245,7 @@ router.post("/:id/messages", aiLimiter, validateBody(SendSchema), async (req, re
 
   let reply = "";
   let streamFailed = false;
+  let modelOffline = false;
   try {
     for await (const chunk of llm.streamRoleplay({
       userId,
@@ -262,11 +264,18 @@ router.post("/:id/messages", aiLimiter, validateBody(SendSchema), async (req, re
   } catch (err) {
     console.error("Roleplay stream failed:", err);
     streamFailed = true;
+    modelOffline = err instanceof LlmUnavailableError;
   }
 
   // Headers are already sent, so the error middleware can't respond anymore:
   // every failure past this point has to end the stream itself.
   try {
+    // No point asking an offline model for a correction too.
+    if (modelOffline && !correctionDone) {
+      correctionDone = Promise.resolve(
+        toStoredCorrection({ ok: false, reason: "unavailable", promptVersion: "unknown", model: "unknown" }),
+      );
+    }
     correctionDone ??= runCorrection();
     userMessage.set("correction", await correctionDone);
     // Keep a partial reply if the stream broke midway; it's still valid context.
@@ -274,7 +283,11 @@ router.post("/:id/messages", aiLimiter, validateBody(SendSchema), async (req, re
     await convo.save();
 
     if (streamFailed && !reply.trim()) {
-      sendEvent(res, "error", { error: "The conversation partner couldn't answer, please try again" });
+      sendEvent(res, "error", {
+        error: modelOffline
+          ? "The conversation partner is offline right now"
+          : "The conversation partner couldn't answer, please try again",
+      });
     } else {
       const last = convo.messages[convo.messages.length - 1]!;
       sendEvent(res, "done", { assistantMessageId: last._id.toString() });

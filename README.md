@@ -4,6 +4,8 @@
 
 A German conversation partner that teaches from your own mistakes.
 
+**Live demo: [fehlerfreund.vercel.app](https://fehlerfreund.vercel.app)**. Register with any email. The chat runs on a free model on the developer's own machine, so it's only online while that machine is on. The app says when it's offline (see [Deployment](#deployment)). The first load can take up to a minute while the free API wakes up.
+
 You chat in real-life situations (Bürgeramt, doctor, flat viewing, job interview…) at your CEFR level. An LLM plays the other side and corrects each message, with an explanation in your native language. Your mistakes become flashcards, and an SM-2 spaced-repetition scheduler brings them back for review. There is also a textbook-style A1–B1 grammar course, and your wrong test answers go into the same deck.
 
 ## Features
@@ -21,13 +23,12 @@ You chat in real-life situations (Bürgeramt, doctor, flat viewing, job intervie
 
 - **Client:** React 19, TypeScript, Tailwind CSS 4, Vite, React Router, Web Speech API
 - **Server:** Node.js, Express 5, TypeScript, MongoDB Atlas (Mongoose), Zod, Nodemailer
-- **LLM:** a local model via [Ollama](https://ollama.com) (default `gemma3:4b`), or the Claude API (`claude-sonnet-5`), or a mock
-- **Tests:** Vitest (115 tests) and a correction-quality eval
+- **LLM:** a local model via [Ollama](https://ollama.com) (default `gemma3:4b`), or the Claude API (`claude-sonnet-5`)
+- **Tests:** Vitest (112 tests) and a correction-quality eval
 
 ## Engineering notes
 
-- **Three interchangeable LLM providers behind one interface** (`LLM_MODE`), and the routes never know which one runs:
-  - `mock`: canned, per-situation scripts. Free and deterministic, used for UI work and tests.
+- **Two interchangeable LLM providers behind one interface** (`LLM_MODE`), and the routes never know which one runs:
   - `ollama`: a free local model via Ollama's REST API, with NDJSON streaming and JSON-schema structured output.
   - `live`: the Claude API.
 
@@ -66,7 +67,7 @@ You chat in real-life situations (Bürgeramt, doctor, flat viewing, job intervie
 
 ## Running locally
 
-Requirements: Node.js 20+ and a MongoDB connection string (a free Atlas cluster works). Ollama is only needed for `LLM_MODE=ollama`.
+Requirements: Node.js 20+ and a MongoDB connection string (a free Atlas cluster works). Ollama is needed for the chat (`LLM_MODE=ollama`, the default).
 
 ```bash
 # optional: free local model
@@ -74,7 +75,7 @@ ollama pull gemma3:4b
 
 # server
 cd server
-cp .env.example .env   # set MONGODB_URI and pick LLM_MODE (mock / ollama / live)
+cp .env.example .env   # set MONGODB_URI and pick LLM_MODE (ollama / live)
 npm install
 npm run dev            # http://localhost:4000, restarts on changes to src, prompts and .env
 
@@ -86,14 +87,22 @@ npm run dev            # http://localhost:5173 (proxies /api to the server)
 
 Run the tests with `cd server && npm test`.
 
-In development, password-reset emails are printed to the server terminal (`EMAIL_MODE=console`). Set `EMAIL_MODE=smtp` to send real ones. The daily reminder needs `REMINDER_API_KEY` and the n8n workflow; see [n8n/README.md](n8n/README.md).
+In development, password-reset emails are printed to the server terminal (`EMAIL_MODE=console`). To send real ones, set `EMAIL_MODE=brevo` (Brevo's HTTP API, also used in production) or `EMAIL_MODE=smtp`. The daily reminder needs `REMINDER_API_KEY` and the n8n workflow; see [n8n/README.md](n8n/README.md).
 
 ## Deployment
 
 The public demo runs on free tiers: the client on **Vercel** (`client/vercel.json`), the API on **Render** (`render.yaml` Blueprint) and the database on **MongoDB Atlas**.
 
 - The client calls the API through a Vercel rewrite (`/api/*` → Render), so the auth cookie stays first-party and works in browsers that block third-party cookies. That puts two proxies in front of the API, hence `TRUST_PROXY=2`, which keeps per-visitor rate limits.
-- The free plan has no GPU and too little memory for a local model, so the demo chat runs with `LLM_MODE=mock`, and the app says so. Everything else (grammar, flashcards, statistics, speech) is fully functional.
+- **The model runs at home, for free.** Render's free plan has no GPU and too little memory for a model, so the API calls Ollama on the developer's machine through a tunnel. Ollama has no authentication, so it sits behind [`ollama-gateway`](ollama-gateway/README.md), a dependency-free proxy:
+  - it only accepts requests with a bearer token,
+  - it only allows chat with one model,
+  - it only exposes three endpoints, so pulling or deleting models is refused.
+- **Offline is a normal state, not an error.** When the machine is off, `/api/llm/status` reports it (cached for 15 s) and the UI says the conversation partner is offline. A chat message then fails within a fraction of a second instead of timing out.
+  - Every "upstream down" answer from the tunnel or the gateway (502/503/530, ngrok errors) maps to one `LlmUnavailableError`.
+  - `/api/health` doesn't depend on the model, so Render never restarts a healthy API just because the model is away.
+  - Grammar, flashcards, statistics and speech always work.
+- Render's free plan blocks outgoing SMTP, so password-reset emails go through Brevo's HTTP API (`EMAIL_MODE=brevo`, `server/src/lib/brevo.ts`).
 - Render free services sleep after 15 idle minutes. The client detects the unreachable API, shows a "waking up" notice and retries for up to 90 seconds.
 - GitHub Actions runs type-checks, the unit tests, lint and both builds on every push.
 

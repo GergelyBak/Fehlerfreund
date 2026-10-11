@@ -1,9 +1,8 @@
 // Static for the MVP.
 // - title / description / tasks[].hu / phrases are shown in the UI.
 // - role / scenario / tasks[].de go to the roleplay prompt (German).
-// - opening is the partner's first line; mockScript drives LLM_MODE=mock.
-// Every German line that can appear in the chat carries its Hungarian
-// translation, so mock mode can translate without calling Claude.
+// - opening is the partner's first line.
+// Fixed German lines carry their Hungarian translation for the UI.
 
 export interface Line {
   de: string;
@@ -20,7 +19,6 @@ export interface Situation {
   opening: Line;
   tasks: { id: string; hu: string; de: string }[];
   phrases: Line[];
-  mockScript: Line[];
 }
 
 export const SITUATIONS: Situation[] = [
@@ -50,13 +48,6 @@ export const SITUATIONS: Situation[] = [
       { de: "Können Sie das bitte wiederholen?", hu: "Megismételné, kérem?" },
       { de: "Brauche ich noch weitere Unterlagen?", hu: "Kell még más dokumentum?" },
     ],
-    mockScript: [
-      { de: "Gerne. Haben Sie Ihren Ausweis oder Reisepass dabei?", hu: "Szívesen. Önnél van a személyi igazolványa vagy az útlevele?" },
-      { de: "Danke. Und die Wohnungsgeberbestätigung von Ihrem Vermieter brauche ich auch.", hu: "Köszönöm. És szükségem van a főbérlőjétől kapott szállásadói igazolásra is." },
-      { de: "Wie ist Ihre neue Adresse, bitte?", hu: "Mi az új címe, kérem?" },
-      { de: "Alles klar, ich trage das jetzt ein. Einen Moment, bitte.", hu: "Rendben, most beírom. Egy pillanat, kérem." },
-      { de: "So, fertig. Hier ist Ihre Meldebescheinigung, die bekommen Sie sofort.", hu: "Így, kész. Itt a bejelentő igazolása, azt azonnal megkapja." },
-    ],
   },
   {
     id: "arzt",
@@ -80,14 +71,6 @@ export const SITUATIONS: Situation[] = [
       { de: "Ich bin allergisch gegen Penicillin.", hu: "Allergiás vagyok a penicillinre." },
       { de: "Ich brauche eine Krankschreibung.", hu: "Betegállományi igazolásra van szükségem." },
       { de: "Wie oft soll ich die Tabletten nehmen?", hu: "Milyen gyakran szedjem a tablettákat?" },
-    ],
-    mockScript: [
-      { de: "Oh, das tut mir leid. Seit wann haben Sie diese Beschwerden?", hu: "Ó, sajnálom. Mióta vannak ezek a panaszai?" },
-      { de: "Haben Sie auch Fieber oder Husten?", hu: "Van láza vagy köhögése is?" },
-      { de: "Ich schaue mal in Ihren Hals. Sagen Sie bitte „Aaah“.", hu: "Megnézem a torkát. Mondja, kérem, hogy „Ááá”." },
-      { de: "Das ist eine leichte Erkältung. Ich verschreibe Ihnen ein Medikament.", hu: "Ez egy enyhe megfázás. Felírok Önnek egy gyógyszert." },
-      { de: "Nehmen Sie die Tabletten dreimal am Tag, fünf Tage lang.", hu: "Szedje a tablettákat naponta háromszor, öt napig." },
-      { de: "Gute Besserung! Brauchen Sie noch eine Krankschreibung?", hu: "Jobbulást! Kell még betegállományi igazolás?" },
     ],
   },
   {
@@ -116,14 +99,6 @@ export const SITUATIONS: Situation[] = [
       { de: "Ich arbeite als Krankenpfleger.", hu: "Ápolóként dolgozom." },
       { de: "Die Wohnung gefällt mir sehr gut.", hu: "Nagyon tetszik a lakás." },
     ],
-    mockScript: [
-      { de: "Hier ist das Wohnzimmer. Es ist schön hell, oder?", hu: "Ez itt a nappali. Szép világos, ugye?" },
-      { de: "Die Kaltmiete ist 780 Euro, dazu kommen 190 Euro Nebenkosten.", hu: "Az alapbér 780 euró, ehhez jön még 190 euró rezsi." },
-      { de: "Die Wohnung ist ab dem Ersten des nächsten Monats frei.", hu: "A lakás a jövő hónap elsejétől szabad." },
-      { de: "Darf ich fragen, was Sie beruflich machen?", hu: "Megkérdezhetem, mivel foglalkozik?" },
-      { de: "Sehr gut. Die Kaution beträgt drei Kaltmieten.", hu: "Nagyon jó. A kaució három havi alapbér." },
-      { de: "Haben Sie noch Fragen zur Wohnung?", hu: "Van még kérdése a lakással kapcsolatban?" },
-    ],
   },
   {
     id: "restaurant",
@@ -148,14 +123,6 @@ export const SITUATIONS: Situation[] = [
       { de: "Die Rechnung, bitte.", hu: "A számlát, kérem." },
       { de: "Kann ich mit Karte zahlen?", hu: "Fizethetek kártyával?" },
     ],
-    mockScript: [
-      { de: "Kein Problem, wir haben noch einen Tisch am Fenster frei. Bitte hier entlang.", hu: "Nem probléma, van még egy szabad asztalunk az ablaknál. Erre tessék." },
-      { de: "Hier ist die Speisekarte. Was möchten Sie trinken?", hu: "Itt az étlap. Mit szeretne inni?" },
-      { de: "Sehr gerne. Und was darf ich Ihnen zum Essen bringen?", hu: "Nagyon szívesen. És mit hozhatok enni?" },
-      { de: "Eine gute Wahl! Heute kann ich auch die Käsespätzle empfehlen.", hu: "Jó választás! Ma a sajtos spätzlét is ajánlhatom." },
-      { de: "Hat es Ihnen geschmeckt? Möchten Sie noch einen Nachtisch?", hu: "Ízlett? Kér még desszertet?" },
-      { de: "Das macht dann 34,50 Euro. Zahlen Sie bar oder mit Karte?", hu: "Az összesen 34,50 euró lesz. Készpénzzel vagy kártyával fizet?" },
-    ],
   },
   {
     id: "bank",
@@ -178,13 +145,6 @@ export const SITUATIONS: Situation[] = [
       { de: "Hier ist meine Meldebescheinigung.", hu: "Itt a lakcímbejelentő igazolásom." },
       { de: "Wann bekomme ich meine Karte?", hu: "Mikor kapom meg a kártyámat?" },
       { de: "Kann ich auch Online-Banking nutzen?", hu: "Használhatok netbankot is?" },
-    ],
-    mockScript: [
-      { de: "Gerne! Wir haben zwei Kontomodelle: Das Basiskonto ist kostenlos, das Komfortkonto kostet 4,90 Euro im Monat.", hu: "Szívesen! Kétféle számlánk van: az alapszámla ingyenes, a komfortszámla havi 4,90 euróba kerül." },
-      { de: "Für die Kontoeröffnung brauche ich Ihren Ausweis und Ihre Meldebescheinigung.", hu: "A számlanyitáshoz szükségem van a személyi igazolványára és a lakcímbejelentő igazolására." },
-      { de: "Haben Sie auch Ihre Steuer-Identifikationsnummer?", hu: "Megvan az adóazonosító száma is?" },
-      { de: "Perfekt. Möchten Sie auch Online-Banking nutzen?", hu: "Tökéletes. Szeretné a netbankot is használni?" },
-      { de: "Ihre Bankkarte kommt in etwa einer Woche per Post, die PIN kommt separat.", hu: "A bankkártyája körülbelül egy héten belül postán érkezik, a PIN-kód külön jön." },
     ],
   },
   {
@@ -209,14 +169,6 @@ export const SITUATIONS: Situation[] = [
       { de: "Wie oft am Tag soll ich das nehmen?", hu: "Naponta hányszor szedjem?" },
       { de: "Was kostet das?", hu: "Mennyibe kerül?" },
     ],
-    mockScript: [
-      { de: "Seit wann haben Sie die Beschwerden?", hu: "Mióta vannak a panaszai?" },
-      { de: "Haben Sie Allergien oder nehmen Sie andere Medikamente?", hu: "Van valamilyen allergiája, vagy szed más gyógyszert?" },
-      { de: "Dann empfehle ich Ihnen diese Lutschtabletten und ein Nasenspray.", hu: "Akkor ezt a szopogató tablettát és egy orrspray-t ajánlom." },
-      { de: "Nehmen Sie alle drei Stunden eine Tablette, aber höchstens sechs am Tag.", hu: "Háromóránként vegyen be egy tablettát, de naponta legfeljebb hatot." },
-      { de: "Dafür brauchen Sie kein Rezept. Das macht zusammen 12,80 Euro.", hu: "Ehhez nem kell recept. Összesen 12,80 euró lesz." },
-      { de: "Gute Besserung! Brauchen Sie eine Tüte?", hu: "Jobbulást! Kér egy zacskót?" },
-    ],
   },
   {
     id: "bahnhof",
@@ -240,14 +192,6 @@ export const SITUATIONS: Situation[] = [
       { de: "Muss ich umsteigen?", hu: "Át kell szállnom?" },
       { de: "Von welchem Gleis fährt der Zug ab?", hu: "Melyik vágányról indul a vonat?" },
       { de: "Wann kommt der Zug in München an?", hu: "Mikor ér a vonat Münchenbe?" },
-    ],
-    mockScript: [
-      { de: "Für wann brauchen Sie die Fahrkarte? Für heute oder für einen anderen Tag?", hu: "Mikorra kell a jegy? Mára vagy egy másik napra?" },
-      { de: "Es gibt einen direkten ICE um 9:04 Uhr. Die Fahrt dauert vier Stunden und kostet 89 Euro.", hu: "Van egy közvetlen ICE 9:04-kor. Az út négy óra, és 89 euróba kerül." },
-      { de: "Günstiger geht es mit Umstieg in Leipzig: Abfahrt um 10:15 Uhr, für 59 Euro.", hu: "Olcsóbban átszállással megy, Lipcsében: indulás 10:15-kor, 59 euróért." },
-      { de: "Möchten Sie nur die Hinfahrt oder auch die Rückfahrt?", hu: "Csak oda kéri, vagy vissza is?" },
-      { de: "Der Zug fährt von Gleis 7 ab. Hier ist Ihre Fahrkarte.", hu: "A vonat a 7-es vágányról indul. Itt a jegye." },
-      { de: "Gute Reise!", hu: "Jó utat!" },
     ],
   },
   {
@@ -275,14 +219,6 @@ export const SITUATIONS: Situation[] = [
       { de: "Wie sind die Arbeitszeiten?", hu: "Milyen a munkaidő?" },
       { de: "Wann könnte ich anfangen?", hu: "Mikor kezdhetnék?" },
     ],
-    mockScript: [
-      { de: "Vielen Dank. Welche Berufserfahrung haben Sie bisher?", hu: "Köszönöm szépen. Milyen munkatapasztalata van eddig?" },
-      { de: "Interessant. Was sind Ihre Stärken?", hu: "Érdekes. Mik az erősségei?" },
-      { de: "Bei uns haben Sie viel Kontakt mit Kunden, auch am Telefon. Ist das in Ordnung für Sie?", hu: "Nálunk sokat fog ügyfelekkel beszélni, telefonon is. Ez rendben van Önnek?" },
-      { de: "Haben Sie Fragen an uns?", hu: "Van kérdése felénk?" },
-      { de: "Es ist eine Vollzeitstelle mit 40 Stunden pro Woche und Gleitzeit.", hu: "Ez egy teljes munkaidős állás, heti 40 órában, rugalmas munkaidővel." },
-      { de: "Vielen Dank für das Gespräch. Wir melden uns bis Ende nächster Woche bei Ihnen.", hu: "Köszönjük a beszélgetést. A jövő hét végéig jelentkezünk." },
-    ],
   },
   {
     id: "vermieter",
@@ -305,14 +241,6 @@ export const SITUATIONS: Situation[] = [
       { de: "Können Sie einen Handwerker schicken?", hu: "Tudna küldeni egy szerelőt?" },
       { de: "Am Vormittag bin ich zu Hause.", hu: "Délelőtt otthon vagyok." },
       { de: "Passt Ihnen Donnerstag?", hu: "Megfelel Önnek a csütörtök?" },
-    ],
-    mockScript: [
-      { de: "Ah, guten Tag! Was kann ich für Sie tun?", hu: "Á, jó napot! Miben segíthetek?" },
-      { de: "Oh je. Seit wann funktioniert die Heizung nicht mehr?", hu: "Jaj. Mióta nem működik a fűtés?" },
-      { de: "Ist nur ein Heizkörper kalt oder sind alle kalt?", hu: "Csak egy radiátor hideg, vagy mind?" },
-      { de: "Ich rufe sofort den Handwerker an. Wann sind Sie zu Hause?", hu: "Azonnal felhívom a szerelőt. Mikor van otthon?" },
-      { de: "Gut, der Handwerker kommt am Donnerstag zwischen 9 und 12 Uhr.", hu: "Jó, a szerelő csütörtökön 9 és 12 óra között jön." },
-      { de: "Entschuldigen Sie die Unannehmlichkeiten. Auf Wiederhören!", hu: "Elnézést a kellemetlenségért. Viszonthallásra!" },
     ],
   },
   {
@@ -340,22 +268,8 @@ export const SITUATIONS: Situation[] = [
       { de: "Kann ich mit Karte zahlen?", hu: "Fizethetek kártyával?" },
       { de: "Den Kassenbon, bitte.", hu: "A blokkot kérném." },
     ],
-    mockScript: [
-      { de: "Das finden Sie in Gang 4, neben dem Zucker.", hu: "Azt a 4-es sorban találja, a cukor mellett." },
-      { de: "Laktosefreie Milch steht im Kühlregal, ganz hinten links.", hu: "A laktózmentes tej a hűtőpolcon van, leghátul balra." },
-      { de: "Der Pfandautomat ist gleich am Eingang, rechts.", hu: "A palackvisszaváltó automata rögtön a bejáratnál van, jobbra." },
-      { de: "Ich kann Sie jetzt auch an der Kasse bedienen. Brauchen Sie eine Tüte?", hu: "Most a pénztárnál is ki tudom szolgálni. Kér szatyrot?" },
-      { de: "Das macht 23,47 Euro. Haben Sie eine Kundenkarte?", hu: "Az 23,47 euró lesz. Van törzsvásárlói kártyája?" },
-      { de: "Hier ist Ihr Kassenbon. Einen schönen Tag noch!", hu: "Itt a blokkja. További szép napot!" },
-    ],
   },
 ];
-
-// What the mock partner says once its script has run out.
-export const MOCK_FALLBACK: Line = {
-  de: "Gibt es sonst noch etwas, worüber Sie sprechen möchten?",
-  hu: "Van még valami, amiről beszélni szeretne?",
-};
 
 export function getSituation(id: string) {
   return SITUATIONS.find((s) => s.id === id);

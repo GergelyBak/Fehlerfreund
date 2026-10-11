@@ -26,6 +26,12 @@ app.get("/api/health", (_req, res) => {
   res.json({ ok: true, llm: { mode: llm.mode, model: llm.model } });
 });
 
+// Separate from /health (Render's health check must stay fast and green even
+// when the machine running the model is off).
+app.get("/api/llm/status", async (_req, res) => {
+  res.json({ mode: llm.mode, model: llm.model, available: await llm.isAvailable() });
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/conversations", conversationRoutes);
 app.use("/api/cards", cardRoutes);

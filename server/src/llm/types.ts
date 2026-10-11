@@ -34,10 +34,10 @@ export interface TranslateParams {
   targetLanguage: string;
 }
 
-// Both the live Claude implementation and the mock implement this, so routes
-// never know (or care) which one is running.
+// Both the Claude and the Ollama implementation provide this, so routes never
+// know (or care) which one is running.
 export interface LlmProvider {
-  mode: "live" | "ollama" | "mock";
+  mode: "live" | "ollama";
   // Whether correction and reply can run at the same time without slowing each other down.
   concurrent: boolean;
   // Model that writes the partner's replies, for display (e.g. "gemma3:4b").
@@ -46,4 +46,10 @@ export interface LlmProvider {
   // Yields text chunks as they arrive.
   streamRoleplay(params: RoleplayParams): AsyncGenerator<string, void>;
   translate(params: TranslateParams): Promise<{ text: string; model: string }>;
+  // Whether the model can answer right now (Ollama runs on a machine that may be off).
+  isAvailable(): Promise<boolean>;
 }
+
+// Thrown when the model can't be reached at all, so the UI can say
+// "offline" instead of a generic error.
+export class LlmUnavailableError extends Error {}

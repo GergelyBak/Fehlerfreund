@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { env } from "../config/env.js";
+import { sendViaBrevo } from "./brevo.js";
 
 export interface Mail {
   to: string;
@@ -19,6 +20,11 @@ const transport =
     : null;
 
 export async function sendMail(mail: Mail) {
+  if (env.EMAIL_MODE === "brevo") {
+    // Both are checked at startup when EMAIL_MODE=brevo.
+    await sendViaBrevo(env.BREVO_API_KEY!, env.MAIL_FROM!, mail);
+    return;
+  }
   if (!transport) {
     // Development: no mail server needed, the link shows up in the terminal.
     console.log(`\n📧 [EMAIL_MODE=console] To: ${mail.to}\n   Subject: ${mail.subject}\n\n${mail.text}\n`);

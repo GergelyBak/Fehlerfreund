@@ -11,4 +11,6 @@ export const liveProvider: LlmProvider = {
   correct: correctMessage,
   streamRoleplay,
   translate: translateText,
+  // A hosted API: if it is down, the request itself reports that.
+  isAvailable: async () => true,
 };

@@ -50,13 +50,12 @@ export function SituationsPage() {
             az üzeneteidet pedig közben javítjuk.
           </p>
         </div>
-        {llm?.mode === "mock" && (
+        {llm?.available === false && (
           <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900 ring-1 ring-amber-200">
-            🧪 <strong>Nyilvános demó:</strong> itt a beszélgetőtárs előre megírt válaszokkal felel, mert az ingyenes tárhelyen
-            nem fut nyelvi modell. A nyelvtan, a kártyák, a statisztika és a felolvasás teljesen működik. A teljes változat helyben, az
-            Ollamával fut,{' '}
+            😴 <strong>A beszélgetőtárs most offline.</strong> A nyelvi modell ({llm.model}, Ollama) ingyenesen, a fejlesztő saját
+            gépén fut, és az most nincs bekapcsolva. A nyelvtan, a kártyák, a statisztika és a felolvasás ettől függetlenül működik.{' '}
             <a href="https://github.com/GergelyBak/Fehlerfreund" className="font-medium underline" target="_blank" rel="noreferrer">
-              lásd a GitHubon
+              Részletek a GitHubon
             </a>
             .
           </p>

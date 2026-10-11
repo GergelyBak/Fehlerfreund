@@ -2,7 +2,14 @@ import { z } from "zod";
 import { env } from "../config/env.js";
 import { CorrectionSchema } from "./correctionSchema.js";
 import { loadPrompt } from "./prompts.js";
-import type { CorrectParams, CorrectionResult, LlmProvider, RoleplayParams, TranslateParams } from "./types.js";
+import {
+  LlmUnavailableError,
+  type CorrectParams,
+  type CorrectionResult,
+  type LlmProvider,
+  type RoleplayParams,
+  type TranslateParams,
+} from "./types.js";
 
 // Free, local alternative to Claude (LLM_MODE=ollama), using Ollama's REST API
 // directly: https://github.com/ollama/ollama/blob/main/docs/api.md
@@ -18,6 +25,11 @@ const BASE_OPTIONS = { num_ctx: 4096 };
 const KEEP_ALIVE = "30m";
 // The correction schema as JSON Schema, for Ollama's structured output.
 const CORRECTION_JSON_SCHEMA = z.toJSONSchema(CorrectionSchema);
+// The ollama-gateway (production) requires it; plain local Ollama ignores it.
+const AUTH_HEADERS: Record<string, string> = env.OLLAMA_API_KEY ? { Authorization: `Bearer ${env.OLLAMA_API_KEY}` } : {};
+// What a tunnel or the gateway answers when the machine running the model is
+// off: Cloudflare 502/530, the gateway 503, ngrok "endpoint offline".
+const OFFLINE_STATUSES = new Set([502, 503, 504, 530]);
 
 interface OllamaMessage {
   role: "system" | "user" | "assistant";
@@ -35,13 +47,16 @@ async function chat(body: Record<string, unknown>, signal?: AbortSignal) {
   try {
     res = await fetch(`${env.OLLAMA_URL}/api/chat`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...AUTH_HEADERS },
       body: JSON.stringify({ model: env.OLLAMA_MODEL, keep_alive: KEEP_ALIVE, ...body }),
       signal,
     });
   } catch (err) {
     if (signal?.aborted) throw err;
-    throw new Error(`Ollama is not reachable at ${env.OLLAMA_URL}. Is it running? (${String(err)})`);
+    throw new LlmUnavailableError(`Ollama is not reachable at ${env.OLLAMA_URL}. Is it running? (${String(err)})`);
+  }
+  if (OFFLINE_STATUSES.has(res.status) || res.headers.has("ngrok-error-code")) {
+    throw new LlmUnavailableError(`Ollama is offline (${res.status} from ${env.OLLAMA_URL})`);
   }
   if (!res.ok) {
     throw new Error(`Ollama error ${res.status}: ${await res.text()}`);
@@ -188,7 +203,7 @@ async function translate(opts: TranslateParams) {
 // instead of as a failed chat message.
 export async function checkOllama() {
   try {
-    const res = await fetch(`${env.OLLAMA_URL}/api/tags`, { signal: AbortSignal.timeout(3000) });
+    const res = await fetch(`${env.OLLAMA_URL}/api/tags`, { headers: AUTH_HEADERS, signal: AbortSignal.timeout(3000) });
     const { models } = (await res.json()) as { models: { name: string }[] };
     const names = models.map((m) => m.name);
     const wanted = env.OLLAMA_MODEL.includes(":") ? env.OLLAMA_MODEL : `${env.OLLAMA_MODEL}:latest`;
@@ -205,6 +220,24 @@ export async function checkOllama() {
   }
 }
 
+// Cached briefly: the UI asks on every page load, and the answer only
+// changes when the machine running the model goes on or off.
+const STATUS_TTL_MS = 15_000;
+let status: { available: boolean; checkedAt: number } | null = null;
+
+async function isAvailable() {
+  if (status && Date.now() - status.checkedAt < STATUS_TTL_MS) return status.available;
+  let available = false;
+  try {
+    const res = await fetch(`${env.OLLAMA_URL}/api/version`, { headers: AUTH_HEADERS, signal: AbortSignal.timeout(4000) });
+    available = res.ok && !res.headers.has("ngrok-error-code");
+  } catch {
+    available = false;
+  }
+  status = { available, checkedAt: Date.now() };
+  return available;
+}
+
 export const ollamaProvider: LlmProvider = {
   mode: "ollama",
   concurrent: false,
@@ -212,4 +245,5 @@ export const ollamaProvider: LlmProvider = {
   correct,
   streamRoleplay,
   translate,
+  isAvailable,
 };

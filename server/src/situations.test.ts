@@ -12,8 +12,7 @@ describe("situations content", () => {
     expect(s.tasks).toHaveLength(3);
     expect(new Set(s.tasks.map((t) => t.id)).size).toBe(3);
     expect(s.phrases.length).toBeGreaterThanOrEqual(6);
-    expect(s.mockScript.length).toBeGreaterThanOrEqual(5);
-    for (const line of [s.opening, ...s.phrases, ...s.mockScript]) {
+    for (const line of [s.opening, ...s.phrases]) {
       expect(line.de.trim()).not.toBe("");
       expect(line.hu.trim()).not.toBe("");
     }
@@ -26,7 +25,6 @@ describe("situations content", () => {
   it("keeps prompt-only fields out of the public shape", () => {
     const pub = toPublicSituation(SITUATIONS[0]!);
     expect(pub).not.toHaveProperty("scenario");
-    expect(pub).not.toHaveProperty("mockScript");
     expect(pub.tasks[0]).not.toHaveProperty("de");
   });
 });
