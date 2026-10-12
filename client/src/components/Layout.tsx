@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { to: '/', icon: '💬', key: 'chat', short: 'chatShort', end: true },
   { to: '/review', icon: '🗂️', key: 'review', short: 'review', badge: true },
   { to: '/grammar', icon: '📘', key: 'grammar', short: 'grammar' },
+  { to: '/vocab', icon: '🔤', key: 'vocab', short: 'vocab' },
   { to: '/stats', icon: '📊', key: 'stats', short: 'stats' },
 ] as const
 
@@ -100,7 +101,7 @@ export function Layout() {
           className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur sm:hidden"
           aria-label={t.nav.mainNav}
         >
-          <div className="grid h-16 grid-cols-4">
+          <div className="grid h-16 grid-cols-5">
             {NAV_ITEMS.map((item) => (
               <NavLink
                 key={item.to}

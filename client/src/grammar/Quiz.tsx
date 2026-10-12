@@ -4,9 +4,9 @@ import { api } from '../api/client'
 import { errorMessage } from '../api/errors'
 import { notifyCardsChanged } from '../review/cardEvents'
 import { useI18n } from '../i18n/context'
+import { CharButtons } from '../components/CharButtons'
+import { insertAtCursor } from '../components/insertAtCursor'
 import { GAP, PASS_SCORE, type CheckResponse, type Exercise, type ExerciseResult, type Progress } from './types'
-
-const SPECIAL_CHARS = ['ä', 'ö', 'ü', 'ß', 'Ä', 'Ö', 'Ü']
 
 export function Quiz({
   topicId,
@@ -33,15 +33,8 @@ export function Quiz({
 
   function insertChar(char: string) {
     if (!activeGap) return
-    const el = inputs.current.get(activeGap)
-    const value = answers[activeGap] ?? ''
-    const start = el?.selectionStart ?? value.length
-    const end = el?.selectionEnd ?? value.length
-    setAnswer(activeGap, value.slice(0, start) + char + value.slice(end))
-    requestAnimationFrame(() => {
-      el?.focus()
-      el?.setSelectionRange(start + 1, start + 1)
-    })
+    const gap = activeGap
+    insertAtCursor(inputs.current.get(gap), answers[gap] ?? '', char, (v) => setAnswer(gap, v))
   }
 
   async function check() {
@@ -132,27 +125,6 @@ export function Quiz({
           </div>
         </div>
       )}
-    </div>
-  )
-}
-
-// ä ö ü ß buttons for keyboards without them (e.g. Hungarian ones).
-function CharButtons({ onInsert, disabled }: { onInsert: (c: string) => void; disabled?: boolean }) {
-  return (
-    <div className="flex flex-wrap gap-1.5">
-      {SPECIAL_CHARS.map((c) => (
-        <button
-          key={c}
-          type="button"
-          // Keep focus (and the phone keyboard) in the input while tapping.
-          onMouseDown={(ev) => ev.preventDefault()}
-          onClick={() => onInsert(c)}
-          disabled={disabled}
-          className="size-10 rounded-lg bg-slate-100 text-lg font-medium text-slate-800 hover:bg-indigo-100 disabled:opacity-40 sm:size-8 sm:text-base"
-        >
-          {c}
-        </button>
-      ))}
     </div>
   )
 }

@@ -4,6 +4,8 @@ export type UiGrade = 1 | 3 | 4 | 5
 
 export interface Card {
   id: string
+  // fix = correct a sentence; vocab = translate a word into German
+  kind: 'fix' | 'vocab'
   errorType: ErrorType
   original: string
   corrected: string

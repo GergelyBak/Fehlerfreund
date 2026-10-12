@@ -10,16 +10,16 @@ import type { Stats } from '../stats/types'
 const pct = (x: number) => `${Math.round(x * 100)}%`
 
 export function StatsPage() {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const [stats, setStats] = useState<Stats | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
-    api<Stats>(`/stats?tz=${encodeURIComponent(tz)}`)
+    api<Stats>(`/stats?tz=${encodeURIComponent(tz)}&lang=${lang}`)
       .then(setStats)
       .catch((err) => setError(errorMessage(err, activeMessages().stats.loadFailed)))
-  }, [])
+  }, [lang])
 
   if (error) return <p className="text-red-600">{error}</p>
   if (!stats) return <p className="text-slate-500">{t.common.loading}</p>
@@ -136,6 +136,10 @@ export function StatsPage() {
 
             <Card title={t.stats.grammar} subtitle={t.stats.grammarSubtitle(stats.grammar.attempted, stats.grammar.passed)}>
               <GrammarMeters topics={stats.grammar.topics} />
+            </Card>
+
+            <Card title={t.stats.vocab} subtitle={t.stats.vocabSubtitle(stats.vocab.attempted, stats.vocab.passed)}>
+              <GrammarMeters topics={stats.vocab.topics} basePath="/vocab" />
             </Card>
           </div>
         </>

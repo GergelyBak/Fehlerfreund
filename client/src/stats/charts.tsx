@@ -246,28 +246,29 @@ export function CardStageBar({ cards }: { cards: Stats['cards'] }) {
 }
 
 // --- Grammar: one meter per topic, grouped by level, in course order ---
-export function GrammarMeters({ topics }: { topics: Stats['grammar']['topics'] }) {
+// basePath: where each meter links to (/grammar or /vocab).
+export function GrammarMeters({ topics, basePath = '/grammar' }: { topics: Stats['grammar']['topics']; basePath?: string }) {
   const levels = [...new Set(topics.map((t) => t.level))]
   return (
     <div className="space-y-4">
       {levels.map((level) => (
         <div key={level} className="space-y-1.5">
           <h3 className="text-xs font-semibold tracking-wide text-slate-500 uppercase">{level}</h3>
-          <TopicMeters topics={topics.filter((t) => t.level === level)} />
+          <TopicMeters topics={topics.filter((t) => t.level === level)} basePath={basePath} />
         </div>
       ))}
     </div>
   )
 }
 
-function TopicMeters({ topics }: { topics: Stats['grammar']['topics'] }) {
+function TopicMeters({ topics, basePath }: { topics: Stats['grammar']['topics']; basePath: string }) {
   return (
     <ul className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
       {topics.map((t) => {
         const pct = t.bestScore === null ? null : Math.round(t.bestScore * 100)
         return (
           <li key={t.id}>
-            <Link to={`/grammar/${t.id}`} className="block space-y-1 rounded-lg px-1 py-1 hover:bg-slate-50">
+            <Link to={`${basePath}/${t.id}`} className="block space-y-1 rounded-lg px-1 py-1 hover:bg-slate-50">
               <span className="flex items-baseline justify-between gap-3 text-sm">
                 <span className="truncate text-slate-700">
                   {t.order}. {t.title}

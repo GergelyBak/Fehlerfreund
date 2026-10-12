@@ -205,7 +205,10 @@ export function ReviewPage() {
     )
   }
 
-  const typedCorrect = typed.trim() !== '' && sameSentence(typed, card.answer)
+  const isVocab = card.kind === 'vocab'
+  // Vocabulary answers can have variants ("der Lehrer / die Lehrerin"): any one counts.
+  const typedCorrect =
+    typed.trim() !== '' && (isVocab ? card.answer.split(' / ') : [card.answer]).some((a) => sameSentence(typed, a))
   const progress = Math.min(reviewed, sessionSize)
 
   return (
@@ -249,16 +252,28 @@ export function ReviewPage() {
           )}
         </div>
 
-        <div className="space-y-2">
-          <p className="text-sm font-medium text-slate-500">{t.review.fixSentence}</p>
-          <p className="text-xl leading-relaxed font-medium">
-            {revealed ? (
-              <Highlight sentence={card.prompt} fragment={card.original} className="bg-red-100 text-red-800" />
-            ) : (
-              card.prompt
+        {isVocab ? (
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-slate-500">{t.review.vocabPrompt}</p>
+            <p className="text-xl leading-relaxed font-medium">{card.prompt}</p>
+            {revealed && card.original && (
+              <p className="text-sm text-slate-500">
+                {t.review.yourWrongAnswer} <span className="text-red-600 line-through">{card.original}</span>
+              </p>
             )}
-          </p>
-        </div>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-slate-500">{t.review.fixSentence}</p>
+            <p className="text-xl leading-relaxed font-medium">
+              {revealed ? (
+                <Highlight sentence={card.prompt} fragment={card.original} className="bg-red-100 text-red-800" />
+              ) : (
+                card.prompt
+              )}
+            </p>
+          </div>
+        )}
 
         {!revealed ? (
           <form
@@ -280,7 +295,7 @@ export function ReviewPage() {
                 }
               }}
               rows={2}
-              placeholder={t.review.typePlaceholder}
+              placeholder={isVocab ? t.review.vocabPlaceholder : t.review.typePlaceholder}
               className="w-full resize-none rounded-xl border border-slate-300 px-3 py-2 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
             />
             <button
@@ -308,10 +323,14 @@ export function ReviewPage() {
                 <Highlight sentence={card.answer} fragment={card.corrected} className="bg-emerald-200 text-emerald-900" />
               </p>
             </div>
-            <p className="text-slate-700">
-              <span className="text-red-600 line-through">{card.original}</span> →{' '}
-              <span className="font-medium text-emerald-700">{card.corrected}</span>: {card.explanation}
-            </p>
+            {isVocab ? (
+              <p className="text-slate-600 italic">{card.explanation}</p>
+            ) : (
+              <p className="text-slate-700">
+                <span className="text-red-600 line-through">{card.original}</span> →{' '}
+                <span className="font-medium text-emerald-700">{card.corrected}</span>: {card.explanation}
+              </p>
+            )}
 
             <div className="space-y-2">
               <p className="text-sm text-slate-500">{t.review.howDidItGo}</p>

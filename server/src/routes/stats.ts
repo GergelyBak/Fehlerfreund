@@ -6,6 +6,8 @@ import { Conversation } from "../models/Conversation.js";
 import { GrammarProgress } from "../models/GrammarProgress.js";
 import { ReviewLog } from "../models/ReviewLog.js";
 import { GRAMMAR_TOPICS } from "../grammar/index.js";
+import { VOCAB_THEMES } from "../vocab/index.js";
+import { vocabProgressId } from "./vocab.js";
 import { ERROR_TYPES, type ErrorType } from "../llm/correctionSchema.js";
 import {
   MATURE_INTERVAL_DAYS,
@@ -146,6 +148,16 @@ router.get("/", async (req, res) => {
     bestScore: progressByTopic.get(t.id)?.bestScore ?? null,
   }));
 
+  // --- Vocabulary: same shape as grammar, theme titles in the UI language ---
+  const lang = req.query.lang === "en" ? "en" : "hu";
+  const vocabThemes = VOCAB_THEMES.map((t) => ({
+    id: t.id,
+    level: t.level,
+    order: t.order,
+    title: t.title[lang],
+    bestScore: progressByTopic.get(vocabProgressId(t.id))?.bestScore ?? null,
+  }));
+
   res.json({
     timeZone: tz,
     streak: computeStreak(activeDays, today),
@@ -161,6 +173,11 @@ router.get("/", async (req, res) => {
       topics: grammarTopics,
       attempted: grammarTopics.filter((t) => t.bestScore !== null).length,
       passed: grammarTopics.filter((t) => (t.bestScore ?? 0) >= PASS_SCORE).length,
+    },
+    vocab: {
+      topics: vocabThemes,
+      attempted: vocabThemes.filter((t) => t.bestScore !== null).length,
+      passed: vocabThemes.filter((t) => (t.bestScore ?? 0) >= PASS_SCORE).length,
     },
   });
 });

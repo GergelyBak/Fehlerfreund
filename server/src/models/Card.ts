@@ -7,6 +7,9 @@ const cardSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     key: { type: String, required: true },
+    // fix = correct the mistake in a sentence (chat, grammar);
+    // vocab = translate a word into German (vocabulary tests).
+    kind: { type: String, enum: ["fix", "vocab"], default: "fix" },
 
     errorType: { type: String, enum: ERROR_TYPES, required: true },
     original: { type: String, required: true },

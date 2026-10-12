@@ -109,6 +109,7 @@ export const hu = {
     chatShort: 'Chat',
     review: 'Ismétlés',
     grammar: 'Nyelvtan',
+    vocab: 'Szótár',
     stats: 'Statisztika',
     logout: 'Kilépés',
     mainNav: 'Fő navigáció',
@@ -214,6 +215,9 @@ export const hu = {
     howDidItGo: 'Mennyire ment?',
     confirmDelete: 'Biztosan törlöd ezt a kártyát?',
     deleteCard: 'Hibás a javítás? Kártya törlése',
+    vocabPrompt: 'Mondd németül:',
+    vocabPlaceholder: 'Írd be németül (nem kötelező), vagy csak gondold végig…',
+    yourWrongAnswer: 'A teszten ezt írtad:',
   },
   time: {
     today: 'ma',
@@ -242,6 +246,27 @@ export const hu = {
     lessonTab: '📖 Tananyag',
     quizTab: (n: number) => `✏️ Teszt (${n} feladat)`,
     toQuiz: 'Tovább a teszthez →',
+  },
+  vocab: {
+    title: '🔤 Szótár',
+    intro:
+      'A szintednek megfelelő szókincs, témák szerint. Nézd át a szavakat (meg is hallgathatod őket), aztán teszteld magad: a rossz válaszaidból kártyák lesznek az ismétlőpakliban.',
+    passed: (level: string, passed: number, total: number, pct: number) =>
+      `${level}: ${passed} / ${total} téma teljesítve (legalább ${pct}%)`,
+    comingSoon: 'Az A2 és a B1 szint szókincse hamarosan érkezik.',
+    words: (n: number) => `${n} szó`,
+    loadFailed: 'Nem sikerült betölteni a szótárat.',
+    themeLoadFailed: 'Nem sikerült betölteni a témát.',
+    backToThemes: '← Vissza a témákhoz',
+    themes: '← Témák',
+    themeBadge: (level: string, order: number) => `${level} · ${order}. téma`,
+    wordsTab: (n: number) => `📋 Szavak (${n})`,
+    testTab: '✏️ Teszt',
+    toTest: 'Tovább a teszthez →',
+    testIntro: 'Írd be a szavakat németül. A főneveket a névelőjükkel együtt (der, die, das).',
+    plural: 'Tsz.',
+    answerAria: (translation: string) => `Németül: ${translation}`,
+    article: (solution: string) => `Majdnem! A névelő nem jó: ${solution}`,
   },
   quiz: {
     checkFailed: 'Nem sikerült kiértékelni a tesztet.',
@@ -289,6 +314,8 @@ export const hu = {
     cardStagesSubtitle: 'Egy kártya akkor „megy”, ha legalább 21 napos időközzel jön vissza.',
     noCards: 'Még nincs kártyád.',
     grammarSubtitle: (attempted: number, passed: number) => `${attempted} témakört próbáltál ki, ${passed} teljesítve.`,
+    vocab: 'Szótár',
+    vocabSubtitle: (attempted: number, passed: number) => `${attempted} szótémát próbáltál ki, ${passed} teljesítve.`,
   },
   charts: {
     errorBarTitle: (label: string, type: string, mistakes: number, cards: number, due: number) =>

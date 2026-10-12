@@ -23,11 +23,14 @@ export interface Stats {
   activity: ActivityDay[]
   errorTypes: ErrorTypeStat[]
   cards: { total: number; due: number; new: number; learning: number; mature: number }
-  grammar: {
-    topics: { id: string; level: string; order: number; title: string; bestScore: number | null }[]
-    attempted: number
-    passed: number
-  }
+  grammar: TopicProgress
+  vocab: TopicProgress
+}
+
+export interface TopicProgress {
+  topics: { id: string; level: string; order: number; title: string; bestScore: number | null }[]
+  attempted: number
+  passed: number
 }
 
 // Chart colors, validated with the dataviz skill's palette checker

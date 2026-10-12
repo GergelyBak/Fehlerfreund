@@ -109,6 +109,7 @@ export const en: Messages = {
     chatShort: 'Chat',
     review: 'Review',
     grammar: 'Grammar',
+    vocab: 'Vocabulary',
     stats: 'Statistics',
     logout: 'Sign out',
     mainNav: 'Main navigation',
@@ -214,6 +215,9 @@ export const en: Messages = {
     howDidItGo: 'How did it go?',
     confirmDelete: 'Delete this card?',
     deleteCard: 'Wrong correction? Delete card',
+    vocabPrompt: 'Say it in German:',
+    vocabPlaceholder: 'Type it in German (optional), or just think it through…',
+    yourWrongAnswer: 'In the test you wrote:',
   },
   time: {
     today: 'today',
@@ -243,6 +247,27 @@ export const en: Messages = {
     lessonTab: '📖 Lesson',
     quizTab: (n: number) => `✏️ Test (${n} ${n === 1 ? 'exercise' : 'exercises'})`,
     toQuiz: 'On to the test →',
+  },
+  vocab: {
+    title: '🔤 Vocabulary',
+    intro:
+      'The words for your level, by topic. Go through the list (you can listen to every word), then test yourself: wrong answers become cards in your review deck.',
+    passed: (level: string, passed: number, total: number, pct: number) =>
+      `${level}: ${passed} / ${total} topics passed (at least ${pct}%)`,
+    comingSoon: 'A2 and B1 vocabulary is coming soon.',
+    words: (n: number) => `${n} ${n === 1 ? 'word' : 'words'}`,
+    loadFailed: "Couldn't load the vocabulary.",
+    themeLoadFailed: "Couldn't load the topic.",
+    backToThemes: '← Back to topics',
+    themes: '← Topics',
+    themeBadge: (level: string, order: number) => `${level} · Topic ${order}`,
+    wordsTab: (n: number) => `📋 Words (${n})`,
+    testTab: '✏️ Test',
+    toTest: 'On to the test →',
+    testIntro: 'Type the words in German. Nouns with their article (der, die, das).',
+    plural: 'Pl.',
+    answerAria: (translation: string) => `In German: ${translation}`,
+    article: (solution: string) => `Almost! Wrong article: ${solution}`,
   },
   quiz: {
     checkFailed: "Couldn't check the test.",
@@ -290,6 +315,8 @@ export const en: Messages = {
     cardStagesSubtitle: 'A card counts as learned once it comes back after 21 days or more.',
     noCards: 'No cards yet.',
     grammarSubtitle: (attempted: number, passed: number) => `${attempted} topics tried, ${passed} passed.`,
+    vocab: 'Vocabulary',
+    vocabSubtitle: (attempted: number, passed: number) => `${attempted} vocabulary topics tried, ${passed} passed.`,
   },
   charts: {
     errorBarTitle: (label: string, type: string, mistakes: number, cards: number, due: number) =>

@@ -6,6 +6,7 @@ import { buildPrompt, cardKey } from "./cardContent.js";
 export interface CardContent {
   // Same key = same card; repeating the mistake bumps it instead of duplicating.
   key: string;
+  kind?: "fix" | "vocab";
   errorType: ErrorType;
   original: string;
   corrected: string;

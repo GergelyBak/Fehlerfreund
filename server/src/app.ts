@@ -8,6 +8,7 @@ import conversationRoutes from "./routes/conversations.js";
 import cardRoutes from "./routes/cards.js";
 import grammarRoutes from "./routes/grammar.js";
 import statsRoutes from "./routes/stats.js";
+import vocabRoutes from "./routes/vocab.js";
 import { internalReminderRoutes, reminderRoutes } from "./routes/reminders.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { HttpError } from "./lib/HttpError.js";
@@ -37,6 +38,7 @@ app.use("/api/conversations", conversationRoutes);
 app.use("/api/cards", cardRoutes);
 app.use("/api/grammar", grammarRoutes);
 app.use("/api/stats", statsRoutes);
+app.use("/api/vocab", vocabRoutes);
 app.use("/api/reminders", reminderRoutes);
 app.use("/api/internal/reminders", internalReminderRoutes);
 

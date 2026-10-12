@@ -16,6 +16,7 @@ function toPublicCard(card: CardDoc) {
   const state = { easiness: card.easiness, interval: card.interval, repetitions: card.repetitions };
   return {
     id: card.id as string,
+    kind: card.kind ?? "fix",
     errorType: card.errorType,
     original: card.original,
     corrected: card.corrected,
