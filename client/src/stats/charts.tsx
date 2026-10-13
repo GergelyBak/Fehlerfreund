@@ -263,7 +263,7 @@ export function GrammarMeters({ topics, basePath = '/grammar' }: { topics: Stats
 
 function TopicMeters({ topics, basePath }: { topics: Stats['grammar']['topics']; basePath: string }) {
   return (
-    <ul className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
+    <ul className="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
       {topics.map((t) => {
         const pct = t.bestScore === null ? null : Math.round(t.bestScore * 100)
         return (

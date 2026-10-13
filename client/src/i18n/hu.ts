@@ -247,6 +247,11 @@ export const hu = {
     quizTab: (n: number) => `✏️ Teszt (${n} feladat)`,
     toQuiz: 'Tovább a teszthez →',
   },
+  crash: {
+    title: 'Hoppá, valami elromlott',
+    text: 'Ez az oldal most nem tudott megjelenni. Az adataid megvannak. Próbáld újratölteni, vagy válassz másik menüpontot.',
+    reload: 'Újratöltés',
+  },
   install: {
     title: '📲 Telepítsd a telefonodra',
     text: 'Saját ikonnal a kezdőképernyőn, böngészősáv nélkül, mint egy alkalmazás.',

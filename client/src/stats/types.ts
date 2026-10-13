@@ -24,7 +24,8 @@ export interface Stats {
   errorTypes: ErrorTypeStat[]
   cards: { total: number; due: number; new: number; learning: number; mature: number }
   grammar: TopicProgress
-  vocab: TopicProgress
+  // Missing from an older API version.
+  vocab?: TopicProgress
 }
 
 export interface TopicProgress {

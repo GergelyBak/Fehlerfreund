@@ -248,6 +248,11 @@ export const en: Messages = {
     quizTab: (n: number) => `✏️ Test (${n} ${n === 1 ? 'exercise' : 'exercises'})`,
     toQuiz: 'On to the test →',
   },
+  crash: {
+    title: 'Oops, something went wrong',
+    text: "This page couldn't be shown right now. Your data is safe. Try reloading, or pick another menu item.",
+    reload: 'Reload',
+  },
   install: {
     title: '📲 Install the app',
     text: 'Get its own icon on your home screen and use it without the browser bar, like an app.',

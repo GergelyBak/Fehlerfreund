@@ -6,6 +6,7 @@ import { onCardsChanged } from '../review/cardEvents'
 import type { CardStats } from '../review/types'
 import { useI18n } from '../i18n/context'
 import { LanguageSwitch } from '../i18n/LanguageSwitch'
+import { ErrorBoundary } from './ErrorBoundary'
 
 // Labels come from the messages (t.nav[key]); 'short' is the phone tab bar label.
 const NAV_ITEMS = [
@@ -44,6 +45,7 @@ function DueBadge({ due, className = '' }: { due: number | null; className?: str
 export function Layout() {
   const { user, logout } = useAuth()
   const { t } = useI18n()
+  const location = useLocation()
   const due = useDueCount()
   // Inside a conversation the chat gets the whole screen on phones; it has
   // its own back button.
@@ -93,7 +95,9 @@ export function Layout() {
           inChat ? '' : 'pb-[calc(5.5rem+env(safe-area-inset-bottom))] sm:pb-8'
         }`}
       >
-        <Outlet />
+        <ErrorBoundary key={location.pathname}>
+          <Outlet />
+        </ErrorBoundary>
       </main>
 
       {!inChat && (

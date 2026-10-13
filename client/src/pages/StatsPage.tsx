@@ -113,7 +113,7 @@ export function StatsPage() {
             </section>
           )}
 
-          <div className="grid items-start gap-6 lg:grid-cols-2">
+          <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
             <Card title={t.stats.errorsTitle} subtitle={t.stats.errorsSubtitle}>
               {stats.errorTypes.length ? (
                 <ErrorTypeBars items={stats.errorTypes} />
@@ -138,9 +138,12 @@ export function StatsPage() {
               <GrammarMeters topics={stats.grammar.topics} />
             </Card>
 
-            <Card title={t.stats.vocab} subtitle={t.stats.vocabSubtitle(stats.vocab.attempted, stats.vocab.passed)}>
-              <GrammarMeters topics={stats.vocab.topics} basePath="/vocab" />
-            </Card>
+            {/* Optional: an older API (mid-deploy) doesn't send it yet. */}
+            {stats.vocab && (
+              <Card title={t.stats.vocab} subtitle={t.stats.vocabSubtitle(stats.vocab.attempted, stats.vocab.passed)}>
+                <GrammarMeters topics={stats.vocab.topics} basePath="/vocab" />
+              </Card>
+            )}
           </div>
         </>
       )}
