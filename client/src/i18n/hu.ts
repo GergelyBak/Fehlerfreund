@@ -247,6 +247,13 @@ export const hu = {
     quizTab: (n: number) => `✏️ Teszt (${n} feladat)`,
     toQuiz: 'Tovább a teszthez →',
   },
+  install: {
+    title: '📲 Telepítsd a telefonodra',
+    text: 'Saját ikonnal a kezdőképernyőn, böngészősáv nélkül, mint egy alkalmazás.',
+    iosSteps: 'Safariban koppints a Megosztás gombra (négyzet felfelé nyíllal), majd válaszd: „Főképernyőhöz adás”.',
+    button: 'Telepítés',
+    dismiss: 'Bezárás',
+  },
   vocab: {
     title: '🔤 Szótár',
     intro:

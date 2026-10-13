@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   composeReminder,
   hasSomethingToSay,
+  huArticle,
   isReminderTime,
   localHour,
   unsubscribeToken,
@@ -88,6 +89,22 @@ describe("composeReminder", () => {
     const mail = composeReminder({ ...input, name: "<b>Anna</b>" });
     expect(mail.html).not.toContain("<b>Anna</b>");
     expect(mail.html).toContain("&#60;b&#62;Anna");
+  });
+});
+
+describe("huArticle", () => {
+  it("uses 'az' when the spoken number starts with a vowel", () => {
+    // egy, öt, ötven, ötszáz, ezer, ezerkétszáz
+    for (const n of [1, 5, 50, 500, 1000, 1200]) expect(huArticle(n), String(n)).toBe("az");
+    // kettő, tíz, tizenegy, tizenöt, száz, hétszáz
+    for (const n of [2, 10, 11, 15, 100, 700]) expect(huArticle(n), String(n)).toBe("a");
+  });
+
+  it("fixes the streak subject for a 1- or 5-day streak", () => {
+    const base = { name: "Anna", language: "hu", clientOrigin: "x", unsubscribeUrl: "y", dueCards: 0, practicedToday: false };
+    expect(composeReminder({ ...base, streak: 1 }).subject).toBe("Ne szakadjon meg az 1 napos sorozatod! 🔥");
+    expect(composeReminder({ ...base, streak: 5 }).subject).toBe("Ne szakadjon meg az 5 napos sorozatod! 🔥");
+    expect(composeReminder({ ...base, streak: 2 }).subject).toBe("Ne szakadjon meg a 2 napos sorozatod! 🔥");
   });
 });
 

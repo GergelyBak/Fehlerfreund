@@ -42,9 +42,18 @@ export function hasSomethingToSay(f: ReminderFacts) {
   return f.dueCards > 0 || (f.streak > 0 && !f.practicedToday);
 }
 
+/** Hungarian "a"/"az" before a number written in digits: "az" when the
+ *  spoken number starts with a vowel (egy, öt, ötven, ezer…). */
+export function huArticle(n: number) {
+  const digits = String(Math.trunc(Math.abs(n)));
+  const startsWithVowel =
+    n === 1 || digits.startsWith("5") || (digits.length % 3 === 1 && digits.length > 1 && digits.startsWith("1"));
+  return startsWithVowel ? "az" : "a";
+}
+
 const TEXT = {
   hu: {
-    subjectStreak: (s: number) => `Ne szakadjon meg a ${s} napos sorozatod! 🔥`,
+    subjectStreak: (s: number) => `Ne szakadjon meg ${huArticle(s)} ${s} napos sorozatod! 🔥`,
     subjectDue: (n: number) => `${n} kártya vár ismétlésre`,
     greeting: (name: string) => `Szia ${name}!`,
     due: (n: number) => `${n} kártya vár ismétlésre. Pár perc az egész.`,

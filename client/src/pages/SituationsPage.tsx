@@ -8,6 +8,7 @@ import { useLlmInfo } from '../chat/llmInfo'
 import { useSituations } from '../chat/useSituations'
 import type { Conversation, ConversationSummary } from '../chat/types'
 import { useI18n } from '../i18n/context'
+import { InstallBanner } from '../pwa/InstallBanner'
 
 export function SituationsPage() {
   const { user } = useAuth()
@@ -53,6 +54,7 @@ export function SituationsPage() {
             {t.situations.introAfter}
           </p>
         </div>
+        <InstallBanner />
         {llm?.available === false && (
           <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900 ring-1 ring-amber-200">
             😴 <strong>{t.situations.offlineTitle}</strong> {t.situations.offlineText(llm.model)}{' '}

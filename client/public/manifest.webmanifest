@@ -1,0 +1,23 @@
+{
+  "name": "Fehlerfreund – German from your mistakes",
+  "short_name": "Fehlerfreund",
+  "description": "Practise German in real-life conversations and learn from your own mistakes.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f8fafc",
+  "theme_color": "#ffffff",
+  "lang": "hu",
+  "categories": ["education"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Ismétlés / Review", "url": "/review", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Szótár / Vocabulary", "url": "/vocab", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

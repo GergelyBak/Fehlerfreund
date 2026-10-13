@@ -113,7 +113,7 @@ export function StatsPage() {
             </section>
           )}
 
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid items-start gap-6 lg:grid-cols-2">
             <Card title={t.stats.errorsTitle} subtitle={t.stats.errorsSubtitle}>
               {stats.errorTypes.length ? (
                 <ErrorTypeBars items={stats.errorTypes} />

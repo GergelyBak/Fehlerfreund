@@ -248,6 +248,13 @@ export const en: Messages = {
     quizTab: (n: number) => `✏️ Test (${n} ${n === 1 ? 'exercise' : 'exercises'})`,
     toQuiz: 'On to the test →',
   },
+  install: {
+    title: '📲 Install the app',
+    text: 'Get its own icon on your home screen and use it without the browser bar, like an app.',
+    iosSteps: 'In Safari, tap the Share button (square with an arrow), then choose "Add to Home Screen".',
+    button: 'Install',
+    dismiss: 'Dismiss',
+  },
   vocab: {
     title: '🔤 Vocabulary',
     intro:
