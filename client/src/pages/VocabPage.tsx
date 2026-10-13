@@ -27,7 +27,8 @@ export function VocabPage() {
 
   const themes = loaded?.themes ?? null
   const levels = [...new Set((themes ?? []).map((th) => th.level))]
-  const preferred = levels.includes(user?.level ?? '') ? user!.level : levels[0]
+  // The learner's own level if it has words yet, otherwise the highest level below it.
+  const preferred = levels.filter((l) => l <= (user?.level ?? 'A1')).at(-1) ?? levels[0]
   const level = params.get('level') ?? preferred ?? 'A1'
   const shown = (themes ?? []).filter((th) => th.level === level)
   const passed = shown.filter((th) => (th.progress?.bestScore ?? 0) >= PASS_SCORE).length

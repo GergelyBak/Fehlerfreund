@@ -44,9 +44,8 @@ describe("vocabulary content", () => {
     }
   });
 
-  it("has a realistic A1 size", () => {
-    const a1 = words.filter((w) => w.level === "A1").length;
-    expect(a1).toBeGreaterThanOrEqual(600);
+  it.each(["A1", "A2"])("has a realistic %s size", (level) => {
+    expect(words.filter((w) => w.level === level).length).toBeGreaterThanOrEqual(600);
   });
 });
 

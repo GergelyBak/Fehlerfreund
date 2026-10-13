@@ -254,7 +254,7 @@ export const en: Messages = {
       'The words for your level, by topic. Go through the list (you can listen to every word), then test yourself: wrong answers become cards in your review deck.',
     passed: (level: string, passed: number, total: number, pct: number) =>
       `${level}: ${passed} / ${total} topics passed (at least ${pct}%)`,
-    comingSoon: 'A2 and B1 vocabulary is coming soon.',
+    comingSoon: 'B1 vocabulary is coming soon.',
     words: (n: number) => `${n} ${n === 1 ? 'word' : 'words'}`,
     loadFailed: "Couldn't load the vocabulary.",
     themeLoadFailed: "Couldn't load the topic.",

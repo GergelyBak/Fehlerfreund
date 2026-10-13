@@ -253,7 +253,7 @@ export const hu = {
       'A szintednek megfelelő szókincs, témák szerint. Nézd át a szavakat (meg is hallgathatod őket), aztán teszteld magad: a rossz válaszaidból kártyák lesznek az ismétlőpakliban.',
     passed: (level: string, passed: number, total: number, pct: number) =>
       `${level}: ${passed} / ${total} téma teljesítve (legalább ${pct}%)`,
-    comingSoon: 'Az A2 és a B1 szint szókincse hamarosan érkezik.',
+    comingSoon: 'A B1 szint szókincse hamarosan érkezik.',
     words: (n: number) => `${n} szó`,
     loadFailed: 'Nem sikerült betölteni a szótárat.',
     themeLoadFailed: 'Nem sikerült betölteni a témát.',
