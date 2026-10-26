@@ -4,12 +4,14 @@ import { A2_PART1 } from "./a2/part1.js";
 import { A2_PART2 } from "./a2/part2.js";
 import { B1_PART1 } from "./b1/part1.js";
 import { B1_PART2 } from "./b1/part2.js";
+import { B1_PART3 } from "./b1/part3.js";
+import { B1_PART4 } from "./b1/part4.js";
 import { gradeWord, variants, type Verdict } from "./grade.js";
 import type { VocabTheme, VocabWord } from "./types.js";
 
 export type { VocabTheme, VocabWord } from "./types.js";
 
-export const VOCAB_THEMES: VocabTheme[] = [...A1_PART1, ...A1_PART2, ...A2_PART1, ...A2_PART2, ...B1_PART1, ...B1_PART2].sort(
+export const VOCAB_THEMES: VocabTheme[] = [...A1_PART1, ...A1_PART2, ...A2_PART1, ...A2_PART2, ...B1_PART1, ...B1_PART2, ...B1_PART3, ...B1_PART4].sort(
   (a, b) => a.level.localeCompare(b.level) || a.order - b.order,
 );
 

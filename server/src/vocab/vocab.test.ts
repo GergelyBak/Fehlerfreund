@@ -47,6 +47,10 @@ describe("vocabulary content", () => {
   it.each(["A1", "A2"])("has a realistic %s size", (level) => {
     expect(words.filter((w) => w.level === level).length).toBeGreaterThanOrEqual(600);
   });
+
+  it("has a realistic B1 size", () => {
+    expect(words.filter((w) => w.level === "B1").length).toBeGreaterThanOrEqual(1000);
+  });
 });
 
 describe("gradeWord", () => {
