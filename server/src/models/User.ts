@@ -14,6 +14,9 @@ const userSchema = new Schema(
     // can't be used to reset passwords.
     passwordResetTokenHash: { type: String, select: false },
     passwordResetExpires: { type: Date, select: false },
+    // Part of every login token. Bumping it (password change or reset,
+    // "sign out everywhere") makes all earlier tokens invalid.
+    sessionVersion: { type: Number, default: 0 },
     // Daily email reminder (sent by the n8n workflow). Opt-in.
     reminders: {
       enabled: { type: Boolean, default: false },

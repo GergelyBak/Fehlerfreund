@@ -23,14 +23,14 @@ You chat in real-life situations (Bürgeramt, doctor, flat viewing, job intervie
   - **Android** and desktop Chrome/Edge show a one-tap install button.
   - **iPhone** users get the Safari "Add to Home Screen" steps.
   - **Offline:** the service worker serves pages network-first with an offline fallback and caches the hashed assets. It never caches `/api`, so data is always live.
-- **Accounts.** JWT auth, password reset by email, and per-user progress.
+- **Accounts and profile.** JWT auth and password reset by email. The profile page covers name, level, language, the reminder and a password change. It can also sign out all other devices, download all your data as JSON, and delete the account with everything that belongs to it.
 
 ## Stack
 
 - **Client:** React 19, TypeScript, Tailwind CSS 4, Vite, React Router, Web Speech API
 - **Server:** Node.js, Express 5, TypeScript, MongoDB Atlas (Mongoose), Zod, Nodemailer
 - **LLM:** a local model via [Ollama](https://ollama.com) (default `gemma3:4b`), or the Claude API (`claude-sonnet-5`)
-- **Tests:** Vitest (220 tests) and a correction-quality eval
+- **Tests:** Vitest (223 tests) and a correction-quality eval
 
 ## Engineering notes
 
@@ -71,6 +71,7 @@ You chat in real-life situations (Bürgeramt, doctor, flat viewing, job intervie
   - There are per-user rate limits and a daily token budget.
   - The API key stays server-side only.
   - Password-reset tokens are single-use and stored hashed, and the reset endpoint doesn't reveal which emails have accounts.
+  - Every login token carries the account's session version, and three things raise it: a password change, a password reset, and "sign out everywhere". Any older token stops working at once, so a stolen session can be ended. A short in-process cache keeps the per-request check cheap.
   - Environment variables are validated at startup, and unhandled errors are logged loudly.
 
 ## Running locally

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { NavLink, Outlet, useLocation, useMatch } from 'react-router'
+import { Link, NavLink, Outlet, useLocation, useMatch } from 'react-router'
 import { api } from '../api/client'
 import { useAuth } from '../auth/useAuth'
 import { onCardsChanged } from '../review/cardEvents'
@@ -77,8 +77,22 @@ export function Layout() {
             </nav>
           </div>
           <div className="flex items-center gap-1 text-sm">
-            <span className="mr-2 hidden text-slate-500 md:inline">{user?.email}</span>
             <LanguageSwitch />
+            {/* Profile: the initial in a circle, plus the name on wider screens. */}
+            <Link
+              to="/profile"
+              aria-label={t.profile.open}
+              title={t.profile.open}
+              className="ml-1 flex min-h-9 items-center gap-2 rounded-lg px-1.5 text-slate-700 hover:bg-slate-100 md:pr-2.5"
+            >
+              <span
+                aria-hidden
+                className="grid size-8 place-items-center rounded-full bg-indigo-100 text-sm font-semibold text-indigo-700"
+              >
+                {user?.displayName?.trim().charAt(0).toUpperCase() || '?'}
+              </span>
+              <span className="hidden max-w-[10rem] truncate md:inline">{user?.displayName}</span>
+            </Link>
             <button
               onClick={logout}
               className="rounded-lg px-3 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900"

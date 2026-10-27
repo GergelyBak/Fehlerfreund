@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from "node:crypto";
-import { Router } from "express";
+import { Router, type Response } from "express";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { env } from "../config/env.js";
@@ -7,7 +7,13 @@ import { User, LEVELS, NATIVE_LANGUAGES, type UserDoc } from "../models/User.js"
 import { validateBody } from "../middleware/validate.js";
 import { requireAuth } from "../middleware/requireAuth.js";
 import { authLimiter, resetLimiter } from "../middleware/rateLimit.js";
-import { AUTH_COOKIE, authCookieOptions, signToken } from "../lib/jwt.js";
+import { AUTH_COOKIE, authCookieOptions, clearCookieOptions, signToken } from "../lib/jwt.js";
+import { rememberSessionVersion } from "../lib/sessionCache.js";
+import { Card } from "../models/Card.js";
+import { Conversation } from "../models/Conversation.js";
+import { GrammarProgress } from "../models/GrammarProgress.js";
+import { ReviewLog } from "../models/ReviewLog.js";
+import { TokenUsage } from "../models/TokenUsage.js";
 import { HttpError } from "../lib/HttpError.js";
 import { passwordResetMail, sendMail } from "../lib/mailer.js";
 import { isValidTimeZone } from "../stats/compute.js";
@@ -63,7 +69,7 @@ router.post("/register", authLimiter, validateBody(RegisterSchema), async (req, 
     throw new HttpError(409, "Email already registered");
   }
   const user = await User.create({ ...data, passwordHash: await bcrypt.hash(password, 12) });
-  res.cookie(AUTH_COOKIE, signToken(user.id), authCookieOptions);
+  res.cookie(AUTH_COOKIE, signToken(user.id, user.sessionVersion ?? 0), authCookieOptions);
   res.status(201).json({ user: toPublic(user) });
 });
 
@@ -73,13 +79,12 @@ router.post("/login", authLimiter, validateBody(LoginSchema), async (req, res) =
   if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
     throw new HttpError(401, "Invalid email or password");
   }
-  res.cookie(AUTH_COOKIE, signToken(user.id), authCookieOptions);
+  res.cookie(AUTH_COOKIE, signToken(user.id, user.sessionVersion ?? 0), authCookieOptions);
   res.json({ user: toPublic(user) });
 });
 
 router.post("/logout", (_req, res) => {
-  const { maxAge: _maxAge, ...clearOptions } = authCookieOptions;
-  res.clearCookie(AUTH_COOKIE, clearOptions);
+  res.clearCookie(AUTH_COOKIE, clearCookieOptions);
   res.status(204).end();
 });
 
@@ -97,6 +102,82 @@ router.patch("/me", requireAuth, validateBody(UpdateMeSchema), async (req, res) 
   const user = await User.findByIdAndUpdate(req.userId, { $set: update }, { new: true, runValidators: true });
   if (!user) throw new HttpError(401, "User no longer exists");
   res.json({ user: toPublic(user) });
+});
+
+// --- Account security and data (profile page) ---
+
+/** The signed-in user with the password hash, after checking the password. */
+async function confirmPassword(userId: string, password: string) {
+  const user = await User.findById(userId).select("+passwordHash");
+  if (!user) throw new HttpError(401, "User no longer exists");
+  if (!(await bcrypt.compare(password, user.passwordHash))) throw new HttpError(400, "Wrong password");
+  return user;
+}
+
+/** Revokes every existing login of this user and signs this browser in again. */
+async function newSession(user: UserDoc, res: Response) {
+  user.sessionVersion = (user.sessionVersion ?? 0) + 1;
+  await user.save();
+  rememberSessionVersion(user.id, user.sessionVersion);
+  res.cookie(AUTH_COOKIE, signToken(user.id, user.sessionVersion), authCookieOptions);
+}
+
+const ChangePasswordSchema = z.object({
+  currentPassword: z.string().min(1),
+  newPassword: z.string().min(8, "At least 8 characters"),
+});
+
+router.post("/me/password", requireAuth, authLimiter, validateBody(ChangePasswordSchema), async (req, res) => {
+  const { currentPassword, newPassword } = req.body as z.infer<typeof ChangePasswordSchema>;
+  const user = await confirmPassword(req.userId!, currentPassword);
+  user.passwordHash = await bcrypt.hash(newPassword, 12);
+  // Other devices signed in with the old password are signed out.
+  await newSession(user, res);
+  res.json({ user: toPublic(user) });
+});
+
+router.post("/logout-all", requireAuth, async (req, res) => {
+  const user = await User.findById(req.userId);
+  if (!user) throw new HttpError(401, "User no longer exists");
+  await newSession(user, res);
+  res.json({ ok: true });
+});
+
+// Everything stored about the learner, as one JSON file (data portability).
+router.get("/me/export", requireAuth, async (req, res) => {
+  const userId = req.userId!;
+  const [user, conversations, cards, progress, reviews] = await Promise.all([
+    User.findById(userId).lean(),
+    Conversation.find({ userId }).lean(),
+    Card.find({ userId }).lean(),
+    GrammarProgress.find({ userId }).lean(),
+    ReviewLog.find({ userId }).lean(),
+  ]);
+  if (!user) throw new HttpError(401, "User no longer exists");
+  const { passwordResetTokenHash: _t, passwordResetExpires: _e, ...account } = user as typeof user & Record<string, unknown>;
+  const date = new Date().toISOString().slice(0, 10);
+  res.setHeader("Content-Disposition", `attachment; filename="fehlerfreund-export-${date}.json"`);
+  res.json({ exportedAt: new Date().toISOString(), account, conversations, cards, progress, reviews });
+});
+
+const DeleteSchema = z.object({ password: z.string().min(1) });
+
+// Deletes the account and everything that belongs to it. Cannot be undone.
+router.delete("/me", requireAuth, authLimiter, validateBody(DeleteSchema), async (req, res) => {
+  const { password } = req.body as z.infer<typeof DeleteSchema>;
+  const user = await confirmPassword(req.userId!, password);
+  const userId = user._id;
+  await Promise.all([
+    Conversation.deleteMany({ userId }),
+    Card.deleteMany({ userId }),
+    GrammarProgress.deleteMany({ userId }),
+    ReviewLog.deleteMany({ userId }),
+    TokenUsage.deleteMany({ userId }),
+  ]);
+  await User.deleteOne({ _id: userId });
+  rememberSessionVersion(user.id, null);
+  res.clearCookie(AUTH_COOKIE, clearCookieOptions);
+  res.status(204).end();
 });
 
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
@@ -140,9 +221,12 @@ router.post("/reset-password", authLimiter, validateBody(ResetSchema), async (re
   // Single use: the same link can't reset the password twice.
   user.passwordResetTokenHash = undefined;
   user.passwordResetExpires = undefined;
+  // Whoever had the old password may still be signed in somewhere: end those sessions.
+  user.sessionVersion = (user.sessionVersion ?? 0) + 1;
   await user.save();
+  rememberSessionVersion(user.id, user.sessionVersion);
 
-  res.cookie(AUTH_COOKIE, signToken(user.id), authCookieOptions);
+  res.cookie(AUTH_COOKIE, signToken(user.id, user.sessionVersion ?? 0), authCookieOptions);
   res.json({ user: toPublic(user) });
 });
 

@@ -11,6 +11,8 @@ export interface AuthState {
   logout: () => Promise<void>
   resetPassword: (token: string, password: string) => Promise<void>
   updateMe: (patch: UserUpdate) => Promise<void>
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>
+  deleteAccount: (password: string) => Promise<void>
 }
 
 export const AuthContext = createContext<AuthState | null>(null)

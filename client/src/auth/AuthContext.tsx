@@ -80,8 +80,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(user)
   }, [])
 
+  // The server signs out every other device and sends this one a fresh login.
+  const changePassword = useCallback(async (currentPassword: string, newPassword: string) => {
+    const { user } = await api<{ user: User }>('/auth/me/password', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    })
+    setUser(user)
+  }, [])
+
+  const deleteAccount = useCallback(async (password: string) => {
+    await api('/auth/me', { method: 'DELETE', body: JSON.stringify({ password }) })
+    setUser(null)
+  }, [])
+
   return (
-    <AuthContext.Provider value={{ user, loading, waking, login, register, logout, resetPassword, updateMe }}>
+    <AuthContext.Provider
+      value={{ user, loading, waking, login, register, logout, resetPassword, updateMe, changePassword, deleteAccount }}
+    >
       {children}
     </AuthContext.Provider>
   )

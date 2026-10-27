@@ -9,6 +9,7 @@ import { GrammarPage } from './pages/GrammarPage'
 import { GrammarTopicPage } from './pages/GrammarTopicPage'
 import { SituationsPage } from './pages/SituationsPage'
 import { StatsPage } from './pages/StatsPage'
+import { ProfilePage } from './pages/ProfilePage'
 import { VocabPage } from './pages/VocabPage'
 import { VocabThemePage } from './pages/VocabThemePage'
 import { LoginPage } from './pages/LoginPage'
@@ -36,6 +37,7 @@ export default function App() {
               <Route path="vocab" element={<VocabPage />} />
               <Route path="vocab/:id" element={<VocabThemePage />} />
               <Route path="stats" element={<StatsPage />} />
+              <Route path="profile" element={<ProfilePage />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
