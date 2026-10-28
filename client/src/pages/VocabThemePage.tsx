@@ -9,8 +9,9 @@ import { activeMessages, useI18n } from '../i18n/context'
 import { notifyCardsChanged } from '../review/cardEvents'
 import { SpeakButtons } from '../speech/SpeakButtons'
 import type { Theme, VocabCheckResponse, Word, WordResult } from '../vocab/types'
+import { PronunciationPractice } from '../vocab/PronunciationPractice'
 
-type Tab = 'words' | 'test'
+type Tab = 'words' | 'test' | 'speak'
 
 // What to read aloud: the first variant ("der Lehrer / die Lehrerin" → "der Lehrer").
 const spoken = (word: Word) => word.de.split(' / ')[0]!
@@ -76,6 +77,7 @@ export function VocabThemePage() {
           [
             ['words', t.vocab.wordsTab(theme.words.length)],
             ['test', t.vocab.testTab],
+            ['speak', t.pronunciation.tab],
           ] as const
         ).map(([key, label]) => (
           <button
@@ -102,9 +104,11 @@ export function VocabThemePage() {
             {t.vocab.toTest}
           </button>
         </>
-      ) : (
+      ) : tab === 'test' ? (
         // Remounting on every visit (or language switch) reshuffles the words.
         <VocabTest key={theme.id + lang} theme={theme} onChecked={setProgress} />
+      ) : (
+        <PronunciationPractice key={theme.id} sentences={theme.words.map((w) => w.example)} />
       )}
     </div>
   )

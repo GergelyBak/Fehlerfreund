@@ -13,6 +13,7 @@ You chat in real-life situations (Bürgeramt, doctor, flat viewing, job intervie
 - **Roleplay chat.** 10 situations, each with 3 goals to tick off and useful phrases that insert into the message box. Replies stream live.
 - **Correction on every message.** Error type (`Kasus`, `Tempus`, `Wortstellung`…), the fix, and a short explanation in Hungarian or English.
 - **English and Hungarian UI.** The app, situations, emails and explanations follow the account's language. A HU/EN switch in the header changes it instantly. Before sign-in, the browser language decides. The grammar lessons themselves are in Hungarian for now.
+- **Pronunciation practice.** Every vocabulary topic has a 🎤 tab: listen to an example sentence, say it, and see word by word what the browser's speech recognizer understood, with a score. The chat has a 🎤 dictation button too. It uses the free built-in Web Speech API, works in Chrome, Edge, Android and Safari, and shows a notice where speech recognition isn't available.
 - **Translate and listen.** Translate any partner message into your language on demand. German is read aloud at normal or slow speed, with optional auto-read.
 - **Flashcards with SM-2.** Chat mistakes and wrong grammar answers become cards. The review page has keyboard grading, and forgotten cards come back within the same session.
 - **Vocabulary by level.** 2,394 words: 663 for A1 and 670 for A2 in 25 topics each, and 1,061 for B1 in 40 topics (career, healthcare, society, politics, law, opinions, idioms, verbs with prepositions, formal letters…). Every word has its article and plural, Hungarian and English translations, an example sentence and read-aloud. Each topic has a test (translation → German), and wrong answers become "say it in German" cards. A wrong article on the right noun is graded separately and filed under `Artikel`, so the statistics show whether you don't know the word or just its gender. The list is the project's own, sized to the Goethe exam levels; it isn't copied from them.
@@ -30,7 +31,7 @@ You chat in real-life situations (Bürgeramt, doctor, flat viewing, job intervie
 - **Client:** React 19, TypeScript, Tailwind CSS 4, Vite, React Router, Web Speech API
 - **Server:** Node.js, Express 5, TypeScript, MongoDB Atlas (Mongoose), Zod, Nodemailer
 - **LLM:** a local model via [Ollama](https://ollama.com) (default `gemma3:4b`), or the Claude API (`claude-sonnet-5`)
-- **Tests:** Vitest (223 tests) and a correction-quality eval
+- **Tests:** Vitest (223 server and 9 client tests) and a correction-quality eval
 
 ## Engineering notes
 
@@ -117,5 +118,5 @@ The public demo runs on free tiers: the client on **Vercel** (`client/vercel.jso
 
 ## Next
 
-- Pronunciation practice with speech recognition
+- Automated browser tests (Playwright) in CI
 - Higher recall from local models (word order and article gender are still the weak spots)

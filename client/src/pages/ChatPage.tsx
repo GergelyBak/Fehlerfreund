@@ -10,6 +10,7 @@ import { SituationPanel } from '../chat/SituationPanel'
 import { useSituations } from '../chat/useSituations'
 import { notifyCardsChanged } from '../review/cardEvents'
 import { AutoReadToggle } from '../speech/AutoReadToggle'
+import { DictateButton } from '../speech/DictateButton'
 import { RATE_NORMAL, loadAutoRead, saveAutoRead, speak, stopSpeaking } from '../speech/speech'
 import type { ChatMessage, Conversation, Phrase, StoredCorrection } from '../chat/types'
 import { activeMessages, useI18n } from '../i18n/context'
@@ -288,7 +289,14 @@ export function ChatPage() {
               title={t.chat.inputTitle}
               // Phone keyboards show a "send" key instead of a plain return.
               enterKeyHint="send"
-              className="flex-1 resize-none rounded-xl border border-slate-300 bg-white px-3 py-2 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+              className="min-w-0 flex-1 resize-none rounded-xl border border-slate-300 bg-white px-3 py-2 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+            />
+            <DictateButton
+              disabled={sending}
+              onText={(spoken) => {
+                setInput((current) => (current.trim() ? `${current.trimEnd()} ${spoken}` : spoken))
+                inputRef.current?.focus()
+              }}
             />
             <button
               type="submit"
