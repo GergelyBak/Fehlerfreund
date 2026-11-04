@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import type { RegisterInput, User, UserUpdate } from './types'
+import type { NativeLanguage, RegisterInput, User, UserUpdate } from './types'
 
 export interface AuthState {
   user: User | null
@@ -8,6 +8,7 @@ export interface AuthState {
   waking: boolean
   login: (email: string, password: string) => Promise<void>
   register: (input: RegisterInput) => Promise<void>
+  startDemo: (language: NativeLanguage) => Promise<void>
   logout: () => Promise<void>
   resetPassword: (token: string, password: string) => Promise<void>
   updateMe: (patch: UserUpdate) => Promise<void>

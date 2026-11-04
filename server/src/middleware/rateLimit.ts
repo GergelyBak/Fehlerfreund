@@ -18,6 +18,15 @@ export const resetLimiter = rateLimit({
   message: { error: "Too many attempts, try again later" },
 });
 
+// Each demo creates an account with sample data, so keep a lid on them.
+export const demoLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 10,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { error: "Too many attempts, try again later" },
+});
+
 // Per-user limit for Claude-backed endpoints (mount after requireAuth).
 export const aiLimiter = rateLimit({
   windowMs: 60 * 1000,

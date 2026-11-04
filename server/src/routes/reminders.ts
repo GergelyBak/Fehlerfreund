@@ -70,7 +70,7 @@ async function activeDays(userId: Types.ObjectId, tz: string, now: Date) {
 internalReminderRoutes.get("/", async (req, res) => {
   const now = new Date();
   const ignoreTime = req.query.ignoreTime === "1";
-  const users = await User.find({ "reminders.enabled": true });
+  const users = await User.find({ "reminders.enabled": true, demoExpiresAt: { $exists: false } });
 
   const reminders = [];
   for (const user of users) {

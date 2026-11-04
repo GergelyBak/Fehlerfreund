@@ -283,6 +283,13 @@ export const hu = {
     deleting: 'Törlés…',
     exportFailed: 'Nem sikerült letölteni az adataidat.',
   },
+  demo: {
+    start: 'Kipróbálom regisztráció nélkül',
+    starting: 'Demó indítása…',
+    hint: 'Mintaadatokkal feltöltött, ideiglenes fiók. Csak te látod.',
+    banner: 'Demó mód: mintaadatokat látsz, és a fiók 24 óra után törlődik.',
+    register: 'Saját fiók létrehozása',
+  },
   crash: {
     title: 'Hoppá, valami elromlott',
     text: 'Ez az oldal most nem tudott megjelenni. Az adataid megvannak. Próbáld újratölteni, vagy válassz másik menüpontot.',

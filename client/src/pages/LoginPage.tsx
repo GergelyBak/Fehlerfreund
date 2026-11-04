@@ -9,8 +9,8 @@ import { useI18n } from '../i18n/context'
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export function LoginPage() {
-  const { user, login } = useAuth()
-  const { t } = useI18n()
+  const { user, login, startDemo, waking } = useAuth()
+  const { t, lang } = useI18n()
   const navigate = useNavigate()
   const location = useLocation()
   const [email, setEmail] = useState('')
@@ -18,6 +18,7 @@ export function LoginPage() {
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({})
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [startingDemo, setStartingDemo] = useState(false)
 
   const from = (location.state as { from?: string } | null)?.from ?? '/'
   if (user) return <Navigate to={from} replace />
@@ -43,6 +44,18 @@ export function LoginPage() {
       setPassword('')
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  async function tryDemo() {
+    setError(null)
+    setStartingDemo(true)
+    try {
+      await startDemo(lang)
+      navigate('/', { replace: true })
+    } catch (err) {
+      setError(errorMessage(err))
+      setStartingDemo(false)
     }
   }
 
@@ -80,6 +93,17 @@ export function LoginPage() {
           {submitting ? t.login.submitting : t.login.submit}
         </Button>
       </form>
+      <div className="space-y-2 border-t border-slate-200 pt-5 text-center">
+        <button
+          type="button"
+          onClick={() => void tryDemo()}
+          disabled={startingDemo || waking}
+          className="w-full rounded-lg px-4 py-2.5 font-medium text-indigo-700 ring-1 ring-indigo-200 hover:bg-indigo-50 disabled:opacity-60"
+        >
+          {startingDemo ? t.demo.starting : `👀 ${t.demo.start}`}
+        </button>
+        <p className="text-xs text-slate-500">{t.demo.hint}</p>
+      </div>
       <p className="text-center text-sm text-slate-600">
         {t.login.noAccount}{' '}
         <Link to="/register" className="font-medium text-indigo-600 hover:underline">

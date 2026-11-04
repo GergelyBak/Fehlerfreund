@@ -13,7 +13,8 @@ export function ReminderSettings() {
   const { t } = useI18n()
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  if (!user) return null
+  // A demo account has no mailbox to remind.
+  if (!user || user.demo) return null
   const { enabled, hour } = user.reminders
 
   async function save(patch: Partial<Settings>) {

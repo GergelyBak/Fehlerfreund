@@ -6,8 +6,7 @@ import { Conversation } from "../models/Conversation.js";
 import { GrammarProgress } from "../models/GrammarProgress.js";
 import { ReviewLog } from "../models/ReviewLog.js";
 import { GRAMMAR_TOPICS } from "../grammar/index.js";
-import { VOCAB_THEMES } from "../vocab/index.js";
-import { vocabProgressId } from "./vocab.js";
+import { VOCAB_THEMES, vocabProgressId } from "../vocab/index.js";
 import { ERROR_TYPES, type ErrorType } from "../llm/correctionSchema.js";
 import {
   MATURE_INTERVAL_DAYS,

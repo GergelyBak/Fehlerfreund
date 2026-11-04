@@ -7,6 +7,8 @@ export interface User {
   displayName: string
   nativeLanguage: NativeLanguage
   level: Level
+  // A temporary account with sample data, without a password.
+  demo: boolean
   reminders: ReminderSettings
 }
 

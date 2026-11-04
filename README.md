@@ -4,7 +4,7 @@
 
 A German conversation partner that teaches from your own mistakes.
 
-**Live demo: [fehlerfreund.vercel.app](https://fehlerfreund.vercel.app)**. Register with any email. The chat runs on a free model on the developer's own machine, so it's only online while that machine is on. The app says when it's offline (see [Deployment](#deployment)). The first load can take up to a minute while the free API wakes up.
+**Live demo: [fehlerfreund.vercel.app](https://fehlerfreund.vercel.app)**. Press "Try it without registering" for a private 24-hour account filled with sample conversations, cards and statistics, or register with any email. The chat runs on a free model on the developer's own machine, so it's only online while that machine is on. The app says when it's offline (see [Deployment](#deployment)), and the sample data works either way. The first load can take up to a minute while the free API wakes up.
 
 You chat in real-life situations (Bürgeramt, doctor, flat viewing, job interview…) at your CEFR level. An LLM plays the other side and corrects each message, with an explanation in your native language. Your mistakes become flashcards, and an SM-2 spaced-repetition scheduler brings them back for review. There is also a textbook-style A1–B1 grammar course and a vocabulary trainer by level and topic, and your wrong test answers go into the same deck.
 
@@ -25,13 +25,14 @@ You chat in real-life situations (Bürgeramt, doctor, flat viewing, job intervie
   - **iPhone** users get the Safari "Add to Home Screen" steps.
   - **Offline:** the service worker serves pages network-first with an offline fallback and caches the hashed assets. It never caches `/api`, so data is always live.
 - **Accounts and profile.** JWT auth and password reset by email. The profile page covers name, level, language, the reminder and a password change. It can also sign out all other devices, download all your data as JSON, and delete the account with everything that belongs to it.
+- **Demo without registering.** One click creates a private account with two weeks of sample history in the visitor's language, so nobody sees or disturbs anyone else's data. It has no password and no mailbox, is rate-limited per IP, and is deleted with all its data after 24 hours.
 
 ## Stack
 
 - **Client:** React 19, TypeScript, Tailwind CSS 4, Vite, React Router, Web Speech API
 - **Server:** Node.js, Express 5, TypeScript, MongoDB Atlas (Mongoose), Zod, Nodemailer
 - **LLM:** a local model via [Ollama](https://ollama.com) (default `gemma3:4b`), or the Claude API (`claude-sonnet-5`)
-- **Tests:** Vitest (223 server and 9 client tests) and a correction-quality eval
+- **Tests:** Vitest (231 server and 9 client tests) and a correction-quality eval
 
 ## Engineering notes
 

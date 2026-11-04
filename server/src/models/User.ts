@@ -17,6 +17,8 @@ const userSchema = new Schema(
     // Part of every login token. Bumping it (password change or reset,
     // "sign out everywhere") makes all earlier tokens invalid.
     sessionVersion: { type: Number, default: 0 },
+    // Set on demo accounts only: they are deleted after this moment.
+    demoExpiresAt: Date,
     // Daily email reminder (sent by the n8n workflow). Opt-in.
     reminders: {
       enabled: { type: Boolean, default: false },
@@ -28,6 +30,8 @@ const userSchema = new Schema(
   },
   { timestamps: true },
 );
+
+userSchema.index({ demoExpiresAt: 1 }, { sparse: true });
 
 export type UserDoc = HydratedDocument<InferSchemaType<typeof userSchema>>;
 export const User = model("User", userSchema);

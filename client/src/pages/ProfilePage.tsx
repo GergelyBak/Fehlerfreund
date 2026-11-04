@@ -12,6 +12,7 @@ import { ReminderSettings } from '../stats/ReminderSettings'
 const MIN_PASSWORD = 8
 
 export function ProfilePage() {
+  const { user } = useAuth()
   const { t } = useI18n()
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -21,10 +22,15 @@ export function ProfilePage() {
       </div>
       <DetailsCard />
       <ReminderSettings />
-      <PasswordCard />
-      <SessionsCard />
-      <DataCard />
-      <DeleteCard />
+      {/* A demo account has no password, and it deletes itself anyway. */}
+      {!user?.demo && (
+        <>
+          <PasswordCard />
+          <SessionsCard />
+          <DataCard />
+          <DeleteCard />
+        </>
+      )}
     </div>
   )
 }
@@ -66,9 +72,11 @@ function DetailsCard() {
   return (
     <Card title={t.profile.detailsTitle} subtitle={t.profile.detailsSubtitle}>
       <form onSubmit={save} className="space-y-4">
-        <Field label={t.form.email} htmlFor="profile-email">
-          <Input id="profile-email" value={user.email} disabled />
-        </Field>
+        {!user.demo && (
+          <Field label={t.form.email} htmlFor="profile-email">
+            <Input id="profile-email" value={user.email} disabled />
+          </Field>
+        )}
         <Field label={t.profile.name} htmlFor="profile-name">
           <Input
             id="profile-name"

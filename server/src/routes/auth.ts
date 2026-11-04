@@ -6,15 +6,16 @@ import { env } from "../config/env.js";
 import { User, LEVELS, NATIVE_LANGUAGES, type UserDoc } from "../models/User.js";
 import { validateBody } from "../middleware/validate.js";
 import { requireAuth } from "../middleware/requireAuth.js";
-import { authLimiter, resetLimiter } from "../middleware/rateLimit.js";
+import { authLimiter, demoLimiter, resetLimiter } from "../middleware/rateLimit.js";
 import { AUTH_COOKIE, authCookieOptions, clearCookieOptions, signToken } from "../lib/jwt.js";
 import { rememberSessionVersion } from "../lib/sessionCache.js";
 import { Card } from "../models/Card.js";
 import { Conversation } from "../models/Conversation.js";
 import { GrammarProgress } from "../models/GrammarProgress.js";
 import { ReviewLog } from "../models/ReviewLog.js";
-import { TokenUsage } from "../models/TokenUsage.js";
 import { HttpError } from "../lib/HttpError.js";
+import { deleteAccountData } from "../lib/accountData.js";
+import { createDemoAccount, removeExpiredDemos } from "../demo/account.js";
 import { passwordResetMail, sendMail } from "../lib/mailer.js";
 import { isValidTimeZone } from "../stats/compute.js";
 
@@ -55,6 +56,7 @@ function toPublic(user: UserDoc) {
     displayName: user.displayName,
     nativeLanguage: user.nativeLanguage,
     level: user.level,
+    demo: Boolean(user.demoExpiresAt),
     reminders: {
       enabled: user.reminders?.enabled ?? false,
       hour: user.reminders?.hour ?? 18,
@@ -81,6 +83,18 @@ router.post("/login", authLimiter, validateBody(LoginSchema), async (req, res) =
   }
   res.cookie(AUTH_COOKIE, signToken(user.id, user.sessionVersion ?? 0), authCookieOptions);
   res.json({ user: toPublic(user) });
+});
+
+const DemoSchema = z.object({ language: z.enum(NATIVE_LANGUAGES).default("hu") });
+
+// Try the app without registering: a private, temporary account with sample
+// data. The sample conversations also work while the language model is offline.
+router.post("/demo", demoLimiter, validateBody(DemoSchema), async (req, res) => {
+  const { language } = req.body as z.infer<typeof DemoSchema>;
+  await removeExpiredDemos();
+  const user = await createDemoAccount(language);
+  res.cookie(AUTH_COOKIE, signToken(user.id, user.sessionVersion ?? 0), authCookieOptions);
+  res.status(201).json({ user: toPublic(user) });
 });
 
 router.post("/logout", (_req, res) => {
@@ -167,13 +181,7 @@ router.delete("/me", requireAuth, authLimiter, validateBody(DeleteSchema), async
   const { password } = req.body as z.infer<typeof DeleteSchema>;
   const user = await confirmPassword(req.userId!, password);
   const userId = user._id;
-  await Promise.all([
-    Conversation.deleteMany({ userId }),
-    Card.deleteMany({ userId }),
-    GrammarProgress.deleteMany({ userId }),
-    ReviewLog.deleteMany({ userId }),
-    TokenUsage.deleteMany({ userId }),
-  ]);
+  await deleteAccountData([userId]);
   await User.deleteOne({ _id: userId });
   rememberSessionVersion(user.id, null);
   res.clearCookie(AUTH_COOKIE, clearCookieOptions);

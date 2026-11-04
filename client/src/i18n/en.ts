@@ -284,6 +284,13 @@ export const en: Messages = {
     deleting: 'Deleting…',
     exportFailed: "Couldn't download your data.",
   },
+  demo: {
+    start: 'Try it without registering',
+    starting: 'Starting the demo…',
+    hint: 'A temporary account filled with sample data. Only you can see it.',
+    banner: "Demo mode: you're looking at sample data, and this account is deleted after 24 hours.",
+    register: 'Create your own account',
+  },
   crash: {
     title: 'Oops, something went wrong',
     text: "This page couldn't be shown right now. Your data is safe. Try reloading, or pick another menu item.",

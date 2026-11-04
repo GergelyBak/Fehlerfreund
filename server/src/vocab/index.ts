@@ -15,6 +15,11 @@ export const VOCAB_THEMES: VocabTheme[] = [...A1_PART1, ...A1_PART2, ...A2_PART1
   (a, b) => a.level.localeCompare(b.level) || a.order - b.order,
 );
 
+// Vocabulary progress shares the grammar progress collection under a
+// "vocab:" prefix, so vocabulary tests count for the streak, the statistics
+// and the daily reminder without extra plumbing.
+export const vocabProgressId = (themeId: string) => `vocab:${themeId}`;
+
 export function getTheme(id: string) {
   return VOCAB_THEMES.find((t) => t.id === id);
 }

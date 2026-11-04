@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { api, ApiError, SERVER_UNREACHABLE } from '../api/client'
-import type { RegisterInput, User, UserUpdate } from './types'
+import type { NativeLanguage, RegisterInput, User, UserUpdate } from './types'
 import { AuthContext } from './useAuth'
 
 const WAKE_TIMEOUT_MS = 90_000
@@ -58,6 +58,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(user)
   }, [])
 
+  const startDemo = useCallback(async (language: NativeLanguage) => {
+    const { user } = await api<{ user: User }>('/auth/demo', {
+      method: 'POST',
+      body: JSON.stringify({ language }),
+    })
+    setUser(user)
+  }, [])
+
   const logout = useCallback(async () => {
     await api('/auth/logout', { method: 'POST' })
     setUser(null)
@@ -96,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, waking, login, register, logout, resetPassword, updateMe, changePassword, deleteAccount }}
+      value={{ user, loading, waking, login, register, startDemo, logout, resetPassword, updateMe, changePassword, deleteAccount }}
     >
       {children}
     </AuthContext.Provider>

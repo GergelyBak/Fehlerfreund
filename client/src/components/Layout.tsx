@@ -103,6 +103,20 @@ export function Layout() {
         </div>
       </header>
 
+      {user?.demo && !inChat && (
+        <div className="bg-amber-50 px-4 py-2 text-center text-sm text-amber-900 ring-1 ring-amber-200">
+          {t.demo.banner}{' '}
+          <button
+            type="button"
+            // A full page load, so nothing of the demo session stays in memory.
+            onClick={() => void logout().then(() => window.location.assign('/register'))}
+            className="font-medium underline"
+          >
+            {t.demo.register}
+          </button>
+        </div>
+      )}
+
       <main
         className={`mx-auto max-w-5xl px-4 py-4 sm:py-8 ${
           // Room for the bottom tab bar (and the iPhone home indicator) on phones.

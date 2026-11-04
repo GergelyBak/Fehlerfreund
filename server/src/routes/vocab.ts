@@ -5,16 +5,11 @@ import { validateBody } from "../middleware/validate.js";
 import { HttpError } from "../lib/HttpError.js";
 import { GrammarProgress } from "../models/GrammarProgress.js";
 import { User } from "../models/User.js";
-import { VOCAB_THEMES, getTheme, gradeTheme, toPublicTheme, translationOf } from "../vocab/index.js";
+import { VOCAB_THEMES, getTheme, gradeTheme, toPublicTheme, translationOf, vocabProgressId } from "../vocab/index.js";
 import { upsertCards } from "../srs/cards.js";
 
 const router = Router();
 router.use(requireAuth);
-
-// Vocabulary progress shares the grammar progress collection under a
-// "vocab:" prefix, so vocabulary tests count for the streak, the statistics
-// and the daily reminder without extra plumbing.
-export const vocabProgressId = (themeId: string) => `vocab:${themeId}`;
 
 const langOf = (q: unknown) => (q === "en" ? "en" : "hu");
 
